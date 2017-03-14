@@ -23,8 +23,8 @@ typedef struct
         char projectId [ M1_CONFIG_VALUE_LENGTH ];
         char userId [ M1_CONFIG_VALUE_LENGTH ];
         char password [ M1_CONFIG_VALUE_LENGTH ];
-//        char hostName [ M1_API_KEY_VALUE_LENGTH ];
-//        unsigned int port;
+        char hostName [ M1_API_KEY_VALUE_LENGTH ];
+        unsigned int port;
 
 } MediumOneDeviceCredentials_t;
 

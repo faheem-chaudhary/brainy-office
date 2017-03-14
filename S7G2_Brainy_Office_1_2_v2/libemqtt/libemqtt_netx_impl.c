@@ -85,20 +85,16 @@ int init_netx_socket ( mqtt_broker_handle_t* broker, const char* hostname, unsig
     if ( socketStatus < 0 )
         return -1;
 
-    // Disable Nagle Algorithm
+    // Disable Nagle Algorithm ... disabling this because NetX BSD has this as default option
 //    socketStatus = setsockopt ( socket_id, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof ( flag ) );
 //    if ( socketStatus < 0 )
 //        return -2;
 
-    struct sockaddr_in socket_address, socket_address1;
+    struct sockaddr_in socket_address;
     // Create the stuff we need to connect
-    socket_address1.sin_family = AF_INET;
-    socket_address1.sin_port = htons ( port );
-    socket_address1.sin_addr.s_addr = inet_addr ( hostname );
-
-    socket_address.sin_family = PF_INET;
-    socket_address.sin_port = port;
-    socket_address.sin_addr.s_addr = htonl ( 0x8F675C0B ); //IP: 143.103.92.11
+    socket_address.sin_family = AF_INET;
+    socket_address.sin_port = htons ( port );
+    socket_address.sin_addr.s_addr = inet_addr ( hostname );
 
     // Connect the socket
     socketStatus = ( connect ( socket_id, (struct sockaddr*) &socket_address, sizeof ( socket_address ) ) );
@@ -137,7 +133,7 @@ int read_packet ( int timeout )
 
 //        readfds [ 0 ] = socket_id;
 
-        // select returns 0 if successful, > 0 for found descriptors, -1 if error
+// select returns 0 if successful, > 0 for found descriptors, -1 if error
         int selectStatus = select ( NX_BSD_SOCKFD_START + 1, &readfds, NULL, NULL, &tmv );
         if ( selectStatus < 0 )
             return -2;

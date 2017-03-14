@@ -20,6 +20,7 @@
 #define MQTT_CONF_PASSWORD_LENGTH   (M1_CONFIG_VALUE_LENGTH + M1_API_KEY_VALUE_LENGTH + 2)
 
 #include "libemqtt.h"
+#include "nx_dns.h"
 
 MediumOneDeviceCredentials_t g_mediumOneDeviceCredentials;
 
@@ -30,6 +31,7 @@ unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
     MediumOneDeviceCredentials_t m1Creds;
     size_t charsRead = 0;
     unsigned int keysRead = 0;
+    char portStr [ 6 ];
 
     // bytesRead will contain the number of bytes read, from this call
     if ( readValueForKey ( configData, dataLength, "name", M1_CONFIG_VALUE_LENGTH, m1Creds.name, &charsRead ) )
@@ -58,13 +60,26 @@ unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
         keysRead++;
     }
 
-    if ( keysRead == 5 )
+    if ( readValueForKey ( configData, dataLength, "host", M1_API_KEY_VALUE_LENGTH, m1Creds.hostName, &charsRead ) )
+    {
+        keysRead++;
+    }
+
+    if ( readValueForKey ( configData, dataLength, "port", M1_CONFIG_VALUE_LENGTH, portStr, &charsRead ) )
+    {
+        m1Creds.port = atoi ( portStr );
+        keysRead++;
+    }
+
+    if ( keysRead == 7 )
     {
         memcpy ( g_mediumOneDeviceCredentials.name, m1Creds.name, M1_CONFIG_VALUE_LENGTH );
         memcpy ( g_mediumOneDeviceCredentials.apiKey, m1Creds.apiKey, M1_API_KEY_VALUE_LENGTH );
         memcpy ( g_mediumOneDeviceCredentials.projectId, m1Creds.projectId, M1_CONFIG_VALUE_LENGTH );
         memcpy ( g_mediumOneDeviceCredentials.userId, m1Creds.userId, M1_CONFIG_VALUE_LENGTH );
         memcpy ( g_mediumOneDeviceCredentials.password, m1Creds.password, M1_CONFIG_VALUE_LENGTH );
+        memcpy ( g_mediumOneDeviceCredentials.hostName, m1Creds.hostName, M1_API_KEY_VALUE_LENGTH );
+        g_mediumOneDeviceCredentials.port = m1Creds.port;
 
         return keysRead;
     }
@@ -123,7 +138,8 @@ void mqtt_message_callback ( int type, char * topic, char * payload, int length 
 #else
 
 //static mqtt_broker_handle_t g_mqttBroker;
-static char g_topic_name [ 255 ];
+char g_topic_name [ 255 ];
+extern NX_DNS g_dns_client;
 
 unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
 {
@@ -134,21 +150,28 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
 
     char m1UsernameStr [ MQTT_CONF_USERNAME_LENGTH ];
     char m1Password [ MQTT_CONF_PASSWORD_LENGTH ];
+    char hostIpAddress [ 16 ];
 
     sprintf ( m1UsernameStr, "%s/%s", g_mediumOneDeviceCredentials.projectId, g_mediumOneDeviceCredentials.userId );
     sprintf ( m1Password, "%s/%s", g_mediumOneDeviceCredentials.apiKey, g_mediumOneDeviceCredentials.password );
 
-    status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, "mqtt2.mediumone.com", 61619, m1UsernameStr,
-                                 m1Password, 0, 0, 0, 0 );
+    { // resolve the hostName to IP Address
+        ULONG ipAddressLong;
+        nx_dns_host_by_name_get ( &g_dns_client, (UCHAR *) g_mediumOneDeviceCredentials.hostName, &ipAddressLong,
+                                  TX_WAIT_FOREVER );
+
+        sprintf ( hostIpAddress, "%d.%d.%d.%d", (int) ( ipAddressLong >> 24 ), (int) ( ipAddressLong >> 16 ) & 0xFF,
+                  (int) ( ipAddressLong >> 8 ) & 0xFF, (int) ( ipAddressLong ) & 0xFF );
+    }
+
+    //"name=desktop-kit-1\r\napi_key=WG46JL5TPKJ3Q272SDCEJDJQGQ4DEOJZGM2GEZBYGRQTAMBQ\r\nproject_id=o3adQcvIn0Q\r\nuser_id=kHgc2feq1bg\r\npassword=Dec2kPok\r\nhost=mqtt2.mediumone.com\r\nport=61619" );
+    status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, hostIpAddress, g_mediumOneDeviceCredentials.port,
+                                 m1UsernameStr, m1Password, 5, 5, 60, 1 );
 
     if ( status == 1 )
     {
 
 //    m1_register_subscription_callback ( mqtt_message_callback );
-//
-//    status = m1_connect ( "mqtt2.mediumone.com", /*61620*/61619, g_mediumOneDeviceCredentials.userId,
-//                          g_mediumOneDeviceCredentials.password, g_mediumOneDeviceCredentials.projectId,
-//                          g_mediumOneDeviceCredentials.apiKey, g_mediumOneDeviceCredentials.name, 5, 5, 60, 1 );
 
         sprintf ( g_topic_name, "0/%s/%s/%s", g_mediumOneDeviceCredentials.projectId,
                   g_mediumOneDeviceCredentials.userId, g_mediumOneDeviceCredentials.name );
@@ -157,11 +180,6 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
         sprintf ( initialConnectMessage, "{\"init_connect\":{\"name\":\"%s\"}}", g_mediumOneDeviceCredentials.name );
         mqtt_netx_publish ( g_topic_name, initialConnectMessage, 0 );
 
-//    m1_publish_event ( initialConnectMessage, NULL );
-
-//TODO: Is this needed?
-// extern const sf_comms_instance_t g_sf_comms0;
-// m1_initialize_comms(&g_sf_comms0);
     }
 
     return ( status == 1 );
