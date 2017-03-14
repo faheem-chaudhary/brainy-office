@@ -306,6 +306,7 @@ Synergy Configuration
     Maximum message size support: Disable
     DHCP options buffer size (bytes): 312
     
+  Module "NetX BSD Support"
   HAL
     Instance "g_fmi FMI Driver on r_fmi"
       Name: g_fmi
@@ -342,6 +343,9 @@ Synergy Configuration
       Instance "g_ux_host_class_storage0 USBX Host Class Mass Storage"
         Name: g_ux_host_class_storage0
         
+        Instance "USBX Host Class Mass Storage Source"
+          Show linkage warning: Disabled
+          
         Instance "USBX Host Configuration g_ux_host_0"
           Name: g_ux_host_0
           
@@ -354,7 +358,16 @@ Synergy Configuration
             USBX Pool Memory Size: 65535
             User Callback for Host Event Notification(Only valid for USB Host): usb_host_event_notification_callback
             
+            Instance "USBX Source"
+              Show linkage warning: Disabled
+              
       Instance "FileX Common on fx"
+        Instance "FileX Source"
+          Show linkage warning: Disabled
+          
+          Instance "ThreadX Source"
+            Show linkage warning: Disabled
+            
   Thread "System Blinker Thread"
     Symbol: sys_blinker_thread
     Name: System Blinker Thread
@@ -419,7 +432,7 @@ Synergy Configuration
   Thread "System Network (Ethernet) Thread"
     Symbol: sys_network_thread
     Name: System Network (Ethernet) Thread
-    Stack size (bytes): 1024
+    Stack size (bytes): 8192
     Priority: 6
     Auto start: Enabled
     Time slicing interval (ticks): 1
@@ -428,10 +441,10 @@ Synergy Configuration
       Name: g_ip
       IPv4 Address (use commas for separation): 0,0,0,0
       Subnet Mask (use commas for separation): 255,255,255,0
-      IP Helper Thread Stack Size (bytes): 2048
+      IP Helper Thread Stack Size (bytes): 4096
       IP Helper Thread Priority: 3
       ARP: Enable
-      ARP Cache Size in Bytes: 512
+      ARP Cache Size in Bytes: 1024
       Reverse ARP: Disable
       TCP: Enable
       UDP: Enable
@@ -440,12 +453,24 @@ Synergy Configuration
       IP fragmentation: Disable
       
       Instance "NetX Common on nx"
+        Instance "NetX Source"
+          Show linkage warning: Disabled
+          
+          Instance "ThreadX Source"
+            Show linkage warning: Disabled
+            
       Instance "g_packet_pool NetX Packet Pool Instance"
         Name: g_packet_pool
         Packet Size in Bytes: 640
-        Number of Packets in Pool: 16
+        Number of Packets in Pool: 32
         
         Instance "NetX Common on nx"
+          Instance "NetX Source"
+            Show linkage warning: Disabled
+            
+            Instance "ThreadX Source"
+              Show linkage warning: Disabled
+              
       Instance "g_sf_el_nx NetX Port ETHER on sf_el_nx"
         Name: g_sf_el_nx
         Channel: 1
@@ -458,10 +483,10 @@ Synergy Configuration
         Name: g_ip
         IPv4 Address (use commas for separation): 0,0,0,0
         Subnet Mask (use commas for separation): 255,255,255,0
-        IP Helper Thread Stack Size (bytes): 2048
+        IP Helper Thread Stack Size (bytes): 4096
         IP Helper Thread Priority: 3
         ARP: Enable
-        ARP Cache Size in Bytes: 512
+        ARP Cache Size in Bytes: 1024
         Reverse ARP: Disable
         TCP: Enable
         UDP: Enable
@@ -470,12 +495,24 @@ Synergy Configuration
         IP fragmentation: Disable
         
         Instance "NetX Common on nx"
+          Instance "NetX Source"
+            Show linkage warning: Disabled
+            
+            Instance "ThreadX Source"
+              Show linkage warning: Disabled
+              
         Instance "g_packet_pool NetX Packet Pool Instance"
           Name: g_packet_pool
           Packet Size in Bytes: 640
-          Number of Packets in Pool: 16
+          Number of Packets in Pool: 32
           
           Instance "NetX Common on nx"
+            Instance "NetX Source"
+              Show linkage warning: Disabled
+              
+              Instance "ThreadX Source"
+                Show linkage warning: Disabled
+                
         Instance "g_sf_el_nx NetX Port ETHER on sf_el_nx"
           Name: g_sf_el_nx
           Channel: 1
@@ -488,10 +525,10 @@ Synergy Configuration
         Name: g_ip
         IPv4 Address (use commas for separation): 0,0,0,0
         Subnet Mask (use commas for separation): 255,255,255,0
-        IP Helper Thread Stack Size (bytes): 2048
+        IP Helper Thread Stack Size (bytes): 4096
         IP Helper Thread Priority: 3
         ARP: Enable
-        ARP Cache Size in Bytes: 512
+        ARP Cache Size in Bytes: 1024
         Reverse ARP: Disable
         TCP: Enable
         UDP: Enable
@@ -500,18 +537,86 @@ Synergy Configuration
         IP fragmentation: Disable
         
         Instance "NetX Common on nx"
+          Instance "NetX Source"
+            Show linkage warning: Disabled
+            
+            Instance "ThreadX Source"
+              Show linkage warning: Disabled
+              
         Instance "g_packet_pool NetX Packet Pool Instance"
           Name: g_packet_pool
           Packet Size in Bytes: 640
-          Number of Packets in Pool: 16
+          Number of Packets in Pool: 32
           
           Instance "NetX Common on nx"
+            Instance "NetX Source"
+              Show linkage warning: Disabled
+              
+              Instance "ThreadX Source"
+                Show linkage warning: Disabled
+                
         Instance "g_sf_el_nx NetX Port ETHER on sf_el_nx"
           Name: g_sf_el_nx
           Channel: 1
           Callback: setMacAddress
           
       Instance "NetX DHCP Common"
+    Instance "NetX BSD Support"
+      NetX BSD Warning: Disabled
+      Internal thread stack size (bytes): 4096
+      Internal thread priority: 3
+      
+      Instance "g_ip NetX IP Instance"
+        Name: g_ip
+        IPv4 Address (use commas for separation): 0,0,0,0
+        Subnet Mask (use commas for separation): 255,255,255,0
+        IP Helper Thread Stack Size (bytes): 4096
+        IP Helper Thread Priority: 3
+        ARP: Enable
+        ARP Cache Size in Bytes: 1024
+        Reverse ARP: Disable
+        TCP: Enable
+        UDP: Enable
+        ICMP: Enable
+        IGMP: Enable
+        IP fragmentation: Disable
+        
+        Instance "NetX Common on nx"
+          Instance "NetX Source"
+            Show linkage warning: Disabled
+            
+            Instance "ThreadX Source"
+              Show linkage warning: Disabled
+              
+        Instance "g_packet_pool NetX Packet Pool Instance"
+          Name: g_packet_pool
+          Packet Size in Bytes: 640
+          Number of Packets in Pool: 32
+          
+          Instance "NetX Common on nx"
+            Instance "NetX Source"
+              Show linkage warning: Disabled
+              
+              Instance "ThreadX Source"
+                Show linkage warning: Disabled
+                
+        Instance "g_sf_el_nx NetX Port ETHER on sf_el_nx"
+          Name: g_sf_el_nx
+          Channel: 1
+          Callback: setMacAddress
+          
+      Instance "g_packet_pool NetX Packet Pool Instance"
+        Name: g_packet_pool
+        Packet Size in Bytes: 640
+        Number of Packets in Pool: 32
+        
+        Instance "NetX Common on nx"
+          Instance "NetX Source"
+            Show linkage warning: Disabled
+            
+            Instance "ThreadX Source"
+              Show linkage warning: Disabled
+              
   Messaging
     Event "System Network Available"
       Symbol: SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE

@@ -39,18 +39,20 @@
 #include <unistd.h>
 #include "nx_bsd.h"
 #include <signal.h>
+#include "tx_api.h"
 
 #define RCVBUFSIZE 1024
 uint8_t packet_buffer [ RCVBUFSIZE ];
 
 int socket_id;
 mqtt_broker_handle_t g_broker;
+TX_THREAD * gp_thread;
 int g_keepalive = 30;
 
 void alive ( int sig );
 void term ( int sig );
 
-int init_netx_socket ( mqtt_broker_handle_t* broker, const char* hostname, short port, int keepalive );
+int init_netx_socket ( mqtt_broker_handle_t* broker, const char* hostname, unsigned int port, int keepalive );
 int send_packet ( void* socket_info, const void* buf, unsigned int count );
 int close_socket ( mqtt_broker_handle_t* broker );
 int read_packet ( int timeout );
@@ -69,29 +71,38 @@ int read_packet ( int timeout )
 int send_packet ( void* socket_info, const void* buf, unsigned int count )
 {
     int fd = * ( (int*) socket_info );
-    return send ( fd, buf, count, 0 );
+    int bytesSend = send ( fd, buf, count, 0 );
+    return bytesSend;
 }
 
-int init_netx_socket ( mqtt_broker_handle_t* broker, const char* hostname, short port, int keepalive )
+int init_netx_socket ( mqtt_broker_handle_t* broker, const char* hostname, unsigned int port, int keepalive )
 {
     int flag = 1;
+    int socketStatus = 0;
 
     // Create the socket
-    if ( ( socket_id = socket ( PF_INET, SOCK_STREAM, 0 ) ) < 0 )
+    socketStatus = ( socket_id = socket ( PF_INET, SOCK_STREAM, 0 ) );
+    if ( socketStatus < 0 )
         return -1;
 
     // Disable Nagle Algorithm
-    if ( setsockopt ( socket_id, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof ( flag ) ) < 0 )
-        return -2;
+//    socketStatus = setsockopt ( socket_id, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof ( flag ) );
+//    if ( socketStatus < 0 )
+//        return -2;
 
-    struct sockaddr_in socket_address;
+    struct sockaddr_in socket_address, socket_address1;
     // Create the stuff we need to connect
-    socket_address.sin_family = AF_INET;
-    socket_address.sin_port = htons ( port );
-    socket_address.sin_addr.s_addr = inet_addr ( hostname );
+    socket_address1.sin_family = AF_INET;
+    socket_address1.sin_port = htons ( port );
+    socket_address1.sin_addr.s_addr = inet_addr ( hostname );
+
+    socket_address.sin_family = PF_INET;
+    socket_address.sin_port = port;
+    socket_address.sin_addr.s_addr = htonl ( 0x8F675C0B ); //IP: 143.103.92.11
 
     // Connect the socket
-    if ( ( connect ( socket_id, (struct sockaddr*) &socket_address, sizeof ( socket_address ) ) ) < 0 )
+    socketStatus = ( connect ( socket_id, (struct sockaddr*) &socket_address, sizeof ( socket_address ) ) );
+    if ( socketStatus < 0 )
         return -1;
 
     // MQTT stuffs
@@ -99,6 +110,7 @@ int init_netx_socket ( mqtt_broker_handle_t* broker, const char* hostname, short
     broker->socket_info = (void*) &socket_id;
     broker->send = send_packet;
 
+    gp_thread = tx_thread_identify ();
     return 0;
 }
 
@@ -123,8 +135,11 @@ int read_packet ( int timeout )
         tmv.tv_sec = timeout;
         tmv.tv_usec = 0;
 
-        // select returns 0 if timeout, 1 if input available, -1 if error
-        if ( select ( 1, &readfds, NULL, NULL, &tmv ) )
+//        readfds [ 0 ] = socket_id;
+
+        // select returns 0 if successful, > 0 for found descriptors, -1 if error
+        int selectStatus = select ( NX_BSD_SOCKFD_START + 1, &readfds, NULL, NULL, &tmv );
+        if ( selectStatus < 0 )
             return -2;
     }
 
@@ -214,6 +229,7 @@ int mqtt_netx_connect ( const char * client_id, const char * host, int mqtt_port
     status = mqtt_connect ( &g_broker );
 
     int packet_length = read_packet ( 1 );
+
     if ( packet_length < 0 )
     {
         fprintf ( stderr, "Error(%d) on read packet!\n", packet_length );

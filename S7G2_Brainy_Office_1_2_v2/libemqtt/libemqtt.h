@@ -31,11 +31,11 @@
     #include <stdint.h>
 
     #ifndef MQTT_CONF_USERNAME_LENGTH
-        #define MQTT_CONF_USERNAME_LENGTH 13 // Recommended by MQTT Specification (12 + '\0')
+        #define MQTT_CONF_USERNAME_LENGTH 33 // Recommended by MQTT Specification (12 + '\0')
     #endif
 
     #ifndef MQTT_CONF_PASSWORD_LENGTH
-        #define MQTT_CONF_PASSWORD_LENGTH 13 // Recommended by MQTT Specification (12 + '\0')
+        #define MQTT_CONF_PASSWORD_LENGTH 65 // Recommended by MQTT Specification (12 + '\0')
     #endif
 
     #define MQTT_MSG_CONNECT       1<<4

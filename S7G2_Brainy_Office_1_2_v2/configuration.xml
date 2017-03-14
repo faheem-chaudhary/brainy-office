@@ -187,6 +187,30 @@
       <description>Express Logic NetX DNS: Provides=[NetX DNS] , Requires=[NetX]</description>
       <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
     </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="fx_src" variant="" vendor="Renesas" version="1.2.0">
+      <description>Express Logic FileX: Provides=[FileX] , Requires=[FileX I/O ,ThreadX]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="nx_src" variant="" vendor="Renesas" version="1.2.0">
+      <description>Express Logic NetX: Provides=[NetX] , Requires=[ThreadX ,NetX Driver]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="nx_bsd" variant="" vendor="Renesas" version="1.2.0">
+      <description>Express Logic NetX: Provides=[NetX BSD Socket Compliance Layer] , Requires=[NetX Source]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="tx_src" variant="" vendor="Renesas" version="1.2.0">
+      <description>Express Logic ThreadX: Provides=[ThreadX]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="ux_src" variant="" vendor="Renesas" version="1.2.0">
+      <description>Express Logic USBX: Provides=[USBX] , Requires=[ThreadX ,USBX Driver]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="ux_host_class_storage_src" variant="" vendor="Renesas" version="1.2.0">
+      <description>Express Logic USBX Host Class Storage: Provides=[USBX Host Class Storage] , Requires=[ThreadX ,USBX]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
   </synergyComponentSelection>
   <synergyIcuConfiguration/>
   <synergyMessagingConfiguration>
@@ -301,10 +325,10 @@
       <property id="module.el.nx.ip.name" value="g_ip"/>
       <property id="module.el.nx.ip.address" value="192,168,0,2"/>
       <property id="module.el.nx.ip.subnet_mask" value="255,255,255,0"/>
-      <property id="module.el.nx.ip.stack_size" value="2048"/>
+      <property id="module.el.nx.ip.stack_size" value="4096"/>
       <property id="module.el.nx.ip.priority" value="3"/>
       <property id="module.el.nx.ip.arp" value="module.el.nx.ip.arp.enable"/>
-      <property id="module.el.nx.ip.arp_cache_size" value="512"/>
+      <property id="module.el.nx.ip.arp_cache_size" value="1024"/>
       <property id="module.el.nx.ip.rarp" value="module.el.nx.ip.rarp.disable"/>
       <property id="module.el.nx.ip.tcp" value="module.el.nx.ip.tcp.enable"/>
       <property id="module.el.nx.ip.udp" value="module.el.nx.ip.udp.enable"/>
@@ -316,7 +340,7 @@
     <module id="module.el.nx.packet_pool.1545898111">
       <property id="module.el.nx.packet_pool.name" value="g_packet_pool"/>
       <property id="module.el.nx.packet_pool.packet_size" value="640"/>
-      <property id="module.el.nx.packet_pool.number_of_packets" value="16"/>
+      <property id="module.el.nx.packet_pool.number_of_packets" value="32"/>
     </module>
     <module id="module.framework.sf_el_nx.1726779425">
       <property id="module.framework.sf_el_nx.name" value="g_sf_el_nx"/>
@@ -330,6 +354,26 @@
       <property id="module.el.nx_dhcp_client.name" value="g_dhcp_client"/>
     </module>
     <module id="module.el.nx_dhcp_common.261721751"/>
+    <module id="module.el.nx_bsd.1055161641">
+      <property id="module.el.nx_bsd.warning" value="module.el.nx_bsd.warning.disabled"/>
+      <property id="module.el.nx_bsd.stack_size" value="4096"/>
+      <property id="module.el.nx_bsd.priority" value="3"/>
+    </module>
+    <module id="module.el.nx_src.1564227994">
+      <property id="module.el.nx_src.linkage_warning" value="module.el.nx_src.linkage_warning.disabled"/>
+    </module>
+    <module id="module.framework.tx_src.941240014">
+      <property id="module.el.tx_src.linkage_warning" value="module.el.tx_src.linkage_warning.disabled"/>
+    </module>
+    <module id="module.el.ux_host_class_storage_src.1395086851">
+      <property id="module.el.ux_host_class_storage_src.linkage_warning" value="module.el.ux_host_class_storage_src.linkage_warning.disabled"/>
+    </module>
+    <module id="module.el.fx_src.1518788304">
+      <property id="module.el.fx_src.linkage_warning" value="module.el.fx_src.linkage_warning.disabled"/>
+    </module>
+    <module id="module.el.ux_src.1705154141">
+      <property id="module.el.ux_src.linkage_warning" value="module.el.ux_src.linkage_warning.disabled"/>
+    </module>
     <context id="_hal.0">
       <stack module="module.driver.fmi_on_fmi.0"/>
       <stack module="module.driver.cgc_on_cgc.0"/>
@@ -346,12 +390,19 @@
       <stack module="module.framework.sf_message.1429754242"/>
       <stack module="module.framework.fx_usbmsc.1804938353">
         <stack module="module.el.ux_host_class_storage.422237099" requires="module.framework.fx_usbmsc.requires.ux_host_class_storage">
+          <stack module="module.el.ux_host_class_storage_src.1395086851" requires="module.el.ux_host_class_storage.requires.ux_host_class_storage_src"/>
           <stack module="module.el.ux_host.310086933" requires="module.el.ux_host_class_storage.requires.ux_host">
             <stack module="module.framework.sf_el_ux_hcd_hs.295022956" requires="module.el.ux_host.requires.sf_el_ux_hcd"/>
-            <stack module="module.el.ux_v2.1611487785" requires="module.el.ux_host.requires.ux_v2"/>
+            <stack module="module.el.ux_v2.1611487785" requires="module.el.ux_host.requires.ux_v2">
+              <stack module="module.el.ux_src.1705154141" requires="module.el.ux_v2.requires.ux_src"/>
+            </stack>
           </stack>
         </stack>
-        <stack module="module.el.fx_common.1380613597" requires="module.framework.fx_usbmsc.requires.fx_common"/>
+        <stack module="module.el.fx_common.1380613597" requires="module.framework.fx_usbmsc.requires.fx_common">
+          <stack module="module.el.fx_src.1518788304" requires="module.el.fx.requires.fx_src">
+            <stack module="module.framework.tx_src.941240014" requires="module.el.fx_src.requires.tx_src"/>
+          </stack>
+        </stack>
       </stack>
     </context>
     <context id="rtos.threadx.thread.721736288">
@@ -381,35 +432,83 @@
     <context id="rtos.threadx.thread.379076183">
       <property id="_symbol" value="sys_network_thread"/>
       <property id="rtos.threadx.thread.name" value="System Network (Ethernet) Thread"/>
-      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.stack" value="8192"/>
       <property id="rtos.threadx.thread.priority" value="6"/>
       <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
       <stack module="module.el.nx.ip.1887369973">
-        <stack module="module.el.nx_common.1025156169" requires="module.el.nx.ip.requires.nx_common"/>
+        <stack module="module.el.nx_common.1025156169" requires="module.el.nx.ip.requires.nx_common">
+          <stack module="module.el.nx_src.1564227994" requires="module.el.nx.ip.requires.nx_src">
+            <stack module="module.framework.tx_src.941240014" requires="module.el.nx_src.requires.tx_src"/>
+          </stack>
+        </stack>
         <stack module="module.el.nx.packet_pool.1545898111" requires="module.el.nx.ip.requires.nx.packet_pool">
-          <stack module="module.el.nx_common.1025156169" requires="module.el.nx.packet_pool.requires.nx_common"/>
+          <stack module="module.el.nx_common.1025156169" requires="module.el.nx.packet_pool.requires.nx_common">
+            <stack module="module.el.nx_src.1564227994" requires="module.el.nx.ip.requires.nx_src">
+              <stack module="module.framework.tx_src.941240014" requires="module.el.nx_src.requires.tx_src"/>
+            </stack>
+          </stack>
         </stack>
         <stack module="module.framework.sf_el_nx.1726779425" requires="module.el.nx.ip.requires.sf_el_nx"/>
       </stack>
       <stack module="module.el.nx_dns_client.499936151">
         <stack module="module.el.nx.ip.1887369973" requires="module.el.nx_dns_client.requires.nx.ip">
-          <stack module="module.el.nx_common.1025156169" requires="module.el.nx.ip.requires.nx_common"/>
+          <stack module="module.el.nx_common.1025156169" requires="module.el.nx.ip.requires.nx_common">
+            <stack module="module.el.nx_src.1564227994" requires="module.el.nx.ip.requires.nx_src">
+              <stack module="module.framework.tx_src.941240014" requires="module.el.nx_src.requires.tx_src"/>
+            </stack>
+          </stack>
           <stack module="module.el.nx.packet_pool.1545898111" requires="module.el.nx.ip.requires.nx.packet_pool">
-            <stack module="module.el.nx_common.1025156169" requires="module.el.nx.packet_pool.requires.nx_common"/>
+            <stack module="module.el.nx_common.1025156169" requires="module.el.nx.packet_pool.requires.nx_common">
+              <stack module="module.el.nx_src.1564227994" requires="module.el.nx.ip.requires.nx_src">
+                <stack module="module.framework.tx_src.941240014" requires="module.el.nx_src.requires.tx_src"/>
+              </stack>
+            </stack>
           </stack>
           <stack module="module.framework.sf_el_nx.1726779425" requires="module.el.nx.ip.requires.sf_el_nx"/>
         </stack>
       </stack>
       <stack module="module.el.nx_dhcp_client.2061180082">
         <stack module="module.el.nx.ip.1887369973" requires="module.el.nx_dhcp_client.requires.nx.ip">
-          <stack module="module.el.nx_common.1025156169" requires="module.el.nx.ip.requires.nx_common"/>
+          <stack module="module.el.nx_common.1025156169" requires="module.el.nx.ip.requires.nx_common">
+            <stack module="module.el.nx_src.1564227994" requires="module.el.nx.ip.requires.nx_src">
+              <stack module="module.framework.tx_src.941240014" requires="module.el.nx_src.requires.tx_src"/>
+            </stack>
+          </stack>
           <stack module="module.el.nx.packet_pool.1545898111" requires="module.el.nx.ip.requires.nx.packet_pool">
-            <stack module="module.el.nx_common.1025156169" requires="module.el.nx.packet_pool.requires.nx_common"/>
+            <stack module="module.el.nx_common.1025156169" requires="module.el.nx.packet_pool.requires.nx_common">
+              <stack module="module.el.nx_src.1564227994" requires="module.el.nx.ip.requires.nx_src">
+                <stack module="module.framework.tx_src.941240014" requires="module.el.nx_src.requires.tx_src"/>
+              </stack>
+            </stack>
           </stack>
           <stack module="module.framework.sf_el_nx.1726779425" requires="module.el.nx.ip.requires.sf_el_nx"/>
         </stack>
         <stack module="module.el.nx_dhcp_common.261721751" requires="module.el.nx_dhcp_client.requires.nx_dhcp_common"/>
+      </stack>
+      <stack module="module.el.nx_bsd.1055161641">
+        <stack module="module.el.nx.ip.1887369973" requires="module.el.nx_bsd.requires.nx.ip">
+          <stack module="module.el.nx_common.1025156169" requires="module.el.nx.ip.requires.nx_common">
+            <stack module="module.el.nx_src.1564227994" requires="module.el.nx.ip.requires.nx_src">
+              <stack module="module.framework.tx_src.941240014" requires="module.el.nx_src.requires.tx_src"/>
+            </stack>
+          </stack>
+          <stack module="module.el.nx.packet_pool.1545898111" requires="module.el.nx.ip.requires.nx.packet_pool">
+            <stack module="module.el.nx_common.1025156169" requires="module.el.nx.packet_pool.requires.nx_common">
+              <stack module="module.el.nx_src.1564227994" requires="module.el.nx.ip.requires.nx_src">
+                <stack module="module.framework.tx_src.941240014" requires="module.el.nx_src.requires.tx_src"/>
+              </stack>
+            </stack>
+          </stack>
+          <stack module="module.framework.sf_el_nx.1726779425" requires="module.el.nx.ip.requires.sf_el_nx"/>
+        </stack>
+        <stack module="module.el.nx.packet_pool.1545898111" requires="module.el.nx_bsd.requires.nx.packet_pool">
+          <stack module="module.el.nx_common.1025156169" requires="module.el.nx.packet_pool.requires.nx_common">
+            <stack module="module.el.nx_src.1564227994" requires="module.el.nx.ip.requires.nx_src">
+              <stack module="module.framework.tx_src.941240014" requires="module.el.nx_src.requires.tx_src"/>
+            </stack>
+          </stack>
+        </stack>
       </stack>
     </context>
     <config id="config.el.ux_v2"/>
@@ -536,6 +635,30 @@
     <config id="config.driver.riic">
       <property id="config.driver.riic.param_checking_enable" value="config.driver.riic.param_checking_enable.bsp"/>
     </config>
+    <config id="config.el.ux_src">
+      <property id="config.el.ux_src.periodic_rate" value=""/>
+      <property id="config.el.ux_src.max_classes" value=""/>
+      <property id="config.el.ux_src.max_slave_classes" value=""/>
+      <property id="config.el.ux_src.max_slave_interfaces" value=""/>
+      <property id="config.el.ux_src.class_driver" value=""/>
+      <property id="config.el.ux_src.device_class_driver" value=""/>
+      <property id="config.el.ux_src.max_hcd" value=""/>
+      <property id="config.el.ux_src.max_devices" value=""/>
+      <property id="config.el.ux_src.max_ed" value=""/>
+      <property id="config.el.ux_src.max_td" value=""/>
+      <property id="config.el.ux_src.max_iso_td" value=""/>
+      <property id="config.el.ux_src.thread_stack_size" value=""/>
+      <property id="config.el.ux_src.thread_pri_enum" value=""/>
+      <property id="config.el.ux_src.thread_pri_class" value=""/>
+      <property id="config.el.ux_src.thread_pri_keyboard" value=""/>
+      <property id="config.el.ux_src.thread_pri_hcd" value=""/>
+      <property id="config.el.ux_src.no_time_slice" value="config.el.ux_src.no_time_slice.disabled"/>
+      <property id="config.el.ux_src.max_slave_lun" value=""/>
+      <property id="config.el.ux_src.max_host_lun" value=""/>
+      <property id="config.el.ux_src.slave_request_control_max_length" value=""/>
+      <property id="config.el.ux_src.slave_request_data_max_length" value=""/>
+      <property id="config.el.ux_src.enforce_safe_alignment" value="config.el.ux_src.enforce_safe_alignment.disabled"/>
+    </config>
     <config id="config.driver.icu">
       <property id="config.driver.icu.param_checking_enable" value="config.driver.icu.param_checking_enable.bsp"/>
     </config>
@@ -547,11 +670,163 @@
     <config id="config.framework.sf_touch_panel_i2c">
       <property id="config.framework.sf_touch_panel_i2c.param_checking_enable" value="config.framework.sf_touch_panel_i2c.param_checking_enable.bsp"/>
     </config>
+    <config id="config.el.fx_src">
+      <property id="config.el.fx_src.error_checking" value="config.el.fx_src.error_checking.enabled"/>
+      <property id="config.el.fx_src.max_long_name_len" value=""/>
+      <property id="config.el.fx_src.max_last_name_len" value=""/>
+      <property id="config.el.fx_src.max_sector_cache" value=""/>
+      <property id="config.el.fx_src.fat_map_size" value=""/>
+      <property id="config.el.fx_src.max_fat_cache" value=""/>
+      <property id="config.el.fx_src.update_rate_in_seconds" value=""/>
+      <property id="config.el.fx_src.no_timer" value="config.el.fx_src.no_timer.disabled"/>
+      <property id="config.el.fx_src.single_thread" value="config.el.fx_src.single_thread.disabled"/>
+      <property id="config.el.fx_src.dont_update_open_files" value="config.el.fx_src.dont_update_open_files.disabled"/>
+      <property id="config.el.fx_src.media_search_cache" value="config.el.fx_src.media_search_cache.enabled"/>
+      <property id="config.el.fx_src.direct_data_read_cache_fill" value="config.el.fx_src.direct_data_read_cache_fill.enabled"/>
+      <property id="config.el.fx_src.media_statistics" value="config.el.fx_src.media_statistics.enabled"/>
+      <property id="config.el.fx_src.single_open_legacy" value="config.el.fx_src.single_open_legacy.disabled"/>
+      <property id="config.el.fx_src.rename_path_inherit" value="config.el.fx_src.rename_path_inherit.disabled"/>
+      <property id="config.el.fx_src.no_local_path" value="config.el.fx_src.no_local_path.disabled"/>
+      <property id="config.el.fx_src.fault_tolerant_data" value="config.el.fx_src.fault_tolerant_data.disabled"/>
+      <property id="config.el.fx_src.fault_tolerant" value="config.el.fx_src.fault_tolerant.disabled"/>
+      <property id="config.el.fx_src.lba_64bit" value="config.el.fx_src.lba_64bit.disabled"/>
+      <property id="config.el.fx_src.fault_tolerant_service" value="config.el.fx_src.fault_tolerant_service.disabled"/>
+      <property id="config.el.fx_src.fault_tolerant_boot_index" value=""/>
+      <property id="config.el.fx_src.fault_tolerant_minimal_cluster" value=""/>
+    </config>
+    <config id="config.el.nx_src">
+      <property id="config.el.nx_src.error_checking" value="config.el.nx_src.error_checking.enabled"/>
+      <property id="config.el.nx_src.ip_static_routing" value="config.el.nx_src.ip_static_routing.disabled"/>
+      <property id="config.el.nx_src.physical_header" value=""/>
+      <property id="config.el.nx_src.physical_trailer" value=""/>
+      <property id="config.el.nx_src.arp_defend_by_reply" value="config.el.nx_src.arp_defend_by_reply.disabled"/>
+      <property id="config.el.nx_src.arp_mac_change_notification" value="config.el.nx_src.arp_mac_change_notification.disabled"/>
+      <property id="config.el.nx_src.arp_expiration_rate" value=""/>
+      <property id="config.el.nx_src.arp_update_rate" value=""/>
+      <property id="config.el.nx_src.tcp_ack_timer_rate" value=""/>
+      <property id="config.el.nx_src.tcp_fast_timer_rate" value=""/>
+      <property id="config.el.nx_src.tcp_transmit_timer_rate" value=""/>
+      <property id="config.el.nx_src.tcp_keepalive_initial" value=""/>
+      <property id="config.el.nx_src.tcp_keepalive_retry" value=""/>
+      <property id="config.el.nx_src.arp_maximum_retries" value=""/>
+      <property id="config.el.nx_src.arp_max_queue_depth" value=""/>
+      <property id="config.el.nx_src.arp_auto_arp_entry" value="config.el.nx_src.arp_auto_arp_entry.enabled"/>
+      <property id="config.el.nx_src.max_multicast_groups" value=""/>
+      <property id="config.el.nx_src.max_listen_requests" value=""/>
+      <property id="config.el.nx_src.tcp_keepalive" value="config.el.nx_src.tcp_keepalive.disabled"/>
+      <property id="config.el.nx_src.tcp_window_scaling" value="config.el.nx_src.tcp_window_scaling.disabled"/>
+      <property id="config.el.nx_src.tcp_immediate_ack" value="config.el.nx_src.tcp_immediate_ack.disabled"/>
+      <property id="config.el.nx_src.tcp_ack_every_n_packets" value=""/>
+      <property id="config.el.nx_src.tcp_maximum_retries" value=""/>
+      <property id="config.el.nx_src.tcp_maximum_tx_queue" value=""/>
+      <property id="config.el.nx_src.tcp_retry_shift" value=""/>
+      <property id="config.el.nx_src.tcp_keepalive_retries" value=""/>
+      <property id="config.el.nx_src.driver_deferred_processing" value="config.el.nx_src.driver_deferred_processing.disabled"/>
+      <property id="config.el.nx_src.loopback_interface" value="config.el.nx_src.loopback_interface.enabled"/>
+      <property id="config.el.nx_src.max_physical_interfaces" value=""/>
+      <property id="config.el.nx_src.fragmentation" value="config.el.nx_src.fragmentation.enabled"/>
+      <property id="config.el.nx_src.ip_rx_checksum" value="config.el.nx_src.ip_rx_checksum.enabled"/>
+      <property id="config.el.nx_src.ip_tx_checksum" value="config.el.nx_src.ip_tx_checksum.enabled"/>
+      <property id="config.el.nx_src.tcp_rx_checksum" value="config.el.nx_src.tcp_rx_checksum.enabled"/>
+      <property id="config.el.nx_src.tcp_tx_checksum" value="config.el.nx_src.tcp_tx_checksum.enabled"/>
+      <property id="config.el.nx_src.udp_rx_checksum" value="config.el.nx_src.udp_rx_checksum.enabled"/>
+      <property id="config.el.nx_src.udp_tx_checksum" value="config.el.nx_src.udp_tx_checksum.enabled"/>
+      <property id="config.el.nx_src.reset_disconnect" value="config.el.nx_src.reset_disconnect.enabled"/>
+      <property id="config.el.nx_src.rx_size_checking" value="config.el.nx_src.rx_size_checking.enabled"/>
+      <property id="config.el.nx_src.arp_info" value="config.el.nx_src.arp_info.enabled"/>
+      <property id="config.el.nx_src.ip_info" value="config.el.nx_src.ip_info.enabled"/>
+      <property id="config.el.nx_src.icmp_info" value="config.el.nx_src.icmp_info.enabled"/>
+      <property id="config.el.nx_src.igmpv" value="config.el.nx_src.igmpv.enabled"/>
+      <property id="config.el.nx_src.igmp_info" value="config.el.nx_src.igmp_info.enabled"/>
+      <property id="config.el.nx_src.packet_info" value="config.el.nx_src.packet_info.enabled"/>
+      <property id="config.el.nx_src.rarp_info" value="config.el.nx_src.rarp_info.enabled"/>
+      <property id="config.el.nx_src.tcp_info" value="config.el.nx_src.tcp_info.enabled"/>
+      <property id="config.el.nx_src.udp_info" value="config.el.nx_src.udp_info.enabled"/>
+      <property id="config.el.nx_src.extended_notify_support" value="config.el.nx_src.extended_notify_support.enabled"/>
+      <property id="config.el.nx_src.packet_header_pad_size" value=""/>
+      <property id="config.el.nx_src.tcp_mss_minimum" value=""/>
+      <property id="config.el.nx_src.source_address_check" value="config.el.nx_src.source_address_check.disabled"/>
+      <property id="config.el.nx_src.arp_defend_interval" value=""/>
+      <property id="config.el.nx_src.tcp_max_out_of_order_packets" value=""/>
+    </config>
+    <config id="config.el.ux_host_class_storage_src">
+      <property id="config.el.ux_host_class_storage_src.filex_stub" value="config.el.ux_host_class_storage_src.filex_stub.disabled"/>
+      <property id="config.el.ux_host_class_storage_src.lun" value="1"/>
+      <property id="config.el.ux_host_class_storage_src.max_media" value="1"/>
+      <property id="config.el.ux_host_class_storage_src.storage_memory_buffer_size" value="1024"/>
+      <property id="config.el.ux_host_class_storage_src.storage_max_transfer_size" value="1024"/>
+      <property id="config.el.ux_host_class_storage_src.storage_thread_stack_size" value="1024"/>
+      <property id="config.el.ux_host_class_storage_src.transfer_timeout" value="100000"/>
+      <property id="config.el.ux_host_class_storage_src.cbi_status_timeout" value="30000"/>
+    </config>
     <config id="config.driver.elc">
       <property id="config.driver.elc.checking" value="config.driver.elc.checking.system"/>
     </config>
     <config id="config.framework.sf_external_irq">
       <property id="config.framework.sf_external_irq.param_checking_enable" value="config.framework.sf_external_irq.param_checking_enable.bsp"/>
+    </config>
+    <config id="config.el.tx_src">
+      <property id="config.el.tx_src.error_checking" value="config.el.tx_src.error_checking.enabled"/>
+      <property id="config.el.tx_src.timer_ticks_per_second" value=""/>
+      <property id="config.el.tx_src.max_priorities" value=""/>
+      <property id="config.el.tx_src.minimum_stack" value=""/>
+      <property id="config.el.tx_src.timer_thread_stack_size" value=""/>
+      <property id="config.el.tx_src.timer_thread_priority" value=""/>
+      <property id="config.el.tx_src.trace_time_mask" value=""/>
+      <property id="config.el.tx_src.timer_process_in_isr" value="config.el.tx_src.timer_process_in_isr.enabled"/>
+      <property id="config.el.tx_src.reactivate_inline" value="config.el.tx_src.reactivate_inline.disabled"/>
+      <property id="config.el.tx_src.stack_filling" value="config.el.tx_src.stack_filling.enabled"/>
+      <property id="config.el.tx_src.stack_checking" value="config.el.tx_src.stack_checking.disabled"/>
+      <property id="config.el.tx_src.preemption_threshold" value="config.el.tx_src.preemption_threshold.disabled"/>
+      <property id="config.el.tx_src.redundant_clearing" value="config.el.tx_src.redundant_clearing.enabled"/>
+      <property id="config.el.tx_src.no_timer" value="config.el.tx_src.no_timer.disabled"/>
+      <property id="config.el.tx_src.notify_callbacks" value="config.el.tx_src.notify_callbacks.disabled"/>
+      <property id="config.el.tx_src.inline_thread_resume_suspend" value="config.el.tx_src.inline_thread_resume_suspend.disabled"/>
+      <property id="config.el.tx_src.not_interruptable" value="config.el.tx_src.not_interruptable.disabled"/>
+      <property id="config.el.tx_src.event_trace" value="config.el.tx_src.event_trace.disabled"/>
+      <property id="config.el.tx_src.trace_buf_name" value="g_tx_trace_buffer"/>
+      <property id="config.el.tx_src.trace_buf_size" value="65536"/>
+      <property id="config.el.tx_src.num_registries" value="30"/>
+      <property id="config.el.tx_src.block_pool_performance_info" value="config.el.tx_src.block_pool_performance_info.disabled"/>
+      <property id="config.el.tx_src.byte_pool_performance_info" value="config.el.tx_src.byte_pool_performance_info.disabled"/>
+      <property id="config.el.tx_src.event_flags_performance_info" value="config.el.tx_src.event_flags_performance_info.disabled"/>
+      <property id="config.el.tx_src.mutex_performance_info" value="config.el.tx_src.mutex_performance_info.disabled"/>
+      <property id="config.el.tx_src.queue_performance_info" value="config.el.tx_src.queue_performance_info.disabled"/>
+      <property id="config.el.tx_src.semaphore_performance_info" value="config.el.tx_src.semaphore_performance_info.disabled"/>
+      <property id="config.el.tx_src.thread_performance_info" value="config.el.tx_src.thread_performance_info.disabled"/>
+      <property id="config.el.tx_src.timer_performance_info" value="config.el.tx_src.timer_performance_info.disabled"/>
+      <property id="config.el.tx_src.hw_stack_monitoring" value="config.el.tx_src.hw_stack_monitoring.enabled"/>
+      <property id="config.el.tx_src.iar_library_support" value="config.el.tx_src.iar_library_support.disabled"/>
+      <property id="config.el.tx_src.epk_support" value="config.el.tx_src.epk_support.disabled"/>
+      <property id="config.el.tx_src.tx_thread_extension_0" value="int bsd_errno;"/>
+      <property id="config.el.tx_src.tx_thread_extension_1" value=""/>
+      <property id="config.el.tx_src.tx_thread_extension_2" value=""/>
+      <property id="config.el.tx_src.tx_block_pool_extension" value=""/>
+      <property id="config.el.tx_src.tx_byte_pool_extension" value=""/>
+      <property id="config.el.tx_src.tx_event_flags_group_extension" value=""/>
+      <property id="config.el.tx_src.tx_mutex_extension" value=""/>
+      <property id="config.el.tx_src.tx_queue_extension" value=""/>
+      <property id="config.el.tx_src.tx_semaphore_extension" value=""/>
+      <property id="config.el.tx_src.tx_timer_extension" value=""/>
+      <property id="config.el.tx_src.tx_thread_user_extension" value=""/>
+      <property id="config.el.tx_src.tx_thread_create_extension" value=""/>
+      <property id="config.el.tx_src.tx_thread_delete_extension" value=""/>
+      <property id="config.el.tx_src.tx_thread_completed_extension" value=""/>
+      <property id="config.el.tx_src.tx_thread_terminated_extension" value=""/>
+      <property id="config.el.tx_src.tx_block_pool_create_extension" value=""/>
+      <property id="config.el.tx_src.tx_byte_pool_create_extension" value=""/>
+      <property id="config.el.tx_src.tx_event_flags_group_create_extension" value=""/>
+      <property id="config.el.tx_src.tx_mutex_create_extension" value=""/>
+      <property id="config.el.tx_src.tx_queue_create_extension" value=""/>
+      <property id="config.el.tx_src.tx_semaphore_create_extension" value=""/>
+      <property id="config.el.tx_src.tx_timer_create_extension" value=""/>
+      <property id="config.el.tx_src.tx_block_pool_delete_extension" value=""/>
+      <property id="config.el.tx_src.tx_byte_pool_delete_extension" value=""/>
+      <property id="config.el.tx_src.tx_event_flags_group_delete_extension" value=""/>
+      <property id="config.el.tx_src.tx_mutex_delete_extension" value=""/>
+      <property id="config.el.tx_src.tx_queue_delete_extension" value=""/>
+      <property id="config.el.tx_src.tx_semaphore_delete_extension" value=""/>
+      <property id="config.el.tx_src.tx_timer_delete_extension" value=""/>
     </config>
     <config id="config.el.fx"/>
   </synergyModuleConfiguration>
