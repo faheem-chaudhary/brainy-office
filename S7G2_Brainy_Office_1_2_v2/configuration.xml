@@ -211,6 +211,34 @@
       <description>Express Logic USBX Host Class Storage: Provides=[USBX Host Class Storage] , Requires=[ThreadX ,USBX]</description>
       <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
     </component>
+    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_adc_periodic" variant="" vendor="Renesas" version="1.2.0">
+      <description>Framework ADC Periodic: Provides=[Framework ADC Periodic] , Requires=[ThreadX ,ADC ,Timer]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_i2c" variant="" vendor="Renesas" version="1.2.0">
+      <description>Framework I2C: Provides=[Framework I2C] , Requires=[ThreadX ,I2C]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_adc" variant="" vendor="Renesas" version="1.2.0">
+      <description>A/D Converter: Provides=[ADC]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_dac" variant="" vendor="Renesas" version="1.2.0">
+      <description>D/A Converter: Provides=[DAC]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_dtc" variant="" vendor="Renesas" version="1.2.0">
+      <description>Data Transfer Controller: Provides=[Transfer]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_gpt" variant="" vendor="Renesas" version="1.2.0">
+      <description>General Purpose Timer: Provides=[Timer ,GPT]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_sci_i2c" variant="" vendor="Renesas" version="1.2.0">
+      <description>SCI I2C: Provides=[I2C Master] , Requires=[SCI Common]</description>
+      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    </component>
   </synergyComponentSelection>
   <synergyIcuConfiguration/>
   <synergyMessagingConfiguration>
@@ -236,10 +264,40 @@
       <subscribe eventClass="module.framework.sf_touch_panel.eventClass.eventClassTouch"/>
       <subscribe eventClass="eventClass.1095746090"/>
       <subscribe eventClass="eventClass.1363358315"/>
-      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
-    <subscriber context="rtos.threadx.thread.41323032" end="0" id="subscriber.1867037620" start="0"/>
-    <subscriber context="rtos.threadx.thread.379076183" end="0" id="subscriber.1881217138" start="0"/>
+    <subscriber context="rtos.threadx.thread.41323032" end="0" id="subscriber.1867037620" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+    </subscriber>
+    <subscriber context="rtos.threadx.thread.379076183" end="0" id="subscriber.1881217138" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+    </subscriber>
+    <subscriber context="rtos.threadx.thread.1517547309" end="0" id="subscriber.449652337" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+    </subscriber>
+    <subscriber context="rtos.threadx.thread.924298567" end="0" id="subscriber.1610198113" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+    </subscriber>
+    <subscriber context="rtos.threadx.thread.2138308075" end="0" id="subscriber.1319785664" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+    </subscriber>
+    <subscriber context="rtos.threadx.thread.282027456" end="0" id="subscriber.1766188524" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+    </subscriber>
+    <subscriber context="rtos.threadx.thread.785910637" end="0" id="subscriber.297692598" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+    </subscriber>
+    <subscriber context="rtos.threadx.thread.1882901370" end="0" id="subscriber.1009286085" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+    </subscriber>
+    <subscriber context="rtos.threadx.thread.1358427708" end="0" id="subscriber.520303301" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+    </subscriber>
+    <subscriber context="rtos.threadx.thread.2024768991" end="0" id="subscriber.1938077575" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+    </subscriber>
+    <subscriber context="rtos.threadx.thread.407260935" end="0" id="subscriber.331782468" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+    </subscriber>
   </synergyMessagingConfiguration>
   <synergyModuleConfiguration>
     <module id="module.driver.cgc_on_cgc.0">
@@ -279,7 +337,7 @@
       <property id="module.driver.external_irq.irq_ipl" value="board.icu.common.irq.priority8"/>
     </module>
     <module id="module.driver.i2c_on_riic.844911528">
-      <property id="module.driver.i2c.name" value="g_i2c0"/>
+      <property id="module.driver.i2c.name" value="g_i2c_touch_panel"/>
       <property id="module.driver.i2c.channel" value="2"/>
       <property id="module.driver.i2c.rate" value="module.driver.i2c.rate.rate_fast"/>
       <property id="module.driver.i2c.slave" value="0x48"/>
@@ -373,6 +431,157 @@
     </module>
     <module id="module.el.ux_src.1705154141">
       <property id="module.el.ux_src.linkage_warning" value="module.el.ux_src.linkage_warning.disabled"/>
+    </module>
+    <module id="module.framework.sf_adc_periodic_on_sf_adc_periodic.1842730638">
+      <property id="module.framework.sf_adc_periodic.name" value="g_sf_adc_periodic0"/>
+      <property id="module.framework.sf_adc_periodic.data_buffer" value="g_adc_raw_data"/>
+      <property id="module.framework.sf_adc_periodic.data_buffer_length" value="8"/>
+      <property id="module.framework.sf_adc_periodic.sample_count" value="1"/>
+      <property id="module.framework.sf_adc_periodic.scan_trigger" value="module.framework.sf_adc_periodic.scan_trigger.gpt_channel_0"/>
+      <property id="module.framework.sf_adc_periodic.p_callback" value="g_adc_framework_microphone_callback"/>
+    </module>
+    <module id="module.driver.adc_on_adc.196131891">
+      <property id="module.driver.adc.name" value="g_adc0"/>
+      <property id="module.driver.adc.unit" value="0"/>
+      <property id="module.driver.adc.resolution" value="module.driver.adc.resolution.resolution_12_bit"/>
+      <property id="module.driver.adc.alignment" value="module.driver.adc.alignment.alignment_right"/>
+      <property id="module.driver.adc.clearing" value="module.driver.adc.clearing.clear_after_read_on"/>
+      <property id="module.driver.adc.mode" value="module.driver.adc.mode.mode_single_scan"/>
+      <property id="module.driver.adc.scan_mask" value="module.driver.adc.scan_mask.default"/>
+      <property id="module.driver.adc.channel_0" value="module.driver.adc.channel_0.used"/>
+      <property id="module.driver.adc.channel_1" value="module.driver.adc.scan_mask.channel_1.unused"/>
+      <property id="module.driver.adc.channel_2" value="module.driver.adc.scan_mask.channel_2.unused"/>
+      <property id="module.driver.adc.channel_3" value="module.driver.adc.scan_mask.channel_3.unused"/>
+      <property id="module.driver.adc.channel_4" value="module.driver.adc.scan_mask.channel_4.unused"/>
+      <property id="module.driver.adc.channel_5" value="module.driver.adc.scan_mask.channel_5.unused"/>
+      <property id="module.driver.adc.channel_6" value="module.driver.adc.scan_mask.channel_6.unused"/>
+      <property id="module.driver.adc.channel_7" value="module.driver.adc.scan_mask.channel_7.unused"/>
+      <property id="module.driver.adc.channel_8" value="module.driver.adc.scan_mask.channel_8.unused"/>
+      <property id="module.driver.adc.channel_9" value="module.driver.adc.scan_mask.channel_9.unused"/>
+      <property id="module.driver.adc.channel_10" value="module.driver.adc.scan_mask.channel_10.unused"/>
+      <property id="module.driver.adc.channel_11" value="module.driver.adc.scan_mask.channel_11.unused"/>
+      <property id="module.driver.adc.channel_12" value="module.driver.adc.scan_mask.channel_12.unused"/>
+      <property id="module.driver.adc.channel_13" value="module.driver.adc.scan_mask.channel_13.unused"/>
+      <property id="module.driver.adc.channel_14" value="module.driver.adc.scan_mask.channel_14.unused"/>
+      <property id="module.driver.adc.channel_15" value="module.driver.adc.scan_mask.channel_15.unused"/>
+      <property id="module.driver.adc.channel_16" value="module.driver.adc.scan_mask.channel_16.unused"/>
+      <property id="module.driver.adc.channel_17" value="module.driver.adc.scan_mask.channel_17.unused"/>
+      <property id="module.driver.adc.channel_18" value="module.driver.adc.scan_mask.channel_18.unused"/>
+      <property id="module.driver.adc.channel_19" value="module.driver.adc.scan_mask.channel_19.unused"/>
+      <property id="module.driver.adc.channel_20" value="module.driver.adc.scan_mask.channel_20.unused"/>
+      <property id="module.driver.adc.channel_21" value="module.driver.adc.scan_mask.channel_21.unused"/>
+      <property id="module.driver.adc.channel_22" value="module.driver.adc.scan_mask.channel_22.unused"/>
+      <property id="module.driver.adc.channel_23" value="module.driver.adc.scan_mask.channel_23.unused"/>
+      <property id="module.driver.adc.channel_24" value="module.driver.adc.scan_mask.channel_24.unused"/>
+      <property id="module.driver.adc.channel_25" value="module.driver.adc.scan_mask.channel_25.unused"/>
+      <property id="module.driver.adc.channel_26" value="module.driver.adc.scan_mask.channel_26.unused"/>
+      <property id="module.driver.adc.channel_27" value="module.driver.adc.scan_mask.channel_27.unused"/>
+      <property id="module.driver.adc.channel_temperature" value="module.driver.adc.scan_mask.channel_temperature.unused"/>
+      <property id="module.driver.adc.channel_voltage" value="module.driver.adc.scan_mask.channel_voltage.unused"/>
+      <property id="module.driver.adc.trigger" value="module.driver.adc.trigger.trigger_software"/>
+      <property id="module.driver.adc.trigger_group_b" value="module.driver.adc.trigger_group_b.trigger_sync_elc"/>
+      <property id="module.driver.adc.priority_group_a" value="module.driver.adc.priority_group_a.group_a_priority_off"/>
+      <property id="module.driver.adc.add_average_count" value="module.driver.adc.add_average_count.add_off"/>
+      <property id="module.driver.adc.add_mask" value="module.driver.adc.add_mask.default"/>
+      <property id="module.driver.adc.add_mask.channel_0" value="module.driver.adc.add_mask.channel_0.unused"/>
+      <property id="module.driver.adc.add_mask.channel_1" value="module.driver.adc.add_mask.channel_1.unused"/>
+      <property id="module.driver.adc.add_mask.channel_2" value="module.driver.adc.add_mask.channel_2.unused"/>
+      <property id="module.driver.adc.add_mask.channel_3" value="module.driver.adc.add_mask.channel_3.unused"/>
+      <property id="module.driver.adc.add_mask.channel_4" value="module.driver.adc.add_mask.channel_4.unused"/>
+      <property id="module.driver.adc.add_mask.channel_5" value="module.driver.adc.add_mask.channel_5.unused"/>
+      <property id="module.driver.adc.add_mask.channel_6" value="module.driver.adc.add_mask.channel_6.unused"/>
+      <property id="module.driver.adc.add_mask.channel_7" value="module.driver.adc.add_mask.channel_7.unused"/>
+      <property id="module.driver.adc.add_mask.channel_8" value="module.driver.adc.add_mask.channel_8.unused"/>
+      <property id="module.driver.adc.add_mask.channel_9" value="module.driver.adc.add_mask.channel_9.unused"/>
+      <property id="module.driver.adc.add_mask.channel_10" value="module.driver.adc.add_mask.channel_10.unused"/>
+      <property id="module.driver.adc.add_mask.channel_11" value="module.driver.adc.add_mask.channel_11.unused"/>
+      <property id="module.driver.adc.add_mask.channel_12" value="module.driver.adc.add_mask.channel_12.unused"/>
+      <property id="module.driver.adc.add_mask.channel_13" value="module.driver.adc.add_mask.channel_13.unused"/>
+      <property id="module.driver.adc.add_mask.channel_14" value="module.driver.adc.add_mask.channel_14.unused"/>
+      <property id="module.driver.adc.add_mask.channel_15" value="module.driver.adc.add_mask.channel_15.unused"/>
+      <property id="module.driver.adc.add_mask.channel_16" value="module.driver.adc.add_mask.channel_16.unused"/>
+      <property id="module.driver.adc.add_mask.channel_17" value="module.driver.adc.add_mask.channel_17.unused"/>
+      <property id="module.driver.adc.add_mask.channel_18" value="module.driver.adc.add_mask.channel_18.unused"/>
+      <property id="module.driver.adc.add_mask.channel_19" value="module.driver.adc.add_mask.channel_19.unused"/>
+      <property id="module.driver.adc.add_mask.channel_20" value="module.driver.adc.add_mask.channel_20.unused"/>
+      <property id="module.driver.adc.add_mask.channel_21" value="module.driver.adc.add_mask.channel_21.unused"/>
+      <property id="module.driver.adc.add_mask.channel_22" value="module.driver.adc.add_mask.channel_22.unused"/>
+      <property id="module.driver.adc.add_mask.channel_23" value="module.driver.adc.add_mask.channel_23.unused"/>
+      <property id="module.driver.adc.add_mask.channel_24" value="module.driver.adc.add_mask.channel_24.unused"/>
+      <property id="module.driver.adc.add_mask.channel_25" value="module.driver.adc.add_mask.channel_25.unused"/>
+      <property id="module.driver.adc.add_mask.channel_26" value="module.driver.adc.add_mask.channel_26.unused"/>
+      <property id="module.driver.adc.add_mask.channel_27" value="module.driver.adc.add_mask.channel_27.unused"/>
+      <property id="module.driver.adc.add_mask.channel_temperature" value="module.driver.adc.add_mask.channel_temperature.unused"/>
+      <property id="module.driver.adc.add_mask.channel_voltage" value="module.driver.adc.add_mask.channel_voltage.unused"/>
+      <property id="module.driver.adc.sample_hold_mask" value="module.driver.adc.sample_hold_mask.default"/>
+      <property id="module.driver.adc.sample_hold_mask.channel_0" value="module.driver.adc.sample_hold_mask.channel_0.unused"/>
+      <property id="module.driver.adc.sample_hold_mask.channel_1" value="module.driver.adc.sample_hold_mask.channel_1.unused"/>
+      <property id="module.driver.adc.sample_hold_mask.channel_2" value="module.driver.adc.sample_hold_mask.channel_2.unused"/>
+      <property id="module.driver.adc.sample_hold_states" value="24"/>
+      <property id="module.driver.adc.p_callback" value="NULL"/>
+      <property id="module.driver.adc.scan_end_ipl" value="board.icu.common.irq.priority4"/>
+      <property id="module.driver.adc.scan_end_b_ipl" value="board.icu.common.irq.disabled"/>
+    </module>
+    <module id="module.driver.timer_on_gpt.321611386">
+      <property id="module.driver.timer.name" value="g_timer0"/>
+      <property id="module.driver.timer.channel" value="0"/>
+      <property id="module.driver.timer.mode" value="module.driver.timer.mode.mode_periodic"/>
+      <property id="module.driver.timer.period" value="4000"/>
+      <property id="module.driver.timer.unit" value="module.driver.timer.unit.unit_frequency_hz"/>
+      <property id="module.driver.timer.duty_cycle" value="50"/>
+      <property id="module.driver.timer.duty_cycle_unit" value="module.driver.timer.unit.unit_percent"/>
+      <property id="module.driver.timer.autostart" value="module.driver.timer.autostart.true"/>
+      <property id="module.driver.timer.gtioca_output_enabled" value="module.driver.timer.gtioca_output_enabled.false"/>
+      <property id="module.driver.timer.gtioca_stop_level" value="module.driver.timer.gtioca_stop_level.pin_level_low"/>
+      <property id="module.driver.timer.gtiocb_output_enabled" value="module.driver.timer.gtiocb_output_enabled.false"/>
+      <property id="module.driver.timer.gtiocb_stop_level" value="module.driver.timer.gtiocb_stop_level.pin_level_low"/>
+      <property id="module.driver.timer.p_callback" value="NULL"/>
+      <property id="module.driver.timer.irq_ipl" value="board.icu.common.irq.disabled"/>
+    </module>
+    <module id="module.driver.transfer_on_dtc.1916045898">
+      <property id="module.driver.transfer.name" value="g_transfer0"/>
+      <property id="module.driver.transfer.mode" value="module.driver.transfer.mode.mode_normal"/>
+      <property id="module.driver.transfer.size" value="module.driver.transfer.size.size_2_byte"/>
+      <property id="module.driver.transfer.dest_addr_mode" value="module.driver.transfer.dest_addr_mode.addr_mode_fixed"/>
+      <property id="module.driver.transfer.src_addr_mode" value="module.driver.transfer.src_addr_mode.addr_mode_fixed"/>
+      <property id="module.driver.transfer.repeat_area" value="module.driver.transfer.repeat_area.repeat_area_source"/>
+      <property id="module.driver.transfer.interrupt" value="module.driver.transfer.interrupt.interrupt_end"/>
+      <property id="module.driver.transfer.p_dest" value="NULL"/>
+      <property id="module.driver.transfer.p_src" value="NULL"/>
+      <property id="module.driver.transfer.length" value="0"/>
+      <property id="module.driver.transfer.num_blocks" value="0"/>
+      <property id="module.driver.transfer.activation_source" value="module.driver.transfer.event.event_elc_software_event_0"/>
+      <property id="module.driver.transfer.auto_enable" value="module.driver.transfer.auto_enable.true"/>
+      <property id="module.driver.transfer.p_callback" value="NULL"/>
+      <property id="module.driver.transfer.irq_ipl" value="board.icu.common.irq.disabled"/>
+    </module>
+    <module id="module.driver.dac_on_dac.1745159952">
+      <property id="module.driver.dac.name" value="g_dac0"/>
+      <property id="module.driver.dac.channel_id" value="0"/>
+      <property id="module.driver.dac.ad_da_synchronized" value="module.driver.dac.ad_da_synchronized.false"/>
+      <property id="module.driver.dac.data_format" value="module.driver.dac.data_format.data_format_flush_right"/>
+      <property id="module.driver.dac.output_amplifier_enabled" value="module.driver.dac.output_amplifier_enabled.false"/>
+    </module>
+    <module id="module.framework.sf_i2c_on_sf_i2c.1780733882">
+      <property id="module.framework.sf_i2c.name" value="g_ams_en210_temp_humid"/>
+    </module>
+    <module id="module.framework.sf_i2c_bus_on_sf_i2c.1415618611">
+      <property id="module.framework.sf_i2c_bus.name" value="g_sf_i2c_bus0"/>
+      <property id="module.framework.sf_i2c_bus.i2c_interface" value="module.framework.sf_i2c_bus.i2c_interface.sci"/>
+      <property id="module.framework.sf_i2c_bus.channel" value="0"/>
+    </module>
+    <module id="module.driver.i2c_on_sci_i2c.1214508694">
+      <property id="module.driver.i2c.name" value="g_i2c_temp_humid"/>
+      <property id="module.driver.i2c.channel" value="0"/>
+      <property id="module.driver.i2c.rate" value="module.driver.i2c.rate.rate_standard"/>
+      <property id="module.driver.i2c.slave" value="0x43"/>
+      <property id="module.driver.i2c.addr_mode" value="module.driver.i2c.addr_mode.addr_mode_7bit"/>
+      <property id="module.driver.i2c.sda_delay" value="300"/>
+      <property id="module.driver.i2c.bitrate_modulation" value="module.driver.i2c.bitrate_modulation.true"/>
+      <property id="module.driver.i2c.p_callback" value="NULL"/>
+      <property id="module.driver.i2c.rxi_ipl" value="board.icu.common.irq.priority6"/>
+      <property id="module.driver.i2c.txi_ipl" value="board.icu.common.irq.priority6"/>
+      <property id="module.driver.i2c.tei_ipl" value="board.icu.common.irq.priority6"/>
     </module>
     <context id="_hal.0">
       <stack module="module.driver.fmi_on_fmi.0"/>
@@ -511,6 +720,93 @@
         </stack>
       </stack>
     </context>
+    <context id="rtos.threadx.thread.1517547309">
+      <property id="_symbol" value="sys_display_thread"/>
+      <property id="rtos.threadx.thread.name" value="System Display Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="8"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="1"/>
+    </context>
+    <context id="rtos.threadx.thread.924298567">
+      <property id="_symbol" value="sys_file_logger_thread"/>
+      <property id="rtos.threadx.thread.name" value="System File Logger Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="7"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="1"/>
+    </context>
+    <context id="rtos.threadx.thread.2138308075">
+      <property id="_symbol" value="cloud_data_thread"/>
+      <property id="rtos.threadx.thread.name" value="Cloud Data Thread"/>
+      <property id="rtos.threadx.thread.stack" value="4096"/>
+      <property id="rtos.threadx.thread.priority" value="7"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="1"/>
+    </context>
+    <context id="rtos.threadx.thread.282027456">
+      <property id="_symbol" value="sensor_vibration_compass_thread"/>
+      <property id="rtos.threadx.thread.name" value="Sensor Vibration and Compass (BMC150) Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="8"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="1"/>
+    </context>
+    <context id="rtos.threadx.thread.785910637">
+      <property id="_symbol" value="sensor_color_proximity_thread"/>
+      <property id="rtos.threadx.thread.name" value="Sensor Color and Proximity (AMS TMD3782) Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="8"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="1"/>
+    </context>
+    <context id="rtos.threadx.thread.1882901370">
+      <property id="_symbol" value="sensor_lightning_thread"/>
+      <property id="rtos.threadx.thread.name" value="Sensor Lightning (AMS AS3935) Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="8"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="1"/>
+    </context>
+    <context id="rtos.threadx.thread.1358427708">
+      <property id="_symbol" value="sensor_humidity_temperature_thread"/>
+      <property id="rtos.threadx.thread.name" value="Sensor Humidity and Temperature (AMS EN210) Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="8"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="1"/>
+      <stack module="module.framework.sf_i2c_on_sf_i2c.1780733882">
+        <stack module="module.driver.i2c_on_sci_i2c.1214508694" requires="module.framework.sf_i2c_on_sf_i2c.requires.i2c"/>
+        <stack module="module.framework.sf_i2c_bus_on_sf_i2c.1415618611" requires="module.framework.sf_i2c_on_sf_i2c.requires.sf_i2c_bus"/>
+      </stack>
+    </context>
+    <context id="rtos.threadx.thread.2024768991">
+      <property id="_symbol" value="sensor_air_quality_thread"/>
+      <property id="rtos.threadx.thread.name" value="Sensor Air Quality (AMS iAQ) Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="8"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="1"/>
+    </context>
+    <context id="rtos.threadx.thread.407260935">
+      <property id="_symbol" value="sensor_microphone_thread"/>
+      <property id="rtos.threadx.thread.name" value="Sensor Microphone (ADC) Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="8"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="1"/>
+      <stack module="module.framework.sf_adc_periodic_on_sf_adc_periodic.1842730638">
+        <stack module="module.driver.adc_on_adc.196131891" requires="module.framework.sf_adc_periodic.requires.adc"/>
+        <stack module="module.driver.timer_on_gpt.321611386" requires="module.framework.sf_adc_periodic.requires.timer"/>
+        <stack module="module.driver.transfer_on_dtc.1916045898" requires="module.framework.sf_adc_periodic.requires.transfer"/>
+      </stack>
+      <stack module="module.driver.dac_on_dac.1745159952"/>
+      <object id="rtos.threadx.object.semaphore.1606640913">
+        <property id="rtos.threadx.object.semaphore.name" value="Microphone (ADC) Data Ready Semaphore"/>
+        <property id="rtos.threadx.object.semaphore.symbol" value="g_microphone_data_ready"/>
+        <property id="rtos.threadx.object.semaphore.count" value="0"/>
+      </object>
+    </context>
     <config id="config.el.ux_v2"/>
     <config id="config.el.nx_dhcp_client">
       <property id="config.el.nx_dhcp_client.priority" value="3"/>
@@ -561,6 +857,12 @@
       <property id="config.driver.ioport.checking" value="config.driver.ioport.checking.system"/>
     </config>
     <config id="config.threadx.thread"/>
+    <config id="config.driver.dac">
+      <property id="config.driver.dac.param_checking_enable" value="config.driver.dac.param_checking_enable.bsp"/>
+    </config>
+    <config id="config.driver.adc">
+      <property id="config.driver.adc.param_checking_enable" value="config.driver.adc.param_checking_enable.enabled"/>
+    </config>
     <config id="config.el.nx"/>
     <config id="config.el.nx_dhcp_common">
       <property id="config.el.nx_dhcp_common.tos" value="config.el.nx_dhcp_common.tos.normal"/>
@@ -616,6 +918,9 @@
     <config id="config.framework.sf_el_ux_dcd_fs">
       <property id="config.framework.sf_el_ux_dcd_fs.irq_ipl" value="board.icu.common.irq.disabled"/>
     </config>
+    <config id="config.framework.sf_adc_periodic">
+      <property id="config.framework.sf_adc_periodic.param_checking_enable" value="config.framework.sf_adc_periodic.param_checking_enable.bsp"/>
+    </config>
     <config id="config.el.nx_dns_client">
       <property id="config.el.nx_dns_client.control_tos" value="config.el.nx_dns_client.control_tos.normal"/>
       <property id="config.el.nx_dns_client.time_to_live" value="128"/>
@@ -658,6 +963,15 @@
       <property id="config.el.ux_src.slave_request_control_max_length" value=""/>
       <property id="config.el.ux_src.slave_request_data_max_length" value=""/>
       <property id="config.el.ux_src.enforce_safe_alignment" value="config.el.ux_src.enforce_safe_alignment.disabled"/>
+    </config>
+    <config id="config.driver.gpt">
+      <property id="config.driver.gpt.param_checking_enable" value="config.driver.gpt.param_checking_enable.bsp"/>
+    </config>
+    <config id="config.driver.sci_i2c">
+      <property id="config.driver.sci_i2c.param_checking_enable" value="config.driver.sci_i2c.param_checking_enable.bsp"/>
+    </config>
+    <config id="config.framework.sf_i2c">
+      <property id="config.framework.sf_i2c.param_checking_enable" value="config.framework.sf_i2c.param_checking_enable.enabled"/>
     </config>
     <config id="config.driver.icu">
       <property id="config.driver.icu.param_checking_enable" value="config.driver.icu.param_checking_enable.bsp"/>
@@ -829,6 +1143,11 @@
       <property id="config.el.tx_src.tx_timer_delete_extension" value=""/>
     </config>
     <config id="config.el.fx"/>
+    <config id="config.driver.dtc">
+      <property id="config.driver.dtc.param_checking_enable" value="config.driver.dtc.param_checking_enable.bsp"/>
+      <property id="config.driver.dtc.software_start" value="config.driver.dtc.software_start.disabled"/>
+      <property id="config.driver.dtc.vector_table" value=".ssp_dtc_vector_table"/>
+    </config>
   </synergyModuleConfiguration>
   <synergyPinConfiguration>
     <pincfg active="true" name="S7G2-SK.pincfg" symbol="g_bsp_pin_cfg"/>

@@ -134,9 +134,9 @@ Synergy Configuration
       P407 44 USBFS0_VBUS USB_Full_Speed_USB0_VBUS Low - "Peripheral mode" CMOS None "ADC0: ADTRG; CTSU0: TS03; ETHERC0: EXOUT; IIC0: SDA; RTC0: RTCOUT; SCI4: CTS_RTS_SS; SPI1: SSL3; USBFS0: VBUS" 
       P408 43 CTSU0_TS04 Cap_Touch_Sensing_Unit_TS04 Low None "Peripheral mode" CMOS None "CTSU0: TS04; ETHERC0: CRS_DV; GPT10: GTIOCB; IRQ0: IRQ07; OPS0: GTOWLO; SCI3: RXD_MISO; SCI3: SCL; USBFS0: ID; USBHS0: ID" 
       P409 42 CTSU0_TS05 Cap_Touch_Sensing_Unit_TS05 Low None "Peripheral mode" CMOS None "CTSU0: TS05; ETHERC0: RX_ER; GPT10: GTIOCA; IRQ0: IRQ06; OPS0: GTOWUP; SCI3: SDA; SCI3: TXD_MOSI; USBFS0: EXICEN; USBHS0: EXICEN" 
-      P410 41 SCI0_RXD_MISO SCI0_RXD0_SCL0_MISO0 Medium None "Peripheral mode" CMOS None "AGT1: AGTOB; CTSU0: TS06; ETHERC0: RXD1; GPT9: GTIOCB; IRQ0: IRQ05; OPS0: GTOVLO; SCI0: RXD_MISO; SCI0: SCL; SCI3: SCK; SDHI0: DAT1; SPI0: MISO" 
-      P411 40 SCI0_TXD_MOSI SCI0_TXD0_SDA0_MOSI0 Medium None "Peripheral mode" CMOS None "AGT1: AGTOA; CTSU0: TS07; ETHERC0: RXD0; GPT9: GTIOCA; IRQ0: IRQ04; OPS0: GTOVUP; SCI0: SDA; SCI0: TXD_MOSI; SCI3: CTS_RTS_SS; SDHI0: DAT0; SPI0: MOSI" 
-      P412 39 SCI0_SCK SCI0_SCK0 High - "Peripheral mode" CMOS None "CTSU0: TS08; ETHERC0: REF50CK; OPS0: GTOULO; SCI0: SCK; SDHI0: CMD; SPI0: RSPCK" 
+      P410 41 SCI0_SCL - Low None "Peripheral mode" "n-ch open drain" None "AGT1: AGTOB; CTSU0: TS06; ETHERC0: RXD1; GPT9: GTIOCB; IRQ0: IRQ05; OPS0: GTOVLO; SCI0: RXD_MISO; SCI0: SCL; SCI3: SCK; SDHI0: DAT1; SPI0: MISO" 
+      P411 40 SCI0_SDA - Low None "Peripheral mode" "n-ch open drain" None "AGT1: AGTOA; CTSU0: TS07; ETHERC0: RXD0; GPT9: GTIOCA; IRQ0: IRQ04; OPS0: GTOVUP; SCI0: SDA; SCI0: TXD_MOSI; SCI3: CTS_RTS_SS; SDHI0: DAT0; SPI0: MOSI" 
+      P412 39 - - - - Disabled - - "CTSU0: TS08; ETHERC0: REF50CK; OPS0: GTOULO; SCI0: SCK; SDHI0: CMD; SPI0: RSPCK" 
       P413 38 GPIO GPIO15 Medium - "Output mode (Initial Low)" CMOS None "CTSU0: TS09; ETHERC0: TXD0; OPS0: GTOUUP; SCI0: CTS_RTS_SS; SDHI0: CLK; SPI0: SSL0" 
       P414 37 CTSU0_TS10 Cap_Touch_Sensing_Unit_TS10 Low - "Peripheral mode" CMOS None "CTSU0: TS10; ETHERC0: TXD1; SDHI0: WP; SPI0: SSL1" 
       P415 36 CTSU0_TS11 Cap_Touch_Sensing_Unit_TS11 Low - "Peripheral mode" CMOS None "CTSU0: TS11; ETHERC0: TXD_EN; SPI0: SSL2" 
@@ -307,6 +307,15 @@ Synergy Configuration
     DHCP options buffer size (bytes): 312
     
   Module "NetX BSD Support"
+  Module "I2C Framework Device on sf_i2c"
+    Parameter Checking: Enabled
+    
+  Module "ADC Periodic Framework on sf_adc_periodic"
+    Parameter Checking: Default (BSP)
+    
+  Module "DAC Driver on r_dac"
+    Parameter Checking: Default (BSP)
+    
   HAL
     Instance "g_fmi FMI Driver on r_fmi"
       Name: g_fmi
@@ -400,8 +409,8 @@ Synergy Configuration
         Pointer to subscriber list array: p_subscriber_lists
         name of the block pool internally used in the messaging framework: sf_msg_blk_pool
         
-      Instance "g_i2c0 I2C Master Driver on r_riic"
-        Name: g_i2c0
+      Instance "g_i2c_touch_panel I2C Master Driver on r_riic"
+        Name: g_i2c_touch_panel
         Channel: 2
         Rate: Fast-mode
         Slave Address: 0x48
@@ -617,6 +626,234 @@ Synergy Configuration
             Instance "ThreadX Source"
               Show linkage warning: Disabled
               
+  Thread "System Display Thread"
+    Symbol: sys_display_thread
+    Name: System Display Thread
+    Stack size (bytes): 1024
+    Priority: 8
+    Auto start: Enabled
+    Time slicing interval (ticks): 1
+    
+  Thread "System File Logger Thread"
+    Symbol: sys_file_logger_thread
+    Name: System File Logger Thread
+    Stack size (bytes): 1024
+    Priority: 7
+    Auto start: Enabled
+    Time slicing interval (ticks): 1
+    
+  Thread "Cloud Data Thread"
+    Symbol: cloud_data_thread
+    Name: Cloud Data Thread
+    Stack size (bytes): 4096
+    Priority: 7
+    Auto start: Enabled
+    Time slicing interval (ticks): 1
+    
+  Thread "Sensor Vibration and Compass (BMC150) Thread"
+    Symbol: sensor_vibration_compass_thread
+    Name: Sensor Vibration and Compass (BMC150) Thread
+    Stack size (bytes): 1024
+    Priority: 8
+    Auto start: Disabled
+    Time slicing interval (ticks): 1
+    
+  Thread "Sensor Color and Proximity (AMS TMD3782) Thread"
+    Symbol: sensor_color_proximity_thread
+    Name: Sensor Color and Proximity (AMS TMD3782) Thread
+    Stack size (bytes): 1024
+    Priority: 8
+    Auto start: Disabled
+    Time slicing interval (ticks): 1
+    
+  Thread "Sensor Lightning (AMS AS3935) Thread"
+    Symbol: sensor_lightning_thread
+    Name: Sensor Lightning (AMS AS3935) Thread
+    Stack size (bytes): 1024
+    Priority: 8
+    Auto start: Disabled
+    Time slicing interval (ticks): 1
+    
+  Thread "Sensor Humidity and Temperature (AMS EN210) Thread"
+    Symbol: sensor_humidity_temperature_thread
+    Name: Sensor Humidity and Temperature (AMS EN210) Thread
+    Stack size (bytes): 1024
+    Priority: 8
+    Auto start: Enabled
+    Time slicing interval (ticks): 1
+    
+    Instance "g_ams_en210_temp_humid I2C Framework Device on sf_i2c"
+      Name: g_ams_en210_temp_humid
+      
+      Instance "g_i2c_temp_humid I2C Master Driver on r_sci_i2c"
+        Name: g_i2c_temp_humid
+        Channel: 0
+        Rate: Standard
+        Slave Address : 0x43
+        Address Mode: 7-Bit
+        SDA Output Delay (nano seconds): 300
+        Bit Rate Modulation Enable: Enable
+        Callback: NULL
+        Receive Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
+        Transmit Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
+        Transmit End Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
+        
+      Instance "g_sf_i2c_bus0 I2C Framework Shared Bus on sf_i2c"
+        Name: g_sf_i2c_bus0
+        I2C Implementation: SCI I2C
+        Channel: 0
+        
+  Thread "Sensor Air Quality (AMS iAQ) Thread"
+    Symbol: sensor_air_quality_thread
+    Name: Sensor Air Quality (AMS iAQ) Thread
+    Stack size (bytes): 1024
+    Priority: 8
+    Auto start: Disabled
+    Time slicing interval (ticks): 1
+    
+  Thread "Sensor Microphone (ADC) Thread"
+    Symbol: sensor_microphone_thread
+    Name: Sensor Microphone (ADC) Thread
+    Stack size (bytes): 1024
+    Priority: 8
+    Auto start: Enabled
+    Time slicing interval (ticks): 1
+    
+    Instance "g_sf_adc_periodic0 ADC Periodic Framework on sf_adc_periodic"
+      Name: g_sf_adc_periodic0
+      Name of the data-buffer to store samples: g_adc_raw_data
+      Length of the data-buffer: 8
+      Number of sampling iterations: 1
+      GPT Timer channel used to trigger the scan: Channel 0
+      Callback: g_adc_framework_microphone_callback
+      
+      Instance "g_adc0 ADC Driver on r_adc"
+        Name: g_adc0
+        Unit: 0
+        Resolution: 12-Bit
+        Alignment: Right
+        Clear after read: On
+        Mode: Single Scan
+        Channel Scan Mask: Select channels below
+            Channel 0: Use in Normal/Group A
+            Channel 1: Unused
+            Channel 2: Unused
+            Channel 3: Unused
+            Channel 4: Unused
+            Channel 5: Unused
+            Channel 6: Unused
+            Channel 7 (S3A7/S124 Only): Unused
+            Channel 8 (S3A7/S124 Only): Unused
+            Channel 9 (S3A7/S124 Only): Unused
+            Channel 10 (S3A7/S124 Only): Unused
+            Channel 11 (S3A7 Only): Unused
+            Channel 12 (S3A7 Only): Unused
+            Channel 13 (S3A7 Only): Unused
+            Channel 14 (S3A7 Only): Unused
+            Channel 15 (S3A7 Only): Unused
+            Channel 16: Unused
+            Channel 17: Unused
+            Channel 18: Unused
+            Channel 19: Unused
+            Channel 20: Unused
+            Channel 21 (Unit 0 Only): Unused
+            Channel 22 (S3A7/S124 Only): Unused
+            Channel 23 (S3A7 Only): Unused
+            Channel 24 (S3A7 Only): Unused
+            Channel 25 (S3A7 Only): Unused
+            Channel 26 (S3A7 Only): Unused
+            Channel 27 (S3A7 Only): Unused
+            Temperature Sensor: Unused
+            Voltage Sensor: Unused
+        Normal/Group A Trigger: ELC Event
+        Group B Trigger (Valid only in Group Scan Mode): ELC Event (The only valid trigger for either group in Group Scan Mode)
+        Group Priority (Valid only in Group Scan Mode): Group A cannot interrupt Group B
+        Add/Average Count: Disabled
+        Addition/Averaging Mask: Select channels to perform addition/averaging below
+            Channel 0: Disabled
+            Channel 1: Disabled
+            Channel 2: Disabled
+            Channel 3: Disabled
+            Channel 4: Disabled
+            Channel 5: Disabled
+            Channel 6: Disabled
+            Channel 7: Disabled
+            Channel 8: Disabled
+            Channel 9: Disabled
+            Channel 10: Disabled
+            Channel 11: Disabled
+            Channel 12: Disabled
+            Channel 13: Disabled
+            Channel 14: Disabled
+            Channel 15: Disabled
+            Channel 16: Disabled
+            Channel 17: Disabled
+            Channel 18: Disabled
+            Channel 19: Disabled
+            Channel 20: Disabled
+            Channel 21: Disabled
+            Channel 22: Disabled
+            Channel 23: Disabled
+            Channel 24: Disabled
+            Channel 25: Disabled
+            Channel 26: Disabled
+            Channel 27: Disabled
+            Temperature Sensor: Disabled
+            Voltage Sensor: Disabled
+        Sample and Hold Mask: Select channels for which individual sample and hold circuit is to be enabled
+            Channel 0: Disabled
+            Channel 1: Disabled
+            Channel 2: Disabled
+        Sample Hold States (Applies only to the 3 channels selected above): 24
+        Callback: NULL
+        Scan End Interrupt Priority: Priority 4 (CM4: valid, CM0+: invalid)
+        Scan End Group B Interrupt Priority: Disabled
+        
+      Instance "g_timer0 Timer Driver on r_gpt"
+        Name: g_timer0
+        Channel: 0
+        Mode: Periodic
+        Period Value: 4000
+        Period Unit: Hertz
+        Duty Cycle Value: 50
+        Duty Cycle Unit: Unit Percent
+        Auto Start: False
+        GTIOCA Output Enabled: False
+        GTIOCA Stop Level: Pin Level Low
+        GTIOCB Output Enabled: False
+        GTIOCB Stop Level: Pin Level Low
+        Callback: NULL
+        Interrupt Priority: Disabled
+        
+      Instance "g_transfer0 Transfer Driver on r_dtc Software Activation 1"
+        Name: g_transfer0
+        Mode: Block
+        Transfer Size: 2 Bytes
+        Destination Address Mode: Incremented
+        Source Address Mode: Incremented
+        Repeat Area (Unused in Normal Mode): Source
+        Interrupt Frequency: After all transfers have completed
+        Destination Pointer: NULL
+        Source Pointer: NULL
+        Number of Transfers: 1
+        Number of Blocks (Valid only in Block Mode): 1
+        Activation Source (Must enable IRQ): Software Activation 1
+        Auto Enable: False
+        Callback (Only valid with Software start): NULL
+        ELC Software Event Interrupt Priority: Disabled
+        
+    Instance "g_dac0 DAC Driver on r_dac"
+      Name: g_dac0
+      Channel: 0
+      Synchronize with ADC: Disabled
+      Data Format: Right Justified
+      Output Amplifier: Disable
+      
+    Object "g_microphone_data_ready Semaphore"
+      Name: Microphone (ADC) Data Ready Semaphore
+      Symbol: g_microphone_data_ready
+      Initial count: 0
+      
   Messaging
     Event "System Network Available"
       Symbol: SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE
@@ -694,9 +931,37 @@ Synergy Configuration
       Event Class "Touch"
       Event Class "System"
       Event Class "Sensor"
-      Event Class "Config"
       
     Subscriber "System Touch Thread" 0 0
+      Event Class "System"
       
     Subscriber "System Network (Ethernet) Thread" 0 0
+      Event Class "System"
+      
+    Subscriber "System Display Thread" 0 0
+      Event Class "System"
+      
+    Subscriber "System File Logger Thread" 0 0
+      Event Class "System"
+      
+    Subscriber "Cloud Data Thread" 0 0
+      Event Class "System"
+      
+    Subscriber "Sensor Vibration and Compass (BMC150) Thread" 0 0
+      Event Class "System"
+      
+    Subscriber "Sensor Color and Proximity (AMS TMD3782) Thread" 0 0
+      Event Class "System"
+      
+    Subscriber "Sensor Lightning (AMS AS3935) Thread" 0 0
+      Event Class "System"
+      
+    Subscriber "Sensor Humidity and Temperature (AMS EN210) Thread" 0 0
+      Event Class "System"
+      
+    Subscriber "Sensor Air Quality (AMS iAQ) Thread" 0 0
+      Event Class "System"
+      
+    Subscriber "Sensor Microphone (ADC) Thread" 0 0
+      Event Class "System"
       

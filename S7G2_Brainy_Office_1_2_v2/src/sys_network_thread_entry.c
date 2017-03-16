@@ -11,7 +11,7 @@ ULONG g_dns_ip [ 2 ];
 #define MQTT_DEBUG_LAN  1
 #define MQTT_DEBUG_M1   2
 #define MQTT_DEBUG_NONE 0
-#define MQTT_DEBUG MQTT_DEBUG_M1
+#define MQTT_DEBUG MQTT_DEBUG_NONE
 
 ULONG sys_network_thread_wait = 10;
 
@@ -19,9 +19,15 @@ extern TX_THREAD sys_network_thread;
 
 void setMacAddress ( nx_mac_address_t *p_mac_config );
 
+#define NETWORK_STATUS_CHECK_MASK (NX_IP_LINK_ENABLED | NX_IP_ADDRESS_RESOLVED | NX_IP_INTERFACE_LINK_ENABLED | NX_IP_INITIALIZE_DONE)
+
 /* System Network (Ethernet) Thread entry function */
 void sys_network_thread_entry ( void )
 {
+    unsigned long networkStatus = 0;
+
+    // nx_ip_link_status_change_notify_set
+    // nx_ip_address_change_notify
 
     while ( 1 )
     {
@@ -91,18 +97,18 @@ void sys_network_thread_entry ( void )
     #elif (MQTT_DEBUG==MQTT_DEBUG_M1)
             sprintf ( m1UsernameStr, "%s/%s", "o3adQcvIn0Q" /*project ID*/, "kHgc2feq1bg" /*User ID*/);
             sprintf ( m1Password, "%s/%s", "WG46JL5TPKJ3Q272SDCEJDJQGQ4DEOJZGM2GEZBYGRQTAMBQ" /*API Key*/,
-                      "Dec2kPok" /*Passowrd*/);
+                    "Dec2kPok" /*Passowrd*/);
             /*mqtt2.mediumone.com=167.114.77.228:61619*/
             int status = mqtt_netx_connect ( "desktop-kit-1", "167.114.77.228", 61619, m1UsernameStr, m1Password, 0, 0,
-                                             0, 0 );
+                    0, 0 );
     #endif
             if ( status == 1 )
             {
-                sprintf ( g_topic_name, "0/%s/%s/%s", "o3adQcvIn0Q", "kHgc2feq1bg", "kHgc2feq1bg" );
+                sprintf ( g_topic_name, "0/%s/%s/%s", "o3adQcvIn0Q", "kHgc2feq1bg", "arcadia" );
 
                 char initialConnectMessage [ 128 ];
                 sprintf ( initialConnectMessage, "{\"event_data\":{\"init_connect\":{\"name\":\"%s\"}}}",
-                          "desktop-kit-1" );
+                        "desktop-kit-1" );
                 mqtt_netx_publish ( g_topic_name, initialConnectMessage, 0 );
             }
         }
@@ -114,11 +120,11 @@ void sys_network_thread_entry ( void )
         while ( 1 ) // actual thread body
         {
             // TODO: Actual thread body code goes here
-//            nx_ip_interface_status_check ( &g_ip, 0, NX_IP_LINK_ENABLED, &status, NX_WAIT_FOREVER )
-
-//            if ( waitForThreadFlag ( THREAD_NETWORK_STOP, true, sys_network_thread_wait ) == true )
+//            nx_ip_interface_status_check ( &g_ip, 0, NETWORK_STATUS_CHECK_MASK, &networkStatus, 0 );
+//
+//            if ( ( networkStatus & NETWORK_STATUS_CHECK_MASK ) != NETWORK_STATUS_CHECK_MASK )
 //            {
-//                break; // Exit from the thread (inner) loop
+//                break;
 //            }
 
             tx_thread_sleep ( sys_network_thread_wait );
