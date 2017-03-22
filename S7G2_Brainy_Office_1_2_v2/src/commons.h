@@ -19,7 +19,7 @@
     #include "hal_data.h"
 
     #define MAX_THREAD_COUNT    16
-    #define USBX_CONFIGURED 0
+    #define USBX_CONFIGURED 1
 extern const bsp_leds_t g_bsp_leds;
 
 typedef enum
@@ -74,14 +74,6 @@ ssp_err_t postSystemEventMessage ( TX_THREAD * sender, sf_message_event_class_t 
                                    sf_message_event_t eventCode );
 ssp_err_t postSensorEventMessage ( TX_THREAD * sender, sf_message_event_class_t eventClass,
                                    sf_message_event_t eventCode, void * dataPtr );
-
-// Configuration function to set the Cloud Implementation Adapter
-// @param [in]  cloudImpl   Implementation Function Pointer to publish payload to cloud.  Use NULL to remove the existing implementation.
-// @param [in]  configImpl  Implementation Function Pointer to setup Cloud Connection.  Use NULL to remove the existing implementation.
-// @param [in]  initImpl    Implementation Function Pointer to initialize Cloud Connection.  Use NULL to remove the existing implementation.  This function will be called right after successful execution of configImpl and is not NULL.  This function will also be called whenever network connection is successfully established.
-// @return                  NULL or existing Cloud Implementation function pointer (if any set in the prior call to this function, NOT the Configuration Setup Impl)
-stringDataFunction setCloudPublishingFunction ( stringDataFunction cloudImpl, stringDataFunction configImpl,
-                                                stringDataFunction initImpl );
 
 bool readValueForKey ( const char * buffer, const size_t bufferSize, const char * key, const int maxValueLength,
                        char * value, size_t * charsRead );

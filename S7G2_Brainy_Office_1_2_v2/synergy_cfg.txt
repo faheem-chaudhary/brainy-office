@@ -134,9 +134,9 @@ Synergy Configuration
       P407 44 USBFS0_VBUS USB_Full_Speed_USB0_VBUS Low - "Peripheral mode" CMOS None "ADC0: ADTRG; CTSU0: TS03; ETHERC0: EXOUT; IIC0: SDA; RTC0: RTCOUT; SCI4: CTS_RTS_SS; SPI1: SSL3; USBFS0: VBUS" 
       P408 43 CTSU0_TS04 Cap_Touch_Sensing_Unit_TS04 Low None "Peripheral mode" CMOS None "CTSU0: TS04; ETHERC0: CRS_DV; GPT10: GTIOCB; IRQ0: IRQ07; OPS0: GTOWLO; SCI3: RXD_MISO; SCI3: SCL; USBFS0: ID; USBHS0: ID" 
       P409 42 CTSU0_TS05 Cap_Touch_Sensing_Unit_TS05 Low None "Peripheral mode" CMOS None "CTSU0: TS05; ETHERC0: RX_ER; GPT10: GTIOCA; IRQ0: IRQ06; OPS0: GTOWUP; SCI3: SDA; SCI3: TXD_MOSI; USBFS0: EXICEN; USBHS0: EXICEN" 
-      P410 41 SCI0_SCL - Low None "Peripheral mode" "n-ch open drain" None "AGT1: AGTOB; CTSU0: TS06; ETHERC0: RXD1; GPT9: GTIOCB; IRQ0: IRQ05; OPS0: GTOVLO; SCI0: RXD_MISO; SCI0: SCL; SCI3: SCK; SDHI0: DAT1; SPI0: MISO" 
-      P411 40 SCI0_SDA - Low None "Peripheral mode" "n-ch open drain" None "AGT1: AGTOA; CTSU0: TS07; ETHERC0: RXD0; GPT9: GTIOCA; IRQ0: IRQ04; OPS0: GTOVUP; SCI0: SDA; SCI0: TXD_MOSI; SCI3: CTS_RTS_SS; SDHI0: DAT0; SPI0: MOSI" 
-      P412 39 - - - - Disabled - - "CTSU0: TS08; ETHERC0: REF50CK; OPS0: GTOULO; SCI0: SCK; SDHI0: CMD; SPI0: RSPCK" 
+      P410 41 SCI0_RXD_MISO - Low None "Peripheral mode" CMOS None "AGT1: AGTOB; CTSU0: TS06; ETHERC0: RXD1; GPT9: GTIOCB; IRQ0: IRQ05; OPS0: GTOVLO; SCI0: RXD_MISO; SCI0: SCL; SCI3: SCK; SDHI0: DAT1; SPI0: MISO" 
+      P411 40 SCI0_TXD_MOSI - Low None "Peripheral mode" CMOS None "AGT1: AGTOA; CTSU0: TS07; ETHERC0: RXD0; GPT9: GTIOCA; IRQ0: IRQ04; OPS0: GTOVUP; SCI0: SDA; SCI0: TXD_MOSI; SCI3: CTS_RTS_SS; SDHI0: DAT0; SPI0: MOSI" 
+      P412 39 SCI0_SCK - Low - "Peripheral mode" CMOS None "CTSU0: TS08; ETHERC0: REF50CK; OPS0: GTOULO; SCI0: SCK; SDHI0: CMD; SPI0: RSPCK" 
       P413 38 GPIO GPIO15 Medium - "Output mode (Initial Low)" CMOS None "CTSU0: TS09; ETHERC0: TXD0; OPS0: GTOUUP; SCI0: CTS_RTS_SS; SDHI0: CLK; SPI0: SSL0" 
       P414 37 CTSU0_TS10 Cap_Touch_Sensing_Unit_TS10 Low - "Peripheral mode" CMOS None "CTSU0: TS10; ETHERC0: TXD1; SDHI0: WP; SPI0: SSL1" 
       P415 36 CTSU0_TS11 Cap_Touch_Sensing_Unit_TS11 Low - "Peripheral mode" CMOS None "CTSU0: TS11; ETHERC0: TXD_EN; SPI0: SSL2" 
@@ -349,14 +349,14 @@ Synergy Configuration
       Auto Media Initialization: Disable
       Timeout ticks for Media Initialization (Specify 0 if no need of thread suspension): 1000
       
-      Instance "g_ux_host_class_storage0 USBX Host Class Mass Storage"
-        Name: g_ux_host_class_storage0
+      Instance "g_ux_host_class_storage USBX Host Class Mass Storage"
+        Name: g_ux_host_class_storage
         
         Instance "USBX Host Class Mass Storage Source"
           Show linkage warning: Disabled
           
-        Instance "USBX Host Configuration g_ux_host_0"
-          Name: g_ux_host_0
+        Instance "USBX Host Configuration g_ux_host_configuration"
+          Name: g_ux_host_configuration
           
           Instance "g_sf_el_ux_hcd_hs_0 USBX Port HCD on sf_el_ux for USBHS"
             Name: g_sf_el_ux_hcd_hs_0
@@ -364,7 +364,7 @@ Synergy Configuration
             
           Instance "USBX on ux"
             USBX Pool Memory Name: g_ux_pool_memory
-            USBX Pool Memory Size: 65535
+            USBX Pool Memory Size: 65536
             User Callback for Host Event Notification(Only valid for USB Host): usb_host_event_notification_callback
             
             Instance "USBX Source"
@@ -631,7 +631,7 @@ Synergy Configuration
     Name: System Display Thread
     Stack size (bytes): 1024
     Priority: 8
-    Auto start: Enabled
+    Auto start: Disabled
     Time slicing interval (ticks): 1
     
   Thread "System File Logger Thread"
@@ -639,15 +639,15 @@ Synergy Configuration
     Name: System File Logger Thread
     Stack size (bytes): 1024
     Priority: 7
-    Auto start: Enabled
+    Auto start: Disabled
     Time slicing interval (ticks): 1
     
   Thread "Cloud Data Thread"
     Symbol: cloud_data_thread
     Name: Cloud Data Thread
-    Stack size (bytes): 4096
+    Stack size (bytes): 8192
     Priority: 7
-    Auto start: Enabled
+    Auto start: Disabled
     Time slicing interval (ticks): 1
     
   Thread "Sensor Vibration and Compass (BMC150) Thread"
@@ -925,43 +925,56 @@ Synergy Configuration
       Payload type: event_config_payload_t
       
     Subscriber "System Main Thread" 0 0
-      Event Class "System"
       
     Subscriber "System Blinker Thread" 0 0
       Event Class "Touch"
       Event Class "System"
       Event Class "Sensor"
+      Event Class "Config"
       
     Subscriber "System Touch Thread" 0 0
       Event Class "System"
+      Event Class "Config"
       
     Subscriber "System Network (Ethernet) Thread" 0 0
       Event Class "System"
+      Event Class "Config"
       
     Subscriber "System Display Thread" 0 0
       Event Class "System"
+      Event Class "Config"
       
     Subscriber "System File Logger Thread" 0 0
       Event Class "System"
+      Event Class "Sensor"
+      Event Class "Config"
       
     Subscriber "Cloud Data Thread" 0 0
       Event Class "System"
+      Event Class "Sensor"
+      Event Class "Config"
       
     Subscriber "Sensor Vibration and Compass (BMC150) Thread" 0 0
       Event Class "System"
+      Event Class "Config"
       
     Subscriber "Sensor Color and Proximity (AMS TMD3782) Thread" 0 0
       Event Class "System"
+      Event Class "Config"
       
     Subscriber "Sensor Lightning (AMS AS3935) Thread" 0 0
       Event Class "System"
+      Event Class "Config"
       
     Subscriber "Sensor Humidity and Temperature (AMS EN210) Thread" 0 0
       Event Class "System"
+      Event Class "Config"
       
     Subscriber "Sensor Air Quality (AMS iAQ) Thread" 0 0
       Event Class "System"
+      Event Class "Config"
       
     Subscriber "Sensor Microphone (ADC) Thread" 0 0
       Event Class "System"
+      Event Class "Config"
       

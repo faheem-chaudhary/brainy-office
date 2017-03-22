@@ -257,46 +257,58 @@
     <eventClass display="System" header="event_system_api.h" id="eventClass.1095746090" payload="event_system_payload" payloadType="event_system_payload_t" value="SF_MESSAGE_EVENT_CLASS_SYSTEM"/>
     <eventClass display="Sensor" header="event_sensor_api.h" id="eventClass.1363358315" payload="event_sensor_payload" payloadType="event_sensor_payload_t" value="SF_MESSAGE_EVENT_CLASS_SENSOR"/>
     <eventClass display="Config" header="event_config_api.h" id="eventClass.1942317328" payload="event_config_payload" payloadType="event_config_payload_t" value="SF_MESSAGE_EVENT_CLASS_CONFIG"/>
-    <subscriber context="rtos.threadx.thread.733700626" end="0" id="subscriber.1787569172" start="0">
-      <subscribe eventClass="eventClass.1095746090"/>
-    </subscriber>
+    <subscriber context="rtos.threadx.thread.733700626" end="0" id="subscriber.1787569172" start="0"/>
     <subscriber context="rtos.threadx.thread.721736288" end="0" id="subscriber.1015849023" start="0">
       <subscribe eventClass="module.framework.sf_touch_panel.eventClass.eventClassTouch"/>
       <subscribe eventClass="eventClass.1095746090"/>
       <subscribe eventClass="eventClass.1363358315"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.41323032" end="0" id="subscriber.1867037620" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.379076183" end="0" id="subscriber.1881217138" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.1517547309" end="0" id="subscriber.449652337" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.924298567" end="0" id="subscriber.1610198113" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1363358315"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.2138308075" end="0" id="subscriber.1319785664" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1363358315"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.282027456" end="0" id="subscriber.1766188524" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.785910637" end="0" id="subscriber.297692598" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.1882901370" end="0" id="subscriber.1009286085" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.1358427708" end="0" id="subscriber.520303301" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.2024768991" end="0" id="subscriber.1938077575" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.407260935" end="0" id="subscriber.331782468" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
   </synergyMessagingConfiguration>
   <synergyModuleConfiguration>
@@ -357,28 +369,6 @@
       <property id="module.framework.sf_message.pp_subscriber_lists" value="p_subscriber_lists"/>
       <property id="module.framework.sf_message.p_blk_pool_name" value="sf_msg_blk_pool"/>
     </module>
-    <module id="module.framework.fx_usbmsc.1804938353">
-      <property id="module.framework.fx.name" value="g_fx_media"/>
-      <property id="module.framework.fx.init_function" value="fx_media_init_function"/>
-      <property id="module.framework.fx_usbmsc.media_init" value="module.framework.fx_usbmsc.media_init.disable"/>
-      <property id="module.framework.fx_usbmsc.init_timeout" value="1000"/>
-    </module>
-    <module id="module.el.ux_host_class_storage.422237099">
-      <property id="module.el.host_class.name" value="g_ux_host_class_storage0"/>
-    </module>
-    <module id="module.el.ux_host.310086933">
-      <property id="module.el.ux_host.name" value="g_ux_host_0"/>
-    </module>
-    <module id="module.el.ux_v2.1611487785">
-      <property id="module.el.ux_v2.pool_memory_name" value="g_ux_pool_memory"/>
-      <property id="module.el.ux_v2.pool_memory_size" value="65535"/>
-      <property id="module.el.ux_v2.system_change_function" value="usb_host_event_notification_callback"/>
-    </module>
-    <module id="module.el.fx_common.1380613597"/>
-    <module id="module.framework.sf_el_ux_hcd_hs.295022956">
-      <property id="module.framework.sf_el_ux_hcd.name" value="g_sf_el_ux_hcd_hs_0"/>
-      <property id="module.framework.sf_el_ux_hcd.hw_address" value="R_USBHS_BASE"/>
-    </module>
     <module id="module.el.nx.ip.1887369973">
       <property id="module.el.nx.ip.name" value="g_ip"/>
       <property id="module.el.nx.ip.address" value="192,168,0,2"/>
@@ -422,15 +412,6 @@
     </module>
     <module id="module.framework.tx_src.941240014">
       <property id="module.el.tx_src.linkage_warning" value="module.el.tx_src.linkage_warning.disabled"/>
-    </module>
-    <module id="module.el.ux_host_class_storage_src.1395086851">
-      <property id="module.el.ux_host_class_storage_src.linkage_warning" value="module.el.ux_host_class_storage_src.linkage_warning.disabled"/>
-    </module>
-    <module id="module.el.fx_src.1518788304">
-      <property id="module.el.fx_src.linkage_warning" value="module.el.fx_src.linkage_warning.disabled"/>
-    </module>
-    <module id="module.el.ux_src.1705154141">
-      <property id="module.el.ux_src.linkage_warning" value="module.el.ux_src.linkage_warning.disabled"/>
     </module>
     <module id="module.framework.sf_adc_periodic_on_sf_adc_periodic.1842730638">
       <property id="module.framework.sf_adc_periodic.name" value="g_sf_adc_periodic0"/>
@@ -583,6 +564,37 @@
       <property id="module.driver.i2c.txi_ipl" value="board.icu.common.irq.priority6"/>
       <property id="module.driver.i2c.tei_ipl" value="board.icu.common.irq.priority6"/>
     </module>
+    <module id="module.el.ux_host_class_storage.303704293">
+      <property id="module.el.host_class.name" value="g_ux_host_class_storage"/>
+    </module>
+    <module id="module.el.ux_host.1638980230">
+      <property id="module.el.ux_host.name" value="g_ux_host_configuration"/>
+    </module>
+    <module id="module.el.ux_v2.759556248">
+      <property id="module.el.ux_v2.pool_memory_name" value="g_ux_pool_memory"/>
+      <property id="module.el.ux_v2.pool_memory_size" value="65536"/>
+      <property id="module.el.ux_v2.system_change_function" value="usb_host_event_notification_callback"/>
+    </module>
+    <module id="module.el.fx_common.725217706"/>
+    <module id="module.framework.sf_el_ux_hcd_hs.1916477931">
+      <property id="module.framework.sf_el_ux_hcd.name" value="g_sf_el_ux_hcd_hs_0"/>
+      <property id="module.framework.sf_el_ux_hcd.hw_address" value="R_USBHS_BASE"/>
+    </module>
+    <module id="module.el.fx_src.100928857">
+      <property id="module.el.fx_src.linkage_warning" value="module.el.fx_src.linkage_warning.disabled"/>
+    </module>
+    <module id="module.el.ux_src.906379672">
+      <property id="module.el.ux_src.linkage_warning" value="module.el.ux_src.linkage_warning.disabled"/>
+    </module>
+    <module id="module.el.ux_host_class_storage_src.689718262">
+      <property id="module.el.ux_host_class_storage_src.linkage_warning" value="module.el.ux_host_class_storage_src.linkage_warning.disabled"/>
+    </module>
+    <module id="module.framework.fx_usbmsc.448429242">
+      <property id="module.framework.fx.name" value="g_fx_media"/>
+      <property id="module.framework.fx.init_function" value="fx_media_init_function"/>
+      <property id="module.framework.fx_usbmsc.media_init" value="module.framework.fx_usbmsc.media_init.disable"/>
+      <property id="module.framework.fx_usbmsc.init_timeout" value="1000"/>
+    </module>
     <context id="_hal.0">
       <stack module="module.driver.fmi_on_fmi.0"/>
       <stack module="module.driver.cgc_on_cgc.0"/>
@@ -597,18 +609,18 @@
       <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
       <stack module="module.framework.sf_message.1429754242"/>
-      <stack module="module.framework.fx_usbmsc.1804938353">
-        <stack module="module.el.ux_host_class_storage.422237099" requires="module.framework.fx_usbmsc.requires.ux_host_class_storage">
-          <stack module="module.el.ux_host_class_storage_src.1395086851" requires="module.el.ux_host_class_storage.requires.ux_host_class_storage_src"/>
-          <stack module="module.el.ux_host.310086933" requires="module.el.ux_host_class_storage.requires.ux_host">
-            <stack module="module.framework.sf_el_ux_hcd_hs.295022956" requires="module.el.ux_host.requires.sf_el_ux_hcd"/>
-            <stack module="module.el.ux_v2.1611487785" requires="module.el.ux_host.requires.ux_v2">
-              <stack module="module.el.ux_src.1705154141" requires="module.el.ux_v2.requires.ux_src"/>
+      <stack module="module.framework.fx_usbmsc.448429242">
+        <stack module="module.el.ux_host_class_storage.303704293" requires="module.framework.fx_usbmsc.requires.ux_host_class_storage">
+          <stack module="module.el.ux_host_class_storage_src.689718262" requires="module.el.ux_host_class_storage.requires.ux_host_class_storage_src"/>
+          <stack module="module.el.ux_host.1638980230" requires="module.el.ux_host_class_storage.requires.ux_host">
+            <stack module="module.framework.sf_el_ux_hcd_hs.1916477931" requires="module.el.ux_host.requires.sf_el_ux_hcd"/>
+            <stack module="module.el.ux_v2.759556248" requires="module.el.ux_host.requires.ux_v2">
+              <stack module="module.el.ux_src.906379672" requires="module.el.ux_v2.requires.ux_src"/>
             </stack>
           </stack>
         </stack>
-        <stack module="module.el.fx_common.1380613597" requires="module.framework.fx_usbmsc.requires.fx_common">
-          <stack module="module.el.fx_src.1518788304" requires="module.el.fx.requires.fx_src">
+        <stack module="module.el.fx_common.725217706" requires="module.framework.fx_usbmsc.requires.fx_common">
+          <stack module="module.el.fx_src.100928857" requires="module.el.fx.requires.fx_src">
             <stack module="module.framework.tx_src.941240014" requires="module.el.fx_src.requires.tx_src"/>
           </stack>
         </stack>
@@ -725,7 +737,7 @@
       <property id="rtos.threadx.thread.name" value="System Display Thread"/>
       <property id="rtos.threadx.thread.stack" value="1024"/>
       <property id="rtos.threadx.thread.priority" value="8"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
     </context>
     <context id="rtos.threadx.thread.924298567">
@@ -733,15 +745,15 @@
       <property id="rtos.threadx.thread.name" value="System File Logger Thread"/>
       <property id="rtos.threadx.thread.stack" value="1024"/>
       <property id="rtos.threadx.thread.priority" value="7"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
     </context>
     <context id="rtos.threadx.thread.2138308075">
       <property id="_symbol" value="cloud_data_thread"/>
       <property id="rtos.threadx.thread.name" value="Cloud Data Thread"/>
-      <property id="rtos.threadx.thread.stack" value="4096"/>
+      <property id="rtos.threadx.thread.stack" value="8192"/>
       <property id="rtos.threadx.thread.priority" value="7"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
     </context>
     <context id="rtos.threadx.thread.282027456">
@@ -903,7 +915,7 @@
       <property id="config.framework.sf_el_ux.fs_irq_ipl" value="board.icu.common.irq.disabled"/>
     </config>
     <config id="config.framework.sf_el_ux_hcd_hs">
-      <property id="config.framework.sf_el_ux_hcd_hs.irq_ipl" value="board.icu.common.irq.priority4"/>
+      <property id="config.framework.sf_el_ux_hcd_hs.irq_ipl" value="board.icu.common.irq.priority3"/>
       <property id="config.framework.sf_el_ux_hcd_hs.fifo_size" value="config.framework.sf_el_ux_hcd_hs.fifo_size.normal"/>
       <property id="config.framework.sf_el_ux_hcd_hs.VBUSENpin_logic" value="config.framework.sf_el_ux_hcd_hs.VBUSENpin_logic.active_low"/>
       <property id="config.framework.sf_el_ux_hcd_hs.hs_bit" value="config.framework.sf_el_ux_hcd_hs.hs_bit.bitset_high"/>
@@ -952,7 +964,7 @@
       <property id="config.el.ux_src.max_ed" value=""/>
       <property id="config.el.ux_src.max_td" value=""/>
       <property id="config.el.ux_src.max_iso_td" value=""/>
-      <property id="config.el.ux_src.thread_stack_size" value=""/>
+      <property id="config.el.ux_src.thread_stack_size" value="2048"/>
       <property id="config.el.ux_src.thread_pri_enum" value=""/>
       <property id="config.el.ux_src.thread_pri_class" value=""/>
       <property id="config.el.ux_src.thread_pri_keyboard" value=""/>
