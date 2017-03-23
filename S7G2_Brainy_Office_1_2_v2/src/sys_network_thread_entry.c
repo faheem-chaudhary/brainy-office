@@ -15,8 +15,6 @@ ULONG g_dns_ip [ 2 ];
 
 ULONG sys_network_thread_wait = 10;
 
-extern TX_THREAD sys_network_thread;
-
 void setMacAddress ( nx_mac_address_t *p_mac_config );
 
 #define NETWORK_STATUS_CHECK_MASK (NX_IP_LINK_ENABLED | NX_IP_ADDRESS_RESOLVED | NX_IP_INTERFACE_LINK_ENABLED | NX_IP_INITIALIZE_DONE)
@@ -114,8 +112,7 @@ void sys_network_thread_entry ( void )
         }
 #endif
 
-        postSystemEventMessage ( &sys_network_thread, SF_MESSAGE_EVENT_CLASS_SYSTEM,
-                                 SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE );
+        postSystemEventMessage ( SF_MESSAGE_EVENT_CLASS_SYSTEM, SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE );
 
         while ( 1 ) // actual thread body
         {
@@ -130,8 +127,7 @@ void sys_network_thread_entry ( void )
             tx_thread_sleep ( sys_network_thread_wait );
         }
 
-        postSystemEventMessage ( &sys_network_thread, SF_MESSAGE_EVENT_CLASS_SYSTEM,
-                                 SF_MESSAGE_EVENT_SYSTEM_NETWORK_DISCONNECTED );
+        postSystemEventMessage ( SF_MESSAGE_EVENT_CLASS_SYSTEM, SF_MESSAGE_EVENT_SYSTEM_NETWORK_DISCONNECTED );
 
         nx_dns_server_remove_all (&g_dns_client);
         nx_dhcp_stop (&g_dhcp_client);

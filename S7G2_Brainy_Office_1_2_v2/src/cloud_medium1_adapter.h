@@ -30,8 +30,8 @@ typedef struct
 
 extern MediumOneDeviceCredentials_t g_mediumOneDeviceCredentials;
 
-unsigned int mediumOneCloudImpl ( char * payload, size_t maxLength );
 unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength );
 unsigned int mediumOneInitImpl ( char * configData, size_t dataLength );
+unsigned int mediumOnePublishImpl ( char * payload, size_t maxLength );
 
 #endif /* CLOUD_MEDIUM1_ADAPTER_H_ */

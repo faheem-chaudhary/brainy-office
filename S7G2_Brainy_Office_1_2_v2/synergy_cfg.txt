@@ -631,7 +631,7 @@ Synergy Configuration
     Name: System Display Thread
     Stack size (bytes): 1024
     Priority: 8
-    Auto start: Disabled
+    Auto start: Enabled
     Time slicing interval (ticks): 1
     
   Thread "System File Logger Thread"
@@ -639,15 +639,15 @@ Synergy Configuration
     Name: System File Logger Thread
     Stack size (bytes): 1024
     Priority: 7
-    Auto start: Disabled
+    Auto start: Enabled
     Time slicing interval (ticks): 1
     
   Thread "Cloud Data Thread"
     Symbol: cloud_data_thread
     Name: Cloud Data Thread
-    Stack size (bytes): 8192
+    Stack size (bytes): 16384
     Priority: 7
-    Auto start: Disabled
+    Auto start: Enabled
     Time slicing interval (ticks): 1
     
   Thread "Sensor Vibration and Compass (BMC150) Thread"

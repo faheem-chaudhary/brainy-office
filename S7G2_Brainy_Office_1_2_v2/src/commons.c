@@ -52,8 +52,7 @@ ssp_err_t messageQueueReleaseBuffer ( void ** message )
                                                SF_MESSAGE_RELEASE_OPTION_NONE );
 }
 
-ssp_err_t postSystemEventMessage ( TX_THREAD * sender, sf_message_event_class_t eventClass,
-                                   sf_message_event_t eventCode )
+ssp_err_t postSystemEventMessage ( sf_message_event_class_t eventClass, sf_message_event_t eventCode )
 {
     event_system_payload_t* message;
     ssp_err_t status = messageQueueAcquireBuffer ( (void **) &message );
@@ -61,7 +60,7 @@ ssp_err_t postSystemEventMessage ( TX_THREAD * sender, sf_message_event_class_t 
     {
         message->header.event_b.class_code = eventClass;
         message->header.event_b.code = eventCode;
-        message->sender = sender;
+        message->sender = tx_thread_identify ();
 
         status = messageQueuePost ( (void **) &message );
 
@@ -73,8 +72,7 @@ ssp_err_t postSystemEventMessage ( TX_THREAD * sender, sf_message_event_class_t 
     return status;
 }
 
-ssp_err_t postSensorEventMessage ( TX_THREAD * sender, sf_message_event_class_t eventClass,
-                                   sf_message_event_t eventCode, void * dataPtr )
+ssp_err_t postSensorEventMessage ( sf_message_event_class_t eventClass, sf_message_event_t eventCode, void * dataPtr )
 {
     event_sensor_payload_t* message;
     ssp_err_t status = messageQueueAcquireBuffer ( (void **) &message );
@@ -82,7 +80,7 @@ ssp_err_t postSensorEventMessage ( TX_THREAD * sender, sf_message_event_class_t 
     {
         message->header.event_b.class_code = eventClass;
         message->header.event_b.code = eventCode;
-        message->sender = sender;
+        message->sender = tx_thread_identify ();
         message->dataPointer = dataPtr;
 
         status = messageQueuePost ( (void **) &message );

@@ -67,7 +67,7 @@ unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
 
     if ( readValueForKey ( configData, dataLength, "port", M1_CONFIG_VALUE_LENGTH, portStr, &charsRead ) )
     {
-        m1Creds.port = atoi ( portStr );
+        m1Creds.port = (unsigned int) atoi ( portStr );
         keysRead++;
     }
 
@@ -136,6 +136,7 @@ void mqtt_message_callback ( int type, char * topic, char * payload, int length 
 }
 
 #else
+    #include "libemqtt_netx_impl.h"
 
 //static mqtt_broker_handle_t g_mqttBroker;
 char g_topic_name [ 255 ];
@@ -177,7 +178,8 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
                   g_mediumOneDeviceCredentials.userId, g_mediumOneDeviceCredentials.name );
 
         char initialConnectMessage [ 256 ];
-        sprintf ( initialConnectMessage, "{\"init_connect\":{\"name\":\"%s\"}}", g_mediumOneDeviceCredentials.name );
+        sprintf ( initialConnectMessage, "{\"event_data\":{\"init_connect\":{\"name\":\"%s\"}}}",
+                  g_mediumOneDeviceCredentials.name );
         mqtt_netx_publish ( g_topic_name, initialConnectMessage, 0 );
 
     }
@@ -185,7 +187,7 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
     return ( status == 1 );
 }
 
-unsigned int mediumOneCloudImpl ( char * payload, size_t maxLength )
+unsigned int mediumOnePublishImpl ( char * payload, size_t maxLength )
 {
 //    0/<project_mqtt_id>/<user_mqtt_id>/<device_id>/
 

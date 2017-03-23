@@ -737,7 +737,7 @@
       <property id="rtos.threadx.thread.name" value="System Display Thread"/>
       <property id="rtos.threadx.thread.stack" value="1024"/>
       <property id="rtos.threadx.thread.priority" value="8"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
     </context>
     <context id="rtos.threadx.thread.924298567">
@@ -745,15 +745,15 @@
       <property id="rtos.threadx.thread.name" value="System File Logger Thread"/>
       <property id="rtos.threadx.thread.stack" value="1024"/>
       <property id="rtos.threadx.thread.priority" value="7"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
     </context>
     <context id="rtos.threadx.thread.2138308075">
       <property id="_symbol" value="cloud_data_thread"/>
       <property id="rtos.threadx.thread.name" value="Cloud Data Thread"/>
-      <property id="rtos.threadx.thread.stack" value="8192"/>
+      <property id="rtos.threadx.thread.stack" value="16384"/>
       <property id="rtos.threadx.thread.priority" value="7"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
     </context>
     <context id="rtos.threadx.thread.282027456">

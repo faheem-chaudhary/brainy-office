@@ -70,10 +70,15 @@ ssp_err_t messageQueuePend ( TX_QUEUE * queue, void ** message, ULONG wait_optio
 ssp_err_t messageQueuePost ( void ** message );
 ssp_err_t messageQueueAcquireBuffer ( void ** message );
 ssp_err_t messageQueueReleaseBuffer ( void ** message );
-ssp_err_t postSystemEventMessage ( TX_THREAD * sender, sf_message_event_class_t eventClass,
-                                   sf_message_event_t eventCode );
-ssp_err_t postSensorEventMessage ( TX_THREAD * sender, sf_message_event_class_t eventClass,
-                                   sf_message_event_t eventCode, void * dataPtr );
+ssp_err_t postSystemEventMessage ( sf_message_event_class_t eventClass, sf_message_event_t eventCode );
+ssp_err_t postSensorEventMessage ( sf_message_event_class_t eventClass, sf_message_event_t eventCode, void * dataPtr );
+
+// Configuration function to set the Cloud Implementation Adapter
+// @param [in]  configImpl  Implementation Function Pointer to setup Cloud Connection.  Use NULL to remove the existing implementation.
+// @param [in]  initImpl    Implementation Function Pointer to initialize Cloud Connection.  Use NULL to remove the existing implementation.  This function will be called right after successful execution of configImpl and is not NULL.  This function will also be called whenever network connection is successfully established.
+// @param [in]  publishImpl   Implementation Function Pointer to publish payload to cloud.  Use NULL to remove the existing implementation.
+void setCloudFunctions ( stringDataFunction configImpl, stringDataFunction initImpl,
+                                  stringDataFunction publishImpl );
 
 bool readValueForKey ( const char * buffer, const size_t bufferSize, const char * key, const int maxValueLength,
                        char * value, size_t * charsRead );
