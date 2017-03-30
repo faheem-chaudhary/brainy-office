@@ -962,4 +962,10 @@
   <v1:configSetting configurationId="p412" altId="p412.sci0.sck">
     <v1:connectionSetting altId="sci0.sck.p412"/>
   </v1:configSetting>
+  <v1:configSetting configurationId="p511.gpio_irq" altId="p511.gpio_irq.gpio_irq_none"/>
+  <v1:configSetting configurationId="p511.gpio_otype" altId="p511.gpio_otype.gpio_otype_none"/>
+  <v1:configSetting configurationId="p511.gpio_pupd" altId="p511.gpio_pupd.gpio_pupd_no_ip_pull"/>
+  <v1:configSetting configurationId="p512.gpio_otype" altId="p512.gpio_otype.gpio_otype_none"/>
+  <v1:configSetting configurationId="p512.gpio_irq" altId="p512.gpio_irq.gpio_irq_none"/>
+  <v1:configSetting configurationId="p512.gpio_pupd" altId="p512.gpio_pupd.gpio_pupd_no_ip_pull"/>
 </v1:pinSettings>
