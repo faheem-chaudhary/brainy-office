@@ -11,7 +11,7 @@
 #include "cloud_medium1_adapter.h"
 #include "commons.h"
 
-#define USE_M1_AGENT    0
+#define DUMMY_CLOUD 0
 
 #undef MQTT_CONF_USERNAME_LENGTH
 #undef MQTT_CONF_PASSWORD_LENGTH
@@ -21,11 +21,33 @@
 
 #include "libemqtt.h"
 #include "nx_dns.h"
+#include "libemqtt_netx_impl.h"
 
 MediumOneDeviceCredentials_t g_mediumOneDeviceCredentials;
 
-void mqtt_message_callback ( int type, char * topic, char * payload, int length );
+#if(DUMMY_CLOUD)
+unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
+{
+    return (unsigned int) 7;
+}
 
+unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
+{
+    return (unsigned int) 1;
+}
+
+char g_publishMessageBuffer [ 512 ];
+unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
+{
+//    0/<project_mqtt_id>/<user_mqtt_id>/<device_id>/
+
+    int length = snprintf ( g_publishMessageBuffer, messageLength, "{\"event_data\":{\"%s\":%s}}",
+            g_mediumOneDeviceCredentials.name, message );
+//    mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
+    return ( length > 0 );
+}
+
+#else
 unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
 {
     MediumOneDeviceCredentials_t m1Creds;
@@ -87,57 +109,6 @@ unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
     return 0;
 }
 
-#if (USE_M1_AGENT)
-    #include "m1_agent.h"
-    #define M1_TLS_ENABLED 0
-
-unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
-{
-    SSP_PARAMETER_NOT_USED ( configData );
-    SSP_PARAMETER_NOT_USED ( dataLength );
-
-    int status;
-
-    m1_register_subscription_callback ( mqtt_message_callback );
-
-    #if (M1_TLS_ENABLED)
-    status = m1_connect ( "mqtt2.mediumone.com", 61620, g_mediumOneDeviceCredentials.userId,
-            g_mediumOneDeviceCredentials.password, g_mediumOneDeviceCredentials.projectId,
-            g_mediumOneDeviceCredentials.apiKey, g_mediumOneDeviceCredentials.name, 5, 5, 60, 1 );
-    #else
-    status = m1_connect ( "mqtt2.mediumone.com", 61619, g_mediumOneDeviceCredentials.userId,
-            g_mediumOneDeviceCredentials.password, g_mediumOneDeviceCredentials.projectId,
-            g_mediumOneDeviceCredentials.apiKey, g_mediumOneDeviceCredentials.name, 5, 5, 60, 0 );
-    #endif
-
-    char initialConnectMessage [ 256 ];
-    sprintf ( initialConnectMessage, "{\"init_connect\":{\"name\":\"%s\"}}", g_mediumOneDeviceCredentials.name );
-
-    m1_publish_event ( initialConnectMessage, NULL );
-
-    //TODO: Is this needed?
-    // extern const sf_comms_instance_t g_sf_comms0;
-    // m1_initialize_comms(&g_sf_comms0);
-
-    return ( status == M1_SUCCESS );
-}
-
-unsigned int mediumOneCloudImpl ( char * payload, size_t maxLength )
-{
-    return 0;
-}
-
-void mqtt_message_callback ( int type, char * topic, char * payload, int length )
-{
-    SSP_PARAMETER_NOT_USED ( type );
-    SSP_PARAMETER_NOT_USED ( topic );
-    SSP_PARAMETER_NOT_USED ( payload );
-    SSP_PARAMETER_NOT_USED ( length );
-}
-
-#else
-    #include "libemqtt_netx_impl.h"
-
 //static mqtt_broker_handle_t g_mqttBroker;
 char g_topic_name [ 255 ];
 extern NX_DNS g_dns_client;
@@ -171,36 +142,27 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
 
     if ( status == 1 )
     {
-
-//    m1_register_subscription_callback ( mqtt_message_callback );
+        //TODO: Setup Subscription function here, at some point in time
 
         sprintf ( g_topic_name, "0/%s/%s/%s", g_mediumOneDeviceCredentials.projectId,
                   g_mediumOneDeviceCredentials.userId, g_mediumOneDeviceCredentials.name );
 
-        char initialConnectMessage [ 256 ];
-        sprintf ( initialConnectMessage, "{\"event_data\":{\"init_connect\":{\"name\":\"%s\"}}}",
-                  g_mediumOneDeviceCredentials.name );
-        mqtt_netx_publish ( g_topic_name, initialConnectMessage, 0 );
-
+        mediumOnePublishImpl ( "{\"connected\":true}", 0 );
     }
 
     return ( status == 1 );
 }
 
-unsigned int mediumOnePublishImpl ( char * payload, size_t maxLength )
+char g_publishMessageBuffer [ 512 ];
+
+unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
 {
 //    0/<project_mqtt_id>/<user_mqtt_id>/<device_id>/
 
-    mqtt_netx_publish ( g_topic_name, payload, 0 );
-    return 0;
-}
-
-void mqtt_message_callback ( int type, char * topic, char * payload, int length )
-{
-    SSP_PARAMETER_NOT_USED ( type );
-    SSP_PARAMETER_NOT_USED ( topic );
-    SSP_PARAMETER_NOT_USED ( payload );
-    SSP_PARAMETER_NOT_USED ( length );
+    int length = sprintf ( g_publishMessageBuffer, "{\"event_data\":{\"%s\":%s}}", g_mediumOneDeviceCredentials.name,
+                           message );
+    mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
+    return ( length > 0 );
 }
 
 #endif

@@ -254,9 +254,12 @@
     <event display="Config Set Cloud Receiver" value="SF_MESSAGE_EVENT_CONFIG_SET_CLOUD_RECEIVER"/>
     <event display="Config Set Display Formatter" value="SF_MESSAGE_EVENT_CONFIG_SET_DISPLAY_FORMATTER"/>
     <event display="Config Set Log Formatter" value="SF_MESSAGE_EVENT_CONFIG_SET_LOG_FORMATTER"/>
+    <event display="System Cloud Available" value="SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE"/>
+    <event display="System Cloud Disconnected" value="SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED"/>
     <eventClass display="System" header="event_system_api.h" id="eventClass.1095746090" payload="event_system_payload" payloadType="event_system_payload_t" value="SF_MESSAGE_EVENT_CLASS_SYSTEM"/>
     <eventClass display="Sensor" header="event_sensor_api.h" id="eventClass.1363358315" payload="event_sensor_payload" payloadType="event_sensor_payload_t" value="SF_MESSAGE_EVENT_CLASS_SENSOR"/>
     <eventClass display="Config" header="event_config_api.h" id="eventClass.1942317328" payload="event_config_payload" payloadType="event_config_payload_t" value="SF_MESSAGE_EVENT_CLASS_CONFIG"/>
+    <eventClass display="ADC Framework Mic Data" header="event_adc_framework_mic_data_api.h" id="eventClass.1733438827" payload="event_adc_framework_mic_data_payload" payloadType="event_adc_framework_mic_data_payload_t" value="SF_MESSAGE_EVENT_CLASS_ADC_FRAMEWORK_MIC_DATA"/>
     <subscriber context="rtos.threadx.thread.733700626" end="0" id="subscriber.1787569172" start="0"/>
     <subscriber context="rtos.threadx.thread.721736288" end="0" id="subscriber.1015849023" start="0">
       <subscribe eventClass="module.framework.sf_touch_panel.eventClass.eventClassTouch"/>
@@ -309,6 +312,7 @@
     <subscriber context="rtos.threadx.thread.407260935" end="0" id="subscriber.331782468" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
       <subscribe eventClass="eventClass.1942317328"/>
+      <subscribe eventClass="eventClass.1733438827"/>
     </subscriber>
   </synergyMessagingConfiguration>
   <synergyModuleConfiguration>
@@ -625,12 +629,17 @@
           </stack>
         </stack>
       </stack>
+      <object id="rtos.threadx.object.mutex.1157569269">
+        <property id="rtos.threadx.object.mutex.name" value="Generate Thread ID Mutex"/>
+        <property id="rtos.threadx.object.mutex.symbol" value="g_generate_thread_id_mutex"/>
+        <property id="rtos.threadx.object.mutex.inherit" value="rtos.threadx.object.mutex.inherit.disabled"/>
+      </object>
     </context>
     <context id="rtos.threadx.thread.721736288">
       <property id="_symbol" value="sys_blinker_thread"/>
       <property id="rtos.threadx.thread.name" value="System Blinker Thread"/>
       <property id="rtos.threadx.thread.stack" value="1024"/>
-      <property id="rtos.threadx.thread.priority" value="5"/>
+      <property id="rtos.threadx.thread.priority" value="10"/>
       <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
     </context>
@@ -639,7 +648,7 @@
       <property id="rtos.threadx.thread.name" value="System Touch Thread"/>
       <property id="rtos.threadx.thread.stack" value="1024"/>
       <property id="rtos.threadx.thread.priority" value="6"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
       <stack module="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.1439474508">
         <stack module="module.framework.sf_message.1429754242" requires="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.requires.sf_message"/>
@@ -737,7 +746,7 @@
       <property id="rtos.threadx.thread.name" value="System Display Thread"/>
       <property id="rtos.threadx.thread.stack" value="1024"/>
       <property id="rtos.threadx.thread.priority" value="8"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
     </context>
     <context id="rtos.threadx.thread.924298567">
@@ -745,13 +754,13 @@
       <property id="rtos.threadx.thread.name" value="System File Logger Thread"/>
       <property id="rtos.threadx.thread.stack" value="1024"/>
       <property id="rtos.threadx.thread.priority" value="7"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
     </context>
     <context id="rtos.threadx.thread.2138308075">
       <property id="_symbol" value="cloud_data_thread"/>
       <property id="rtos.threadx.thread.name" value="Cloud Data Thread"/>
-      <property id="rtos.threadx.thread.stack" value="16384"/>
+      <property id="rtos.threadx.thread.stack" value="8192"/>
       <property id="rtos.threadx.thread.priority" value="7"/>
       <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
@@ -783,7 +792,7 @@
     <context id="rtos.threadx.thread.1358427708">
       <property id="_symbol" value="sensor_humidity_temperature_thread"/>
       <property id="rtos.threadx.thread.name" value="Sensor Humidity and Temperature (AMS EN210) Thread"/>
-      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.stack" value="2048"/>
       <property id="rtos.threadx.thread.priority" value="8"/>
       <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
@@ -803,9 +812,9 @@
     <context id="rtos.threadx.thread.407260935">
       <property id="_symbol" value="sensor_microphone_thread"/>
       <property id="rtos.threadx.thread.name" value="Sensor Microphone (ADC) Thread"/>
-      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.stack" value="4096"/>
       <property id="rtos.threadx.thread.priority" value="8"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
       <stack module="module.framework.sf_adc_periodic_on_sf_adc_periodic.1842730638">
         <stack module="module.driver.adc_on_adc.196131891" requires="module.framework.sf_adc_periodic.requires.adc"/>
@@ -813,11 +822,6 @@
         <stack module="module.driver.transfer_on_dtc.1916045898" requires="module.framework.sf_adc_periodic.requires.transfer"/>
       </stack>
       <stack module="module.driver.dac_on_dac.1745159952"/>
-      <object id="rtos.threadx.object.semaphore.1606640913">
-        <property id="rtos.threadx.object.semaphore.name" value="Microphone (ADC) Data Ready Semaphore"/>
-        <property id="rtos.threadx.object.semaphore.symbol" value="g_microphone_data_ready"/>
-        <property id="rtos.threadx.object.semaphore.count" value="0"/>
-      </object>
     </context>
     <config id="config.el.ux_v2"/>
     <config id="config.el.nx_dhcp_client">
@@ -964,7 +968,7 @@
       <property id="config.el.ux_src.max_ed" value=""/>
       <property id="config.el.ux_src.max_td" value=""/>
       <property id="config.el.ux_src.max_iso_td" value=""/>
-      <property id="config.el.ux_src.thread_stack_size" value="2048"/>
+      <property id="config.el.ux_src.thread_stack_size" value="8192"/>
       <property id="config.el.ux_src.thread_pri_enum" value=""/>
       <property id="config.el.ux_src.thread_pri_class" value=""/>
       <property id="config.el.ux_src.thread_pri_keyboard" value=""/>
@@ -1081,7 +1085,7 @@
       <property id="config.el.ux_host_class_storage_src.max_media" value="1"/>
       <property id="config.el.ux_host_class_storage_src.storage_memory_buffer_size" value="1024"/>
       <property id="config.el.ux_host_class_storage_src.storage_max_transfer_size" value="1024"/>
-      <property id="config.el.ux_host_class_storage_src.storage_thread_stack_size" value="1024"/>
+      <property id="config.el.ux_host_class_storage_src.storage_thread_stack_size" value="2048"/>
       <property id="config.el.ux_host_class_storage_src.transfer_timeout" value="100000"/>
       <property id="config.el.ux_host_class_storage_src.cbi_status_timeout" value="30000"/>
     </config>

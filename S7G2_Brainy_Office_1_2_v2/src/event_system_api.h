@@ -18,7 +18,7 @@
 typedef struct
 {
         sf_message_header_t header;
-        TX_THREAD * sender;
+        uint8_t senderId;
 } event_system_payload_t;
 
 #endif /* EVENT_SYSTEM_API_H_ */

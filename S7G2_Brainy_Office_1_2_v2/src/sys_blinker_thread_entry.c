@@ -28,7 +28,7 @@ void ledOff ( LED _led )
 
 typedef enum
 {
-    OFF = 0, ON = 1, TOGGLE = 2,
+    OFF = 0, TOGGLE = 1, ON = 2,
 } LedMode_t;
 
 LedMode_t ledModes [ TOTAL_LED_COUNT ] =
@@ -40,8 +40,7 @@ void sys_blinker_thread_entry ( void )
     sf_message_header_t * message;
     ssp_err_t msgStatus;
 
-    ledModes [ AMBER ] = TOGGLE;
-    ledModes [ BLUE ] = TOGGLE;
+    ledModes [ RED ] = TOGGLE;
 
     while ( 1 )
     {
@@ -49,28 +48,34 @@ void sys_blinker_thread_entry ( void )
 
         if ( msgStatus == SSP_SUCCESS )
         {
-            // TODO: Process System Message here
+            /// Connectivity --> AMBER
+            /// OFF = Network Not connected
+            /// Blink = Network Connected, Cloud not connected
+            /// ON = Network and Cloud are both connected
             if ( message->event_b.class_code == SF_MESSAGE_EVENT_CLASS_SYSTEM )
             {
                 switch ( message->event_b.code )
                 {
-                    case SF_MESSAGE_EVENT_SYSTEM_USB_STORAGE_READY :
-                        ledModes [ AMBER ] = ON;
-                        break;
-
-                    case SF_MESSAGE_EVENT_SYSTEM_USB_STORAGE_REMOVED :
-                        ledModes [ AMBER ] = TOGGLE;
+                    case SF_MESSAGE_EVENT_SYSTEM_NETWORK_DISCONNECTED :
+                        ledModes [ AMBER ]--;
                         break;
 
                     case SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE :
-                        ledModes [ BLUE ] = ON;
+                        ledModes [ AMBER ]++;
                         break;
 
-                    case SF_MESSAGE_EVENT_SYSTEM_NETWORK_DISCONNECTED :
-                        ledModes [ BLUE ] = TOGGLE;
+                    case SF_MESSAGE_EVENT_SYSTEM_USB_STORAGE_READY :
+                        ledModes [ AMBER ]++;
+                        break;
+
+                    case SF_MESSAGE_EVENT_SYSTEM_USB_STORAGE_REMOVED :
+                        ledModes [ AMBER ]--;
                         break;
                 }
-
+            }
+            else if ( message->event_b.class_code == SF_MESSAGE_EVENT_CLASS_SENSOR )
+            {
+                ledModes [ GREEN ] = TOGGLE;
             }
             else if ( message->event_b.class_code == SF_MESSAGE_EVENT_CLASS_TOUCH )
             {
@@ -90,15 +95,6 @@ void sys_blinker_thread_entry ( void )
         {
             // if any error other than empty queue
         }
-
-//        if ( getEventFlag ( USB_DEVICE_AVAILABLE ) == true )
-//        {
-//            ledOn ( YELLOW );
-//        }
-//        else
-//        {
-//            ledToggle ( YELLOW );
-//        }
 
         for ( int i = 0; i < g_bsp_leds.led_count; i++ )
         {

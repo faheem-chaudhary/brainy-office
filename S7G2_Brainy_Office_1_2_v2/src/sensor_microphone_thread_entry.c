@@ -1,5 +1,8 @@
 #include "sensor_microphone_thread.h"
 #include "commons.h"
+#include "event_adc_framework_mic_data_api.h"
+#include "sf_message_api.h"
+#include "bsp_cfg.h"
 
 void g_adc_framework_microphone_callback ( sf_adc_periodic_callback_args_t * p_args );
 
@@ -10,16 +13,12 @@ void g_adc_framework_microphone_callback ( sf_adc_periodic_callback_args_t * p_a
 
 #define ADC_BASE_PTR  R_S12ADC0_Type *
 
-//bsp_leds_t g_leds;
+ssp_err_t postAdcFrameworkEventMessage ( void * dataPtr );
 
 volatile uint16_t max_sound;
-
 volatile uint16_t sound_level = 0;
 
-//extern TX_THREAD sensor_microphone_thread;
-
-void ledOn ( LED _led );
-void ledOff ( LED _led );
+ULONG sensor_microphone_thread_wait = TX_WAIT_FOREVER;
 
 /* Sensor Microphone (ADC) Thread entry function */
 void sensor_microphone_thread_entry ( void )
@@ -46,34 +45,72 @@ void sensor_microphone_thread_entry ( void )
     err = g_sf_adc_periodic0.p_api->start ( g_sf_adc_periodic0.p_ctrl );
     APP_ERR_TRAP (err)
 
+    sf_message_header_t * message;
+    ssp_err_t msgStatus;
+
     while ( 1 )
     {
-        tx_semaphore_get ( &g_microphone_data_ready, TX_WAIT_FOREVER );
-        if ( sound_level > NOISE_LEVEL_MIN )
-        {
-//            ledOn (AMBER);
-//            g_ioport.p_api->pinWrite ( g_leds.p_leds [ YELLOW ], ON );
-        }
-        else
-        {
-//            ledOff (AMBER);
-//            g_ioport.p_api->pinWrite ( g_leds.p_leds [ YELLOW ], OFF );
-        }
+        msgStatus = messageQueuePend ( &sensor_microphone_thread_message_queue, (void **) &message,
+                                       sensor_microphone_thread_wait );
 
-        if ( sound_level > NOISE_LEVEL_MAX )
+        if ( msgStatus == SSP_SUCCESS )
         {
-//            ledOn (RED);
-//            g_ioport.p_api->pinWrite ( g_leds.p_leds [ RED ], ON );
-        }
-        else
-        {
-//            ledOff (RED);
-//            g_ioport.p_api->pinWrite ( g_leds.p_leds [ RED ], OFF );
-        }
+            switch ( message->event_b.class_code )
+            {
 
-        if ( sound_level > max_sound )
-            max_sound = sound_level;
+                case SF_MESSAGE_EVENT_CLASS_SYSTEM :
+                    //TODO: anything related to System Message Processing goes here
+                    break;
+
+                case SF_MESSAGE_EVENT_CLASS_ADC_FRAMEWORK_MIC_DATA :
+                    if ( sound_level > NOISE_LEVEL_MIN )
+                    {
+                        //ledOn (AMBER);
+                    }
+                    else
+                    {
+                        //ledOff (AMBER);
+                    }
+
+                    if ( sound_level > NOISE_LEVEL_MAX )
+                    {
+                        //ledOn (RED);
+                    }
+                    else
+                    {
+                        //ledOff (RED);
+                    }
+
+                    if ( sound_level > max_sound )
+                    {
+                        max_sound = sound_level;
+                    }
+                    break;
+            }
+
+            messageQueueReleaseBuffer ( (void **) &message );
+        }
     }
+}
+
+ssp_err_t postAdcFrameworkEventMessage ( void * dataPtr )
+{
+    event_adc_framework_mic_data_payload_t* message;
+    ssp_err_t status = messageQueueAcquireBuffer ( (void **) &message );
+    if ( status == SSP_SUCCESS )
+    {
+        message->header.event_b.class_code = SF_MESSAGE_EVENT_CLASS_ADC_FRAMEWORK_MIC_DATA;
+        message->header.event_b.code = 0x00;
+        message->dataPointer = dataPtr;
+
+        status = messageQueuePost ( (void **) &message );
+
+        if ( status != SSP_SUCCESS )
+        {
+            messageQueueReleaseBuffer ( (void **) &message );
+        }
+    }
+    return status;
 }
 
 void g_adc_framework_microphone_callback ( sf_adc_periodic_callback_args_t * p_args )
@@ -98,7 +135,8 @@ void g_adc_framework_microphone_callback ( sf_adc_periodic_callback_args_t * p_a
         sound_level = ( uint16_t ) ( max - min );
         max = 0U;
         min = 4095U;
-        tx_semaphore_ceiling_put ( &g_microphone_data_ready, 1 );
+        postAdcFrameworkEventMessage (NULL);
+//        tx_semaphore_ceiling_put ( &g_microphone_data_ready, 1 );
     }
 }
 

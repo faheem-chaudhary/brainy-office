@@ -8,11 +8,6 @@ ULONG g_ip_address;
 ULONG g_network_mask;
 ULONG g_dns_ip [ 2 ];
 
-#define MQTT_DEBUG_LAN  1
-#define MQTT_DEBUG_M1   2
-#define MQTT_DEBUG_NONE 0
-#define MQTT_DEBUG MQTT_DEBUG_NONE
-
 ULONG sys_network_thread_wait = 10;
 
 void setMacAddress ( nx_mac_address_t *p_mac_config );
@@ -22,7 +17,11 @@ void setMacAddress ( nx_mac_address_t *p_mac_config );
 /* System Network (Ethernet) Thread entry function */
 void sys_network_thread_entry ( void )
 {
-    unsigned long networkStatus = 0;
+//    unsigned long networkStatus = 0;
+    uint8_t sys_network_thread_id = getUniqueThreadId ();
+
+    sf_message_header_t * message;
+    ssp_err_t msgStatus;
 
     // nx_ip_link_status_change_notify_set
     // nx_ip_address_change_notify
@@ -72,47 +71,8 @@ void sys_network_thread_entry ( void )
 //                      (int) ( server_ip_address >> 16 ) & 0xFF, (int) ( server_ip_address >> 8 ) & 0xFF,
 //                      (int) ( server_ip_address ) & 0xFF );
         }
-#if (MQTT_DEBUG)
-        {
-            char g_topic_name [ 64 ];
-            char m1UsernameStr [ MQTT_CONF_USERNAME_LENGTH ];
-            char m1Password [ MQTT_CONF_PASSWORD_LENGTH ];
 
-    #if (MQTT_DEBUG==MQTT_DEBUG_LAN)
-            /*SCL-Faheem.sc.renesasam.com*/
-            nx_dns_host_by_name_get ( &g_dns_client, (UCHAR *) "SCL-Faheem.sc.renesasam.com", &server_ip_address,
-                    TX_WAIT_FOREVER );
-
-            sprintf ( destinationIpAddress, "SCL-Faheem = %d.%d.%d.%d", (int) ( server_ip_address >> 24 ),
-                    (int) ( server_ip_address >> 16 ) & 0xFF, (int) ( server_ip_address >> 8 ) & 0xFF,
-                    (int) ( server_ip_address ) & 0xFF );
-
-            sprintf ( m1UsernameStr, "testuser" );
-            sprintf ( m1Password, "hello" );
-
-            int status = mqtt_netx_connect ( "testament", "143.103.92.11", 1883, m1UsernameStr, m1Password, 0, 0, 0,
-                    0 );
-    #elif (MQTT_DEBUG==MQTT_DEBUG_M1)
-            sprintf ( m1UsernameStr, "%s/%s", "o3adQcvIn0Q" /*project ID*/, "kHgc2feq1bg" /*User ID*/);
-            sprintf ( m1Password, "%s/%s", "WG46JL5TPKJ3Q272SDCEJDJQGQ4DEOJZGM2GEZBYGRQTAMBQ" /*API Key*/,
-                    "Dec2kPok" /*Passowrd*/);
-            /*mqtt2.mediumone.com=167.114.77.228:61619*/
-            int status = mqtt_netx_connect ( "desktop-kit-1", "167.114.77.228", 61619, m1UsernameStr, m1Password, 0, 0,
-                    0, 0 );
-    #endif
-            if ( status == 1 )
-            {
-                sprintf ( g_topic_name, "0/%s/%s/%s", "o3adQcvIn0Q", "kHgc2feq1bg", "arcadia" );
-
-                char initialConnectMessage [ 128 ];
-                sprintf ( initialConnectMessage, "{\"event_data\":{\"init_connect\":{\"name\":\"%s\"}}}",
-                        "desktop-kit-1" );
-                mqtt_netx_publish ( g_topic_name, initialConnectMessage, 0 );
-            }
-        }
-#endif
-
-        postSystemEventMessage ( SF_MESSAGE_EVENT_CLASS_SYSTEM, SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE );
+        postSystemEventMessage ( sys_network_thread_id, SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE );
 
         while ( 1 ) // actual thread body
         {
@@ -124,10 +84,21 @@ void sys_network_thread_entry ( void )
 //                break;
 //            }
 
-            tx_thread_sleep ( sys_network_thread_wait );
+            msgStatus = messageQueuePend ( &sys_network_thread_message_queue, (void **) &message,
+                                           sys_network_thread_wait );
+
+            if ( msgStatus == SSP_SUCCESS )
+            {
+                if ( message->event_b.class_code == SF_MESSAGE_EVENT_CLASS_SYSTEM )
+                {
+                    //TODO: anything related to System Message Processing goes here
+                }
+
+                messageQueueReleaseBuffer ( (void **) &message );
+            }
         }
 
-        postSystemEventMessage ( SF_MESSAGE_EVENT_CLASS_SYSTEM, SF_MESSAGE_EVENT_SYSTEM_NETWORK_DISCONNECTED );
+        postSystemEventMessage ( sys_network_thread_id, SF_MESSAGE_EVENT_SYSTEM_NETWORK_DISCONNECTED );
 
         nx_dns_server_remove_all (&g_dns_client);
         nx_dhcp_stop (&g_dhcp_client);

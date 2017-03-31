@@ -246,7 +246,7 @@ int mqtt_netx_connect ( const char * client_id, const char * host, int mqtt_port
 
     return status;
 }
-
+#if 0
 int pub_test ( int argc, char* argv [] )
 {
     int packet_length;
@@ -308,7 +308,7 @@ int pub_test ( int argc, char* argv [] )
 
     // >>>>> PUBLISH QoS 2
     printf ( "Publish: QoS 2\n" );
-    mqtt_publish_with_qos ( &g_broker, "hello/emqtt", "Example: QoS 2", 1, 2, &msg_id ); // Retain
+    mqtt_publish_with_qos ( &g_broker, "hello/emqtt", "Example: QoS 2", 1, 2, &msg_id );// Retain
     // <<<<< PUBREC
     packet_length = read_packet ( 1 );
     if ( packet_length < 0 )
@@ -459,7 +459,7 @@ int sub_test ()
                 len = mqtt_parse_pub_topic ( packet_buffer, topic );
                 topic [ len ] = '\0'; // for printf
                 len = mqtt_parse_publish_msg ( packet_buffer, msg );
-                msg [ len ] = '\0'; // for printf
+                msg [ len ] = '\0';// for printf
                 printf ( "%s %s\n", topic, msg );
             }
         }
@@ -467,4 +467,4 @@ int sub_test ()
     }
     return 0;
 }
-
+#endif

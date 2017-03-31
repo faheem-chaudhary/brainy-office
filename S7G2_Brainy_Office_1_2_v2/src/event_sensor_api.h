@@ -17,7 +17,7 @@
 typedef struct
 {
         sf_message_header_t header;
-        TX_THREAD * sender;
+        uint8_t senderId;
         void * dataPointer;
 } event_sensor_payload_t;
 

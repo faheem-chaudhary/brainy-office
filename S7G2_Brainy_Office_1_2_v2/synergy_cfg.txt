@@ -377,11 +377,16 @@ Synergy Configuration
           Instance "ThreadX Source"
             Show linkage warning: Disabled
             
+    Object "g_generate_thread_id_mutex Mutex"
+      Name: Generate Thread ID Mutex
+      Symbol: g_generate_thread_id_mutex
+      Priority inheritance: Disabled
+      
   Thread "System Blinker Thread"
     Symbol: sys_blinker_thread
     Name: System Blinker Thread
     Stack size (bytes): 1024
-    Priority: 5
+    Priority: 10
     Auto start: Enabled
     Time slicing interval (ticks): 1
     
@@ -390,7 +395,7 @@ Synergy Configuration
     Name: System Touch Thread
     Stack size (bytes): 1024
     Priority: 6
-    Auto start: Enabled
+    Auto start: Disabled
     Time slicing interval (ticks): 1
     
     Instance "g_sf_touch_panel_i2c0 Touch Panel Framework on sf_touch_panel_i2c"
@@ -631,7 +636,7 @@ Synergy Configuration
     Name: System Display Thread
     Stack size (bytes): 1024
     Priority: 8
-    Auto start: Enabled
+    Auto start: Disabled
     Time slicing interval (ticks): 1
     
   Thread "System File Logger Thread"
@@ -639,13 +644,13 @@ Synergy Configuration
     Name: System File Logger Thread
     Stack size (bytes): 1024
     Priority: 7
-    Auto start: Enabled
+    Auto start: Disabled
     Time slicing interval (ticks): 1
     
   Thread "Cloud Data Thread"
     Symbol: cloud_data_thread
     Name: Cloud Data Thread
-    Stack size (bytes): 16384
+    Stack size (bytes): 8192
     Priority: 7
     Auto start: Enabled
     Time slicing interval (ticks): 1
@@ -677,7 +682,7 @@ Synergy Configuration
   Thread "Sensor Humidity and Temperature (AMS EN210) Thread"
     Symbol: sensor_humidity_temperature_thread
     Name: Sensor Humidity and Temperature (AMS EN210) Thread
-    Stack size (bytes): 1024
+    Stack size (bytes): 2048
     Priority: 8
     Auto start: Enabled
     Time slicing interval (ticks): 1
@@ -714,9 +719,9 @@ Synergy Configuration
   Thread "Sensor Microphone (ADC) Thread"
     Symbol: sensor_microphone_thread
     Name: Sensor Microphone (ADC) Thread
-    Stack size (bytes): 1024
+    Stack size (bytes): 4096
     Priority: 8
-    Auto start: Enabled
+    Auto start: Disabled
     Time slicing interval (ticks): 1
     
     Instance "g_sf_adc_periodic0 ADC Periodic Framework on sf_adc_periodic"
@@ -849,11 +854,6 @@ Synergy Configuration
       Data Format: Right Justified
       Output Amplifier: Disable
       
-    Object "g_microphone_data_ready Semaphore"
-      Name: Microphone (ADC) Data Ready Semaphore
-      Symbol: g_microphone_data_ready
-      Initial count: 0
-      
   Messaging
     Event "System Network Available"
       Symbol: SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE
@@ -903,6 +903,14 @@ Synergy Configuration
       Symbol: SF_MESSAGE_EVENT_CONFIG_SET_LOG_FORMATTER
       Name: Config Set Log Formatter
       
+    Event "System Cloud Available"
+      Symbol: SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE
+      Name: System Cloud Available
+      
+    Event "System Cloud Disconnected"
+      Symbol: SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED
+      Name: System Cloud Disconnected
+      
     Event Class "System"
       Symbol: SF_MESSAGE_EVENT_CLASS_SYSTEM
       Name: System
@@ -923,6 +931,13 @@ Synergy Configuration
       Payload header file: event_config_api.h
       Payload: event_config_payload
       Payload type: event_config_payload_t
+      
+    Event Class "ADC Framework Mic Data"
+      Symbol: SF_MESSAGE_EVENT_CLASS_ADC_FRAMEWORK_MIC_DATA
+      Name: ADC Framework Mic Data
+      Payload header file: event_adc_framework_mic_data_api.h
+      Payload: event_adc_framework_mic_data_payload
+      Payload type: event_adc_framework_mic_data_payload_t
       
     Subscriber "System Main Thread" 0 0
       
@@ -977,4 +992,5 @@ Synergy Configuration
     Subscriber "Sensor Microphone (ADC) Thread" 0 0
       Event Class "System"
       Event Class "Config"
+      Event Class "ADC Framework Mic Data"
       

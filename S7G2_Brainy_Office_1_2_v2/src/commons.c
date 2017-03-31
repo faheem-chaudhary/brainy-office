@@ -52,15 +52,15 @@ ssp_err_t messageQueueReleaseBuffer ( void ** message )
                                                SF_MESSAGE_RELEASE_OPTION_NONE );
 }
 
-ssp_err_t postSystemEventMessage ( sf_message_event_class_t eventClass, sf_message_event_t eventCode )
+ssp_err_t postSystemEventMessage ( uint8_t threadId, sf_message_event_t eventCode )
 {
     event_system_payload_t* message;
     ssp_err_t status = messageQueueAcquireBuffer ( (void **) &message );
     if ( status == SSP_SUCCESS )
     {
-        message->header.event_b.class_code = eventClass;
+        message->header.event_b.class_code = SF_MESSAGE_EVENT_CLASS_SYSTEM;
         message->header.event_b.code = eventCode;
-        message->sender = tx_thread_identify ();
+        message->senderId = threadId;
 
         status = messageQueuePost ( (void **) &message );
 
@@ -72,16 +72,37 @@ ssp_err_t postSystemEventMessage ( sf_message_event_class_t eventClass, sf_messa
     return status;
 }
 
-ssp_err_t postSensorEventMessage ( sf_message_event_class_t eventClass, sf_message_event_t eventCode, void * dataPtr )
+ssp_err_t postSensorEventMessage ( uint8_t threadId, sf_message_event_t eventCode, void * dataPtr )
 {
     event_sensor_payload_t* message;
     ssp_err_t status = messageQueueAcquireBuffer ( (void **) &message );
     if ( status == SSP_SUCCESS )
     {
-        message->header.event_b.class_code = eventClass;
+        message->header.event_b.class_code = SF_MESSAGE_EVENT_CLASS_SENSOR;
         message->header.event_b.code = eventCode;
-        message->sender = tx_thread_identify ();
+        message->senderId = threadId;
         message->dataPointer = dataPtr;
+
+        status = messageQueuePost ( (void **) &message );
+
+        if ( status != SSP_SUCCESS )
+        {
+            messageQueueReleaseBuffer ( (void **) &message );
+        }
+    }
+    return status;
+}
+
+ssp_err_t postConfigEventMessage ( uint8_t threadId, sf_message_event_t eventCode, stringDataFunction dataFunctionPtr )
+{
+    event_config_payload_t* message;
+    ssp_err_t status = messageQueueAcquireBuffer ( (void **) &message );
+    if ( status == SSP_SUCCESS )
+    {
+        message->header.event_b.class_code = SF_MESSAGE_EVENT_CLASS_CONFIG;
+        message->header.event_b.code = eventCode;
+        message->senderId = threadId;
+        message->stringDataFunctionPtr = dataFunctionPtr;
 
         status = messageQueuePost ( (void **) &message );
 

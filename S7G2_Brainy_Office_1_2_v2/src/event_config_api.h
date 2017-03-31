@@ -21,7 +21,7 @@ typedef unsigned int (*stringDataFunction) ( char * payload, size_t payloadLengt
 typedef struct
 {
         sf_message_header_t header;
-        TX_THREAD * sender;
+        uint8_t senderId;
         stringDataFunction stringDataFunctionPtr;
 } event_config_payload_t;
 
