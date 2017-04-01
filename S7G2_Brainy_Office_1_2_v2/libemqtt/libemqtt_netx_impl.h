@@ -10,10 +10,26 @@
 
 #ifndef LIBEMQTT_NETX_IMPL_H_
     #define LIBEMQTT_NETX_IMPL_H_
-    #include <stdint.h>
+    #include "stdbool.h"
+    #include "libemqtt.h"
 
-int mqtt_netx_connect ( const char * client_id, const char * host, int mqtt_port, const char * username,
-                        const char * password, int keep_alive, int retry_limit, int retry_delay, int mqtt_heart_beat );
+typedef struct
+{
+        char userName [ MQTT_CONF_USERNAME_LENGTH ];
+        char password [ MQTT_CONF_PASSWORD_LENGTH ];
+        unsigned long hostIpAddress;
+        unsigned short port;
+        bool isKeepAlive;
+        uint8_t keepAliveDelay;
+        bool isRetryOnDisconnect;
+        uint8_t retrylimit;
+        uint8_t retryDelay;
+} MqttConnection_t;
+
+int mqtt_netx_connect ( const char * client_id, const MqttConnection_t * connection );
+
+//                        const char * host, int mqtt_port, const char * username,
+//                        const char * password, int keep_alive, int retry_limit, int retry_delay, int mqtt_heart_beat );
 
 int mqtt_netx_disconnect ();
 

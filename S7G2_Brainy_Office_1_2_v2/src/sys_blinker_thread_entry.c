@@ -40,7 +40,7 @@ void sys_blinker_thread_entry ( void )
     sf_message_header_t * message;
     ssp_err_t msgStatus;
 
-    ledModes [ RED ] = TOGGLE;
+//    ledModes [ RED ] = TOGGLE;
 
     while ( 1 )
     {
@@ -70,6 +70,14 @@ void sys_blinker_thread_entry ( void )
 
                     case SF_MESSAGE_EVENT_SYSTEM_USB_STORAGE_REMOVED :
                         ledModes [ AMBER ]--;
+                        break;
+
+                    case SF_MESSAGE_EVENT_SYSTEM_BUTTON_S4_PRESSED :
+                        ledModes [ RED ] = ON;
+                        break;
+
+                    case SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED :
+                        ledModes [ RED ] = OFF;
                         break;
                 }
             }

@@ -41,6 +41,12 @@ ULONG sys_main_thread_wait = 10;
 // System Main Thread entry function
 void sys_main_thread_entry ( void )
 {
+    g_button_s4_irq11.p_api->open ( g_button_s4_irq11.p_ctrl, g_button_s4_irq11.p_cfg );
+    g_button_s4_irq11.p_api->enable ( g_button_s4_irq11.p_ctrl );
+
+    g_button_s5_irq10.p_api->open ( g_button_s5_irq10.p_ctrl, g_button_s5_irq10.p_cfg );
+    g_button_s5_irq10.p_api->enable ( g_button_s5_irq10.p_ctrl );
+
 //    setCloudImplementationFunctions ( mediumOneConfigImpl, mediumOneInitImpl, mediumOnePublishImpl );
 
     while ( 1 )
@@ -131,4 +137,16 @@ uint8_t getUniqueThreadId ()
     threadId = ( ( g_currentThreadId++ ) % MAX_THREAD_COUNT );
     tx_mutex_put (&g_generate_thread_id_mutex);
     return threadId;
+}
+
+void button_s4_irq11_callback ( external_irq_callback_args_t * p_args )
+{
+    SSP_PARAMETER_NOT_USED ( p_args );
+    postSystemEventMessage ( get_sys_main_thread_Id (), SF_MESSAGE_EVENT_SYSTEM_BUTTON_S4_PRESSED );
+}
+
+void button_s5_irq10_callback ( external_irq_callback_args_t * p_args )
+{
+    SSP_PARAMETER_NOT_USED ( p_args );
+    postSystemEventMessage ( get_sys_main_thread_Id (), SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED );
 }

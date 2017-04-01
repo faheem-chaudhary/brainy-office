@@ -256,6 +256,8 @@
     <event display="Config Set Log Formatter" value="SF_MESSAGE_EVENT_CONFIG_SET_LOG_FORMATTER"/>
     <event display="System Cloud Available" value="SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE"/>
     <event display="System Cloud Disconnected" value="SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED"/>
+    <event display="System Button S4 Pressed" value="SF_MESSAGE_EVENT_SYSTEM_BUTTON_S4_PRESSED"/>
+    <event display="System Button S5 Pressed" value="SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED"/>
     <eventClass display="System" header="event_system_api.h" id="eventClass.1095746090" payload="event_system_payload" payloadType="event_system_payload_t" value="SF_MESSAGE_EVENT_CLASS_SYSTEM"/>
     <eventClass display="Sensor" header="event_sensor_api.h" id="eventClass.1363358315" payload="event_sensor_payload" payloadType="event_sensor_payload_t" value="SF_MESSAGE_EVENT_CLASS_SENSOR"/>
     <eventClass display="Config" header="event_config_api.h" id="eventClass.1942317328" payload="event_config_payload" payloadType="event_config_payload_t" value="SF_MESSAGE_EVENT_CLASS_CONFIG"/>
@@ -265,10 +267,6 @@
       <subscribe eventClass="module.framework.sf_touch_panel.eventClass.eventClassTouch"/>
       <subscribe eventClass="eventClass.1095746090"/>
       <subscribe eventClass="eventClass.1363358315"/>
-      <subscribe eventClass="eventClass.1942317328"/>
-    </subscriber>
-    <subscriber context="rtos.threadx.thread.41323032" end="0" id="subscriber.1867037620" start="0">
-      <subscribe eventClass="eventClass.1095746090"/>
       <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.379076183" end="0" id="subscriber.1881217138" start="0">
@@ -281,7 +279,6 @@
     </subscriber>
     <subscriber context="rtos.threadx.thread.924298567" end="0" id="subscriber.1610198113" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
-      <subscribe eventClass="eventClass.1363358315"/>
       <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.2138308075" end="0" id="subscriber.1319785664" start="0">
@@ -327,45 +324,6 @@
     </module>
     <module id="module.driver.fmi_on_fmi.0">
       <property id="module.driver.fmi.name" value="g_fmi"/>
-    </module>
-    <module id="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.1439474508">
-      <property id="module.framework.sf_touch_panel.name" value="g_sf_touch_panel_i2c0"/>
-      <property id="module.framework.sf_touch_panel.priority" value="3"/>
-      <property id="module.framework.sf_touch_panel.hsize_pixels" value="240"/>
-      <property id="module.framework.sf_touch_panel.vsize_pixels" value="350"/>
-      <property id="module.framework.sf_touch_panel.update_hz" value="10"/>
-      <property id="module.framework.sf_touch_panel.pin" value="IOPORT_PORT_06_PIN_09"/>
-      <property id="module.framework.sf_touch_panel.ev_class_instance_number" value="0"/>
-      <property id="module.framework.sf_touch_panel.rotation_angle" value="module.framework.sf_touch_panel.rotation_angle.angle0"/>
-    </module>
-    <module id="module.framework.sf_external_irq_on_sf_external_irq.1489305325">
-      <property id="module.framework.sf_external_irq.name" value="g_sf_external_irq0"/>
-      <property id="module.framework.sf_external_irq.event" value="module.framework.sf_external_irq.event.button_event_semaphore_put"/>
-    </module>
-    <module id="module.driver.external_irq_on_icu.1790559745">
-      <property id="module.driver.external_irq.name" value="g_external_irq0"/>
-      <property id="module.driver.external_irq.channel" value="9"/>
-      <property id="module.driver.external_irq.trigger" value="module.driver.external_irq.trigger.trig_falling"/>
-      <property id="module.driver.external_irq.filter_enable" value="module.driver.external_irq.filter_enable.true"/>
-      <property id="module.driver.external_irq.pclk_div" value="module.driver.external_irq.pclk_div.pclk_div_by_64"/>
-      <property id="module.driver.external_irq.interrupt_enable" value="module.driver.external_irq.interrupt_enable.true"/>
-      <property id="module.driver.external_irq.p_callback" value="NULL"/>
-      <property id="module.driver.external_irq.irq_ipl" value="board.icu.common.irq.priority8"/>
-    </module>
-    <module id="module.driver.i2c_on_riic.844911528">
-      <property id="module.driver.i2c.name" value="g_i2c_touch_panel"/>
-      <property id="module.driver.i2c.channel" value="2"/>
-      <property id="module.driver.i2c.rate" value="module.driver.i2c.rate.rate_fast"/>
-      <property id="module.driver.i2c.slave" value="0x48"/>
-      <property id="module.driver.i2c.addr_mode" value="module.driver.i2c.addr_mode.addr_mode_7bit"/>
-      <property id="module.driver.i2c.p_callback" value="NULL"/>
-      <property id="module.driver.i2c.rxi_ipl" value="board.icu.common.irq.priority6"/>
-      <property id="module.driver.i2c.txi_ipl" value="board.icu.common.irq.priority6"/>
-      <property id="module.driver.i2c.tei_ipl" value="board.icu.common.irq.priority6"/>
-      <property id="module.driver.i2c.eri_ipl" value="board.icu.common.irq.priority6"/>
-    </module>
-    <module id="module.external.ex_touch_panel_i2c_sx8654_on_ex_touch_panel_i2c_sx8654.1888893785">
-      <property id="module.external.ex_touch_panel.name" value="module.external.ex_touch_panel.name.sx8654"/>
     </module>
     <module id="module.framework.sf_message.1429754242">
       <property id="module.framework.sf_message.name" value="g_sf_message"/>
@@ -599,6 +557,65 @@
       <property id="module.framework.fx_usbmsc.media_init" value="module.framework.fx_usbmsc.media_init.disable"/>
       <property id="module.framework.fx_usbmsc.init_timeout" value="1000"/>
     </module>
+    <module id="module.driver.external_irq_on_icu.632634258">
+      <property id="module.driver.external_irq.name" value="g_button_s4_irq11"/>
+      <property id="module.driver.external_irq.channel" value="11"/>
+      <property id="module.driver.external_irq.trigger" value="module.driver.external_irq.trigger.trig_rising"/>
+      <property id="module.driver.external_irq.filter_enable" value="module.driver.external_irq.filter_enable.true"/>
+      <property id="module.driver.external_irq.pclk_div" value="module.driver.external_irq.pclk_div.pclk_div_by_64"/>
+      <property id="module.driver.external_irq.interrupt_enable" value="module.driver.external_irq.interrupt_enable.true"/>
+      <property id="module.driver.external_irq.p_callback" value="button_s4_irq11_callback"/>
+      <property id="module.driver.external_irq.irq_ipl" value="board.icu.common.irq.priority8"/>
+    </module>
+    <module id="module.driver.external_irq_on_icu.135035628">
+      <property id="module.driver.external_irq.name" value="g_button_s5_irq10"/>
+      <property id="module.driver.external_irq.channel" value="10"/>
+      <property id="module.driver.external_irq.trigger" value="module.driver.external_irq.trigger.trig_rising"/>
+      <property id="module.driver.external_irq.filter_enable" value="module.driver.external_irq.filter_enable.true"/>
+      <property id="module.driver.external_irq.pclk_div" value="module.driver.external_irq.pclk_div.pclk_div_by_64"/>
+      <property id="module.driver.external_irq.interrupt_enable" value="module.driver.external_irq.interrupt_enable.true"/>
+      <property id="module.driver.external_irq.p_callback" value="button_s5_irq10_callback"/>
+      <property id="module.driver.external_irq.irq_ipl" value="board.icu.common.irq.priority8"/>
+    </module>
+    <module id="module.external.ex_touch_panel_i2c_sx8654_on_ex_touch_panel_i2c_sx8654.619982185">
+      <property id="module.external.ex_touch_panel.name" value="module.external.ex_touch_panel.name.sx8654"/>
+    </module>
+    <module id="module.driver.external_irq_on_icu.621435503">
+      <property id="module.driver.external_irq.name" value="g_external_irq0"/>
+      <property id="module.driver.external_irq.channel" value="9"/>
+      <property id="module.driver.external_irq.trigger" value="module.driver.external_irq.trigger.trig_falling"/>
+      <property id="module.driver.external_irq.filter_enable" value="module.driver.external_irq.filter_enable.true"/>
+      <property id="module.driver.external_irq.pclk_div" value="module.driver.external_irq.pclk_div.pclk_div_by_64"/>
+      <property id="module.driver.external_irq.interrupt_enable" value="module.driver.external_irq.interrupt_enable.true"/>
+      <property id="module.driver.external_irq.p_callback" value="NULL"/>
+      <property id="module.driver.external_irq.irq_ipl" value="board.icu.common.irq.priority8"/>
+    </module>
+    <module id="module.framework.sf_external_irq_on_sf_external_irq.20978770">
+      <property id="module.framework.sf_external_irq.name" value="g_sf_external_irq0"/>
+      <property id="module.framework.sf_external_irq.event" value="module.framework.sf_external_irq.event.button_event_semaphore_put"/>
+    </module>
+    <module id="module.driver.i2c_on_riic.1359688582">
+      <property id="module.driver.i2c.name" value="g_i2c_touch_panel"/>
+      <property id="module.driver.i2c.channel" value="2"/>
+      <property id="module.driver.i2c.rate" value="module.driver.i2c.rate.rate_fast"/>
+      <property id="module.driver.i2c.slave" value="0x48"/>
+      <property id="module.driver.i2c.addr_mode" value="module.driver.i2c.addr_mode.addr_mode_7bit"/>
+      <property id="module.driver.i2c.p_callback" value="NULL"/>
+      <property id="module.driver.i2c.rxi_ipl" value="board.icu.common.irq.priority6"/>
+      <property id="module.driver.i2c.txi_ipl" value="board.icu.common.irq.priority6"/>
+      <property id="module.driver.i2c.tei_ipl" value="board.icu.common.irq.priority6"/>
+      <property id="module.driver.i2c.eri_ipl" value="board.icu.common.irq.priority6"/>
+    </module>
+    <module id="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.1471266304">
+      <property id="module.framework.sf_touch_panel.name" value="g_sf_touch_panel_i2c0"/>
+      <property id="module.framework.sf_touch_panel.priority" value="3"/>
+      <property id="module.framework.sf_touch_panel.hsize_pixels" value="240"/>
+      <property id="module.framework.sf_touch_panel.vsize_pixels" value="350"/>
+      <property id="module.framework.sf_touch_panel.update_hz" value="10"/>
+      <property id="module.framework.sf_touch_panel.pin" value="IOPORT_PORT_06_PIN_09"/>
+      <property id="module.framework.sf_touch_panel.ev_class_instance_number" value="0"/>
+      <property id="module.framework.sf_touch_panel.rotation_angle" value="module.framework.sf_touch_panel.rotation_angle.angle0"/>
+    </module>
     <context id="_hal.0">
       <stack module="module.driver.fmi_on_fmi.0"/>
       <stack module="module.driver.cgc_on_cgc.0"/>
@@ -629,6 +646,16 @@
           </stack>
         </stack>
       </stack>
+      <stack module="module.driver.external_irq_on_icu.632634258"/>
+      <stack module="module.driver.external_irq_on_icu.135035628"/>
+      <stack module="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.1471266304">
+        <stack module="module.framework.sf_message.1429754242" requires="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.requires.sf_message"/>
+        <stack module="module.driver.i2c_on_riic.1359688582" requires="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.requires.i2c"/>
+        <stack module="module.framework.sf_external_irq_on_sf_external_irq.20978770" requires="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.requires.sf_external_irq">
+          <stack module="module.driver.external_irq_on_icu.621435503" requires="module.framework.sf_external_irq_on_sf_external_irq.requires.external_irq"/>
+        </stack>
+        <stack module="module.external.ex_touch_panel_i2c_sx8654_on_ex_touch_panel_i2c_sx8654.619982185" requires="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.requires.ex_touch_panel"/>
+      </stack>
       <object id="rtos.threadx.object.mutex.1157569269">
         <property id="rtos.threadx.object.mutex.name" value="Generate Thread ID Mutex"/>
         <property id="rtos.threadx.object.mutex.symbol" value="g_generate_thread_id_mutex"/>
@@ -642,22 +669,6 @@
       <property id="rtos.threadx.thread.priority" value="10"/>
       <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
-    </context>
-    <context id="rtos.threadx.thread.41323032">
-      <property id="_symbol" value="sys_touch_thread"/>
-      <property id="rtos.threadx.thread.name" value="System Touch Thread"/>
-      <property id="rtos.threadx.thread.stack" value="1024"/>
-      <property id="rtos.threadx.thread.priority" value="6"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
-      <property id="rtos.threadx.thread.timeslice" value="1"/>
-      <stack module="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.1439474508">
-        <stack module="module.framework.sf_message.1429754242" requires="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.requires.sf_message"/>
-        <stack module="module.driver.i2c_on_riic.844911528" requires="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.requires.i2c"/>
-        <stack module="module.framework.sf_external_irq_on_sf_external_irq.1489305325" requires="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.requires.sf_external_irq">
-          <stack module="module.driver.external_irq_on_icu.1790559745" requires="module.framework.sf_external_irq_on_sf_external_irq.requires.external_irq"/>
-        </stack>
-        <stack module="module.external.ex_touch_panel_i2c_sx8654_on_ex_touch_panel_i2c_sx8654.1888893785" requires="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.requires.ex_touch_panel"/>
-      </stack>
     </context>
     <context id="rtos.threadx.thread.379076183">
       <property id="_symbol" value="sys_network_thread"/>

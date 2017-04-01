@@ -21,7 +21,6 @@
 
     #define MAX_THREAD_COUNT    16
     #define USBX_CONFIGURED 1
-    #define DUMMY_CLOUD 1
 
 //    #define CURR_THREAD_ID ((tx_thread_identify()->tx_thread_id)%MAX_THREAD_COUNT)
 //    #define SENDER_THREAD_ID(sender) ((sender->tx_thread_id)%MAX_THREAD_COUNT)

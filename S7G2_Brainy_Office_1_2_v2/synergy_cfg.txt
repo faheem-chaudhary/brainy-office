@@ -266,6 +266,9 @@ Synergy Configuration
     Message Queue Depth (Total number of messages to be enqueued in a Message Queue): 16
     
   Module "FileX on USB Mass Storage"
+  Module "External IRQ Driver on r_icu"
+    Parameter Checking: Default (BSP)
+    
   Module "Touch Panel Framework on sf_touch_panel_i2c"
     Parameter Checking: Default (BSP)
     
@@ -377,27 +380,26 @@ Synergy Configuration
           Instance "ThreadX Source"
             Show linkage warning: Disabled
             
-    Object "g_generate_thread_id_mutex Mutex"
-      Name: Generate Thread ID Mutex
-      Symbol: g_generate_thread_id_mutex
-      Priority inheritance: Disabled
+    Instance "g_button_s4_irq11 External IRQ Driver on r_icu"
+      Name: g_button_s4_irq11
+      Channel: 11
+      Trigger: Rising
+      Digital Filtering: Enabled
+      Digital Filtering Sample Clock (Only valid when Digital Filtering is Enabled): PCLK / 64
+      Interrupt enabled after initialization: True
+      Callback: button_s4_irq11_callback
+      Interrupt Priority: Priority 8 (CM4: valid, CM0+: invalid)
       
-  Thread "System Blinker Thread"
-    Symbol: sys_blinker_thread
-    Name: System Blinker Thread
-    Stack size (bytes): 1024
-    Priority: 10
-    Auto start: Enabled
-    Time slicing interval (ticks): 1
-    
-  Thread "System Touch Thread"
-    Symbol: sys_touch_thread
-    Name: System Touch Thread
-    Stack size (bytes): 1024
-    Priority: 6
-    Auto start: Disabled
-    Time slicing interval (ticks): 1
-    
+    Instance "g_button_s5_irq10 External IRQ Driver on r_icu"
+      Name: g_button_s5_irq10
+      Channel: 10
+      Trigger: Rising
+      Digital Filtering: Enabled
+      Digital Filtering Sample Clock (Only valid when Digital Filtering is Enabled): PCLK / 64
+      Interrupt enabled after initialization: True
+      Callback: button_s5_irq10_callback
+      Interrupt Priority: Priority 8 (CM4: valid, CM0+: invalid)
+      
     Instance "g_sf_touch_panel_i2c0 Touch Panel Framework on sf_touch_panel_i2c"
       Name: g_sf_touch_panel_i2c0
       Thread Priority: 3
@@ -443,6 +445,19 @@ Synergy Configuration
       Instance "Touch Panel Driver on touch_panel_sx8654"
         Name: g_sf_touch_panel_i2c_chip_sx8654
         
+    Object "g_generate_thread_id_mutex Mutex"
+      Name: Generate Thread ID Mutex
+      Symbol: g_generate_thread_id_mutex
+      Priority inheritance: Disabled
+      
+  Thread "System Blinker Thread"
+    Symbol: sys_blinker_thread
+    Name: System Blinker Thread
+    Stack size (bytes): 1024
+    Priority: 10
+    Auto start: Enabled
+    Time slicing interval (ticks): 1
+    
   Thread "System Network (Ethernet) Thread"
     Symbol: sys_network_thread
     Name: System Network (Ethernet) Thread
@@ -911,6 +926,14 @@ Synergy Configuration
       Symbol: SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED
       Name: System Cloud Disconnected
       
+    Event "System Button S4 Pressed"
+      Symbol: SF_MESSAGE_EVENT_SYSTEM_BUTTON_S4_PRESSED
+      Name: System Button S4 Pressed
+      
+    Event "System Button S5 Pressed"
+      Symbol: SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED
+      Name: System Button S5 Pressed
+      
     Event Class "System"
       Symbol: SF_MESSAGE_EVENT_CLASS_SYSTEM
       Name: System
@@ -947,10 +970,6 @@ Synergy Configuration
       Event Class "Sensor"
       Event Class "Config"
       
-    Subscriber "System Touch Thread" 0 0
-      Event Class "System"
-      Event Class "Config"
-      
     Subscriber "System Network (Ethernet) Thread" 0 0
       Event Class "System"
       Event Class "Config"
@@ -961,7 +980,6 @@ Synergy Configuration
       
     Subscriber "System File Logger Thread" 0 0
       Event Class "System"
-      Event Class "Sensor"
       Event Class "Config"
       
     Subscriber "Cloud Data Thread" 0 0

@@ -88,6 +88,9 @@ void sensor_humidity_temperature_thread_entry ( void )
     double tempThresholdInCelsius = 0.2;
     double humidityThresholdInPercent = 3.5;
 
+    uint16_t temperatureThreshold = ( uint16_t ) ( ( ( uint16_t ) ( tempThresholdInCelsius + 273.15 ) ) * 64 );
+    uint16_t humidityThreshold = ( uint16_t ) ( 3.5 * 512 );
+
     double prevTemperatureCelsius = -200.0, prevTemperatureFahrenheit = -200.0, prevHumidityPercent = -100.0; // impossible minimum values for sensor to detect
 
     sf_message_header_t * message;
@@ -124,6 +127,8 @@ void sensor_humidity_temperature_thread_entry ( void )
 
     tx_thread_sleep ( 13 ); // 122 ms conversion time
 
+    bool isForedDataCalculation = false;
+
     while ( 1 )
     {
         msgStatus = messageQueuePend ( &sensor_humidity_temperature_thread_message_queue, (void **) &message,
@@ -134,6 +139,21 @@ void sensor_humidity_temperature_thread_entry ( void )
             if ( message->event_b.class_code == SF_MESSAGE_EVENT_CLASS_SYSTEM )
             {
                 //TODO: anything related to System Message Processing goes here
+
+                if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE )
+                {
+                    isCloudConnected = true;
+                    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id, formatDataForCloudPublish );
+                }
+                else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED )
+                {
+                    isCloudConnected = false;
+                    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id, NULL );
+                }
+                else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_BUTTON_S4_PRESSED )
+                {
+                    isForedDataCalculation = true;
+                }
             }
 
             messageQueueReleaseBuffer ( (void **) &message );
@@ -163,7 +183,7 @@ void sensor_humidity_temperature_thread_entry ( void )
 
             difference = fabs ( g_temperatureCelsius - prevTemperatureCelsius );
 
-            if ( difference > tempThresholdInCelsius )
+            if ( difference > tempThresholdInCelsius || isForedDataCalculation )
             {
                 g_temperatureFahrenheit = ( ( g_temperatureCelsius * 1.8 ) + 32.0 );
 
@@ -183,7 +203,7 @@ void sensor_humidity_temperature_thread_entry ( void )
 
             difference = fabs ( g_humidityPercent - prevHumidityPercent );
 
-            if ( difference > humidityThresholdInPercent )
+            if ( difference > humidityThresholdInPercent || isForedDataCalculation )
             {
                 // post sensor message
                 postSensorEventMessage ( sensor_humidity_temperature_thread_id, SF_MESSAGE_EVENT_SENSOR_NEW_DATA,
@@ -192,6 +212,8 @@ void sensor_humidity_temperature_thread_entry ( void )
                 prevHumidityPercent = g_humidityPercent;
             }
         }
+
+        isForedDataCalculation = false;
     }
 }
 

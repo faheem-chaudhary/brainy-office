@@ -47,43 +47,30 @@ uint8_t packet_buffer [ RCVBUFSIZE ];
 int socket_id;
 mqtt_broker_handle_t g_broker;
 TX_THREAD * gp_thread;
-int g_keepalive = 30;
 
 void alive ( int sig );
-void term ( int sig );
-
-int init_netx_socket ( mqtt_broker_handle_t* broker, const char* hostname, unsigned int port, int keepalive );
+int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * connection );
 int send_packet ( void* socket_info, const void* buf, unsigned int count );
 int close_socket ( mqtt_broker_handle_t* broker );
 int read_packet ( int timeout );
 
-#if 0
-int init_netx_socket ( mqtt_broker_handle_t* broker, const char* hostname, short port, int keepalive )
-{
-    return 0;
-}
-int read_packet ( int timeout )
-{
-    return 0;
-}
-
-#else
 int send_packet ( void* socket_info, const void* buf, unsigned int count )
 {
     int fd = * ( (int*) socket_info );
-    int bytesSend = send ( fd, buf, count, 0 );
+    int bytesSend = (int) send ( fd, buf, (int) count, 0 );
     return bytesSend;
 }
 
-int init_netx_socket ( mqtt_broker_handle_t* broker, const char* hostname, unsigned int port, int keepalive )
+int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * connection )
 {
-    int flag = 1;
     int socketStatus = 0;
 
     // Create the socket
     socketStatus = ( socket_id = socket ( PF_INET, SOCK_STREAM, 0 ) );
     if ( socketStatus < 0 )
+    {
         return -1;
+    }
 
     // Disable Nagle Algorithm ... disabling this because NetX BSD has this as default option
 //    socketStatus = setsockopt ( socket_id, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof ( flag ) );
@@ -93,16 +80,21 @@ int init_netx_socket ( mqtt_broker_handle_t* broker, const char* hostname, unsig
     struct sockaddr_in socket_address;
     // Create the stuff we need to connect
     socket_address.sin_family = AF_INET;
-    socket_address.sin_port = htons ( port );
-    socket_address.sin_addr.s_addr = inet_addr ( hostname );
+    socket_address.sin_port = connection->port;
+    socket_address.sin_addr.s_addr = connection->hostIpAddress;
 
     // Connect the socket
     socketStatus = ( connect ( socket_id, (struct sockaddr*) &socket_address, sizeof ( socket_address ) ) );
     if ( socketStatus < 0 )
+    {
         return -1;
+    }
 
     // MQTT stuffs
-    mqtt_set_alive ( broker, keepalive );
+    if ( connection->isKeepAlive )
+    {
+        mqtt_set_alive ( broker, connection->keepAliveDelay );
+    }
     broker->socket_info = (void*) &socket_id;
     broker->send = send_packet;
 
@@ -149,7 +141,9 @@ int read_packet ( int timeout )
 
     total_bytes += bytes_rcvd; // Keep tally of total bytes
     if ( total_bytes < 2 )
+    {
         return -1;
+    }
 
     // now we have the full fixed header in packet_buffer
     // parse it for remaining length and number of bytes
@@ -163,14 +157,14 @@ int read_packet ( int timeout )
     while ( total_bytes < packet_length )    // Reading the packet
     {
         if ( ( bytes_rcvd = recv ( socket_id, ( packet_buffer + total_bytes ), RCVBUFSIZE, 0 ) ) <= 0 )
+        {
             return -1;
+        }
         total_bytes += bytes_rcvd; // Keep tally of total bytes
     }
 
     return packet_length;
 }
-
-#endif
 
 int mqtt_netx_disconnect ()
 {
@@ -200,6 +194,7 @@ int mqtt_netx_subscribe (
         const char* topic, uint16_t* message_id,
         void (*subscription_callback) ( const char * topic, const char * message_id, uint16_t message_length ) )
 {
+    SSP_PARAMETER_NOT_USED ( subscription_callback );
     int status = mqtt_subscribe ( &g_broker, topic, message_id );
     return status;
 }
@@ -215,13 +210,21 @@ int mqtt_netx_ping ()
     return mqtt_ping ( &g_broker );
 }
 
-int mqtt_netx_connect ( const char * client_id, const char * host, int mqtt_port, const char * username,
-                        const char * password, int keep_alive, int retry_limit, int retry_delay, int mqtt_heart_beat )
+unsigned int g_keepalive = 30;
+void alive ( int sig )
+{
+    SSP_PARAMETER_NOT_USED ( sig );
+
+    mqtt_ping ( &g_broker );
+    alarm ( g_keepalive );
+}
+
+int mqtt_netx_connect ( const char * client_id, const MqttConnection_t * connection )
 {
     int status = 0;
     mqtt_init ( &g_broker, client_id );
-    mqtt_init_auth ( &g_broker, username, password );
-    init_netx_socket ( &g_broker, host, mqtt_port, keep_alive );
+    mqtt_init_auth ( &g_broker, connection->userName, connection->password );
+    init_netx_socket ( &g_broker, connection );
     status = mqtt_connect ( &g_broker );
 
     int packet_length = read_packet ( 1 );
@@ -242,6 +245,15 @@ int mqtt_netx_connect ( const char * client_id, const char * host, int mqtt_port
     {
         fprintf ( stderr, "CONNACK failed!\n" );
         return -2;
+    }
+
+    if ( connection->isKeepAlive )
+    {
+        g_keepalive = connection->keepAliveDelay;
+
+        // Signals after connect MQTT
+        signal ( SIGALRM, alive );
+        alarm ( g_keepalive );
     }
 
     return status;
@@ -359,17 +371,9 @@ int pub_test ( int argc, char* argv [] )
     return 0;
 }
 
-void alive ( int sig )
-{
-    printf ( "Timeout! Sending ping...\n" );
-    mqtt_ping ( &g_broker );
-
-    alarm ( g_keepalive );
-}
-
 void term ( int sig )
 {
-    printf ( "Goodbye!\n" );
+    fprintf ( stderr, "Goodbye!\n" );
     // >>>>> DISCONNECT
     mqtt_disconnect ( &g_broker );
     close_socket ( &g_broker );

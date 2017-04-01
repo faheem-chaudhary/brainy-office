@@ -8,10 +8,17 @@
  * Copyright (c) 2017 Renesas Electronics America (REA) and Faheem Inayat
  */
 
+#include "stddef.h"
+
 #include "cloud_medium1_adapter.h"
 #include "commons.h"
 
-#define DUMMY_CLOUD 0
+#include "libemqtt.h"
+#include "nx_dns.h"
+#include "libemqtt_netx_impl.h"
+
+#define M1_CONFIG_VALUE_LENGTH  33
+#define M1_API_KEY_VALUE_LENGTH 65
 
 #undef MQTT_CONF_USERNAME_LENGTH
 #undef MQTT_CONF_PASSWORD_LENGTH
@@ -19,11 +26,20 @@
 #define MQTT_CONF_USERNAME_LENGTH   (M1_CONFIG_VALUE_LENGTH + M1_CONFIG_VALUE_LENGTH + 2)
 #define MQTT_CONF_PASSWORD_LENGTH   (M1_CONFIG_VALUE_LENGTH + M1_API_KEY_VALUE_LENGTH + 2)
 
-#include "libemqtt.h"
-#include "nx_dns.h"
-#include "libemqtt_netx_impl.h"
+typedef struct
+{
+        char name [ M1_CONFIG_VALUE_LENGTH ];
+        char apiKey [ M1_API_KEY_VALUE_LENGTH ];
+        char projectId [ M1_CONFIG_VALUE_LENGTH ];
+        char userId [ M1_CONFIG_VALUE_LENGTH ];
+        char password [ M1_CONFIG_VALUE_LENGTH ];
+        char hostName [ M1_API_KEY_VALUE_LENGTH ];
+        unsigned int port;
+
+} MediumOneDeviceCredentials_t;
 
 MediumOneDeviceCredentials_t g_mediumOneDeviceCredentials;
+MqttConnection_t g_mqttConnection;
 
 #if(DUMMY_CLOUD)
 unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
@@ -120,25 +136,29 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
 
     int status = 0;
 
-    char m1UsernameStr [ MQTT_CONF_USERNAME_LENGTH ];
-    char m1Password [ MQTT_CONF_PASSWORD_LENGTH ];
-    char hostIpAddress [ 16 ];
+//    char m1UsernameStr [ MQTT_CONF_USERNAME_LENGTH ];
+//    char m1Password [ MQTT_CONF_PASSWORD_LENGTH ];
+//    char hostIpAddress [ 16 ];
 
-    sprintf ( m1UsernameStr, "%s/%s", g_mediumOneDeviceCredentials.projectId, g_mediumOneDeviceCredentials.userId );
-    sprintf ( m1Password, "%s/%s", g_mediumOneDeviceCredentials.apiKey, g_mediumOneDeviceCredentials.password );
+    sprintf ( g_mqttConnection.userName, "%s/%s", g_mediumOneDeviceCredentials.projectId,
+              g_mediumOneDeviceCredentials.userId );
+    sprintf ( g_mqttConnection.password, "%s/%s", g_mediumOneDeviceCredentials.apiKey,
+              g_mediumOneDeviceCredentials.password );
 
     { // resolve the hostName to IP Address
-        ULONG ipAddressLong;
-        nx_dns_host_by_name_get ( &g_dns_client, (UCHAR *) g_mediumOneDeviceCredentials.hostName, &ipAddressLong,
-                                  TX_WAIT_FOREVER );
+        nx_dns_host_by_name_get ( &g_dns_client, (UCHAR *) g_mediumOneDeviceCredentials.hostName,
+                                  &g_mqttConnection.hostIpAddress, TX_WAIT_FOREVER );
 
-        sprintf ( hostIpAddress, "%d.%d.%d.%d", (int) ( ipAddressLong >> 24 ), (int) ( ipAddressLong >> 16 ) & 0xFF,
-                  (int) ( ipAddressLong >> 8 ) & 0xFF, (int) ( ipAddressLong ) & 0xFF );
+        g_mqttConnection.port = (unsigned short) g_mediumOneDeviceCredentials.port;
+        g_mqttConnection.isKeepAlive = true;
+        g_mqttConnection.keepAliveDelay = 60;
+        g_mqttConnection.isRetryOnDisconnect = true;
+        g_mqttConnection.retrylimit = 5;
+        g_mqttConnection.retryDelay = 5;
     }
 
     //"name=desktop-kit-1\r\napi_key=WG46JL5TPKJ3Q272SDCEJDJQGQ4DEOJZGM2GEZBYGRQTAMBQ\r\nproject_id=o3adQcvIn0Q\r\nuser_id=kHgc2feq1bg\r\npassword=Dec2kPok\r\nhost=mqtt2.mediumone.com\r\nport=61619" );
-    status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, hostIpAddress, g_mediumOneDeviceCredentials.port,
-                                 m1UsernameStr, m1Password, 5, 5, 60, 1 );
+    status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
 
     if ( status == 1 )
     {
@@ -159,10 +179,25 @@ unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
 {
 //    0/<project_mqtt_id>/<user_mqtt_id>/<device_id>/
 
-    int length = sprintf ( g_publishMessageBuffer, "{\"event_data\":{\"%s\":%s}}", g_mediumOneDeviceCredentials.name,
+    int status = sprintf ( g_publishMessageBuffer, "{\"event_data\":{\"%s\":%s}}", g_mediumOneDeviceCredentials.name,
                            message );
-    mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
-    return ( length > 0 );
+    if ( status > 0 )
+    {
+        status = mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
+
+        if ( status == 0 ) // Connection Issues, try to connect again
+        {
+            status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
+
+            if ( status == 1 )
+            {
+                mediumOnePublishImpl ( "{\"reconnected\":true}", 0 );
+                status = mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
+            }
+        }
+    }
+
+    return ( status > 0 );
 }
 
 #endif
