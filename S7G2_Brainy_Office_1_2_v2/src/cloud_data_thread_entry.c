@@ -7,7 +7,6 @@
 #include "sf_message.h"
 #include "tx_api.h"
 
-//TODO: This function needs refactoring ... break down the reading part and send the bits to M1 configuration
 bool configureUSBCloudProvisioning ();
 
 void processConfigMessage ( event_config_payload_t *configEventMsg );
@@ -135,7 +134,7 @@ void processSensorMessage ( event_sensor_payload_t *sensorEventMsg )
 void processSystemMessage ( event_system_payload_t *systemEventMsg )
 {
     bool existingCloudConnectable = isCloudConnectable;
-//    bool existingCloudAvailability = isCloudAvailable;
+    bool existingCloudAvailability = isCloudAvailable;
 
     switch ( systemEventMsg->header.event_b.code )
     {
@@ -178,15 +177,14 @@ void processSystemMessage ( event_system_payload_t *systemEventMsg )
         }
     }
 
-    if ( existingCloudConnectable == true && !isCloudAvailable )
+    if ( existingCloudAvailability == true && !isCloudAvailable )
     {
         // publish Cloud NOT available system message
         postSystemEventMessage ( g_cloud_data_thread_id, SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED );
     }
 }
 
-#if (USBX_CONFIGURED)
-    #define CONFIG_FILE "config.txt"
+#define CONFIG_FILE "config.txt"
 
 bool configureUSBCloudProvisioning ()
 {
@@ -216,29 +214,3 @@ bool configureUSBCloudProvisioning ()
 
     return ( keysRead > 0 );
 }
-#else
-bool configureUSBCloudProvisioning ()
-{
-    UINT keysRead = 0;
-    const ULONG bufferSize = 512;
-    char configurationBuffer [ bufferSize ];
-
-    if ( g_cloudConfigImpl != NULL )
-    {
-        sprintf ( configurationBuffer, "name=desktop-kit-1\r\n"
-                  "api_key=WG46JL5TPKJ3Q272SDCEJDJQGQ4DEOJZGM2GEZBYGRQTAMBQ\r\n"
-                  "project_id=o3adQcvIn0Q\r\n"
-                  "user_id=kHgc2feq1bg\r\n"
-                  "password=Dec2kPok\r\n"
-                  "host=mqtt2.mediumone.com\r\n"
-                  "port=61619\r\n" );
-        keysRead = g_cloudConfigImpl ( configurationBuffer, bufferSize );
-        if ( keysRead > 0 && g_cloudInitImpl != NULL )
-        {
-            g_cloudInitImpl ( NULL, 0 );
-        }
-    }
-
-    return ( keysRead > 0 );
-}
-#endif

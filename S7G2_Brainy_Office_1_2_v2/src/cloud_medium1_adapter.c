@@ -41,29 +41,6 @@ typedef struct
 MediumOneDeviceCredentials_t g_mediumOneDeviceCredentials;
 MqttConnection_t g_mqttConnection;
 
-#if(DUMMY_CLOUD)
-unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
-{
-    return (unsigned int) 7;
-}
-
-unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
-{
-    return (unsigned int) 1;
-}
-
-char g_publishMessageBuffer [ 512 ];
-unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
-{
-//    0/<project_mqtt_id>/<user_mqtt_id>/<device_id>/
-
-    int length = snprintf ( g_publishMessageBuffer, messageLength, "{\"event_data\":{\"%s\":%s}}",
-            g_mediumOneDeviceCredentials.name, message );
-//    mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
-    return ( length > 0 );
-}
-
-#else
 unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
 {
     MediumOneDeviceCredentials_t m1Creds;
@@ -125,7 +102,6 @@ unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
     return 0;
 }
 
-//static mqtt_broker_handle_t g_mqttBroker;
 char g_topic_name [ 255 ];
 extern NX_DNS g_dns_client;
 
@@ -135,10 +111,6 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
     SSP_PARAMETER_NOT_USED ( dataLength );
 
     int status = 0;
-
-//    char m1UsernameStr [ MQTT_CONF_USERNAME_LENGTH ];
-//    char m1Password [ MQTT_CONF_PASSWORD_LENGTH ];
-//    char hostIpAddress [ 16 ];
 
     sprintf ( g_mqttConnection.userName, "%s/%s", g_mediumOneDeviceCredentials.projectId,
               g_mediumOneDeviceCredentials.userId );
@@ -157,13 +129,13 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
         g_mqttConnection.retryDelay = 5;
     }
 
-    //"name=desktop-kit-1\r\napi_key=WG46JL5TPKJ3Q272SDCEJDJQGQ4DEOJZGM2GEZBYGRQTAMBQ\r\nproject_id=o3adQcvIn0Q\r\nuser_id=kHgc2feq1bg\r\npassword=Dec2kPok\r\nhost=mqtt2.mediumone.com\r\nport=61619" );
     status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
 
     if ( status == 1 )
     {
         //TODO: Setup Subscription function here, at some point in time
 
+        ///    0/<project_mqtt_id>/<user_mqtt_id>/<device_id>/
         sprintf ( g_topic_name, "0/%s/%s/%s", g_mediumOneDeviceCredentials.projectId,
                   g_mediumOneDeviceCredentials.userId, g_mediumOneDeviceCredentials.name );
 
@@ -177,8 +149,6 @@ char g_publishMessageBuffer [ 512 ];
 
 unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
 {
-//    0/<project_mqtt_id>/<user_mqtt_id>/<device_id>/
-
     int status = sprintf ( g_publishMessageBuffer, "{\"event_data\":{\"%s\":%s}}", g_mediumOneDeviceCredentials.name,
                            message );
     if ( status > 0 )
@@ -199,5 +169,3 @@ unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
 
     return ( status > 0 );
 }
-
-#endif
