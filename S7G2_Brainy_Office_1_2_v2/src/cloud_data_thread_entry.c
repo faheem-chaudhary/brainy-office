@@ -17,15 +17,28 @@ ULONG cloud_data_thread_wait = 5;
 
 uint8_t g_cloud_data_thread_id;
 
+/// Configuration function to set the Cloud Implementation Adapter
+/// @param [in]  configImpl  Implementation Function Pointer to setup Cloud Connection.  Use NULL to remove the existing implementation.
+/// @param [in]  initImpl    Implementation Function Pointer to initialize Cloud Connection.  Use NULL to remove the existing implementation.  This function will be called right after successful execution of configImpl and is not NULL.  This function will also be called whenever network connection is successfully established.
+/// @param [in]  publishImpl   Implementation Function Pointer to publish payload to cloud.  Use NULL to remove the existing implementation.
+void setCloudImplementationFunctions ( stringDataFunction configImpl, stringDataFunction initImpl,
+                                       stringDataFunction publishImpl, void (*houseKeepImpl) ( void ) );
+
+void (*g_houseKeepImpl) ( void ) = NULL;
+
 /* Cloud Data Thread entry function */
 void cloud_data_thread_entry ( void )
 {
     g_cloud_data_thread_id = getUniqueThreadId ();
 
-    setCloudImplementationFunctions ( mediumOneConfigImpl, mediumOneInitImpl, mediumOnePublishImpl );
+    setCloudImplementationFunctions ( mediumOneConfigImpl, mediumOneInitImpl, mediumOnePublishImpl,
+                                      mediumOneHouseKeepImpl );
 
     sf_message_header_t * message;
     ssp_err_t msgStatus;
+
+    ULONG prevTime = 0, currTime = 0;
+    ULONG houseKeepInterval = ( 60 * 100 ); // Every 60 seconds
 
     while ( 1 )
     {
@@ -55,6 +68,16 @@ void cloud_data_thread_entry ( void )
         {
             // if any error other than empty queue
         }
+
+        if ( g_houseKeepImpl != NULL )
+        {
+            currTime = tx_time_get ();
+            if ( currTime - prevTime >= houseKeepInterval )
+            {
+                prevTime = currTime;
+                g_houseKeepImpl ();
+            }
+        }
     }
 }
 
@@ -76,11 +99,12 @@ void registerSensorForCloudPublish ( uint8_t threadId, sensorFormatFunction clou
 }
 
 void setCloudImplementationFunctions ( stringDataFunction configImpl, stringDataFunction initImpl,
-                                       stringDataFunction publishImpl )
+                                       stringDataFunction publishImpl, void (*houseKeepImpl) ( void ) )
 {
     g_cloudPublishImpl = publishImpl;
     g_cloudConfigImpl = configImpl;
     g_cloudInitImpl = initImpl;
+    g_houseKeepImpl = houseKeepImpl;
 }
 
 void processConfigMessage ( event_config_payload_t *configEventMsg )

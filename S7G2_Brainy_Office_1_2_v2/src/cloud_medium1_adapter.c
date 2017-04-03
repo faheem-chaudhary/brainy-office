@@ -161,11 +161,19 @@ unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
 
             if ( status == 1 )
             {
-                mediumOnePublishImpl ( "{\"reconnected\":true}", 0 );
+                mqtt_netx_publish ( g_topic_name, "{\"reconnected\":true}", 0 );
                 status = mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
             }
         }
     }
 
     return ( status > 0 );
+}
+
+void mediumOneHouseKeepImpl ( void )
+{
+    if ( g_mqttConnection.isKeepAlive )
+    {
+        mqtt_netx_ping ();
+    }
 }

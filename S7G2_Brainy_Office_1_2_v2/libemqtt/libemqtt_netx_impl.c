@@ -210,14 +210,14 @@ int mqtt_netx_ping ()
     return mqtt_ping ( &g_broker );
 }
 
-unsigned int g_keepalive = 30;
-void alive ( int sig )
-{
-    SSP_PARAMETER_NOT_USED ( sig );
-
-    mqtt_ping ( &g_broker );
-    alarm ( g_keepalive );
-}
+//unsigned int g_keepalive = 30;
+//void alive ( int sig )
+//{
+//    SSP_PARAMETER_NOT_USED ( sig );
+//
+//    mqtt_ping ( &g_broker );
+//    alarm ( g_keepalive );
+//}
 
 int mqtt_netx_connect ( const char * client_id, const MqttConnection_t * connection )
 {
@@ -247,14 +247,14 @@ int mqtt_netx_connect ( const char * client_id, const MqttConnection_t * connect
         return -2;
     }
 
-    if ( connection->isKeepAlive )
-    {
-        g_keepalive = connection->keepAliveDelay;
+//    if ( connection->isKeepAlive )
+//    {
+//        g_keepalive = connection->keepAliveDelay;
 
-        // Signals after connect MQTT
-        signal ( SIGALRM, alive );
-        alarm ( g_keepalive );
-    }
+    // Signals after connect MQTT
+//        signal ( SIGALRM, alive );
+//        alarm ( g_keepalive );
+//    }
 
     return status;
 }

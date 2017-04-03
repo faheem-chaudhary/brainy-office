@@ -14,5 +14,6 @@
 unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength );
 unsigned int mediumOneInitImpl ( char * configData, size_t dataLength );
 unsigned int mediumOnePublishImpl ( char * payload, size_t maxLength );
+void mediumOneHouseKeepImpl ( void );
 
 #endif /* CLOUD_MEDIUM1_ADAPTER_H_ */

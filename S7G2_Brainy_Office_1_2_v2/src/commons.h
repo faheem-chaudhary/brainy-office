@@ -83,13 +83,6 @@ ssp_err_t postSensorEventMessage ( uint8_t threadId, sf_message_event_t eventCod
 ssp_err_t postConfigEventMessage ( uint8_t threadId, sf_message_event_t eventCode,
                                    stringDataFunction stringDataFunctionPtr );
 
-/// Configuration function to set the Cloud Implementation Adapter
-/// @param [in]  configImpl  Implementation Function Pointer to setup Cloud Connection.  Use NULL to remove the existing implementation.
-/// @param [in]  initImpl    Implementation Function Pointer to initialize Cloud Connection.  Use NULL to remove the existing implementation.  This function will be called right after successful execution of configImpl and is not NULL.  This function will also be called whenever network connection is successfully established.
-/// @param [in]  publishImpl   Implementation Function Pointer to publish payload to cloud.  Use NULL to remove the existing implementation.
-void setCloudImplementationFunctions ( stringDataFunction configImpl, stringDataFunction initImpl,
-                                       stringDataFunction publishImpl );
-
 /// Generic String Processing function signature.  All errors need to be silenced
 /// @param [in]      eventPtr        - Sensor Event Pointer that will be passed back to caller to perform any operations on
 /// @param [in,out]  payload         - Data Buffer to perform processing on
