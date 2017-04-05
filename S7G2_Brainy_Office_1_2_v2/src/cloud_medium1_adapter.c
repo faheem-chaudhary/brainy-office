@@ -155,7 +155,7 @@ unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
     {
         status = mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
 
-        if ( status == 0 ) // Connection Issues, try to connect again
+        if ( status <= 0 ) // Connection Issues, try to connect again
         {
             status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
 
@@ -174,6 +174,16 @@ void mediumOneHouseKeepImpl ( void )
 {
     if ( g_mqttConnection.isKeepAlive )
     {
-        mqtt_netx_ping ();
+        int status = mqtt_netx_ping ();
+
+        if ( status <= 0 ) // Connection Issues, try to connect again
+        {
+            status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
+
+            if ( status == 1 )
+            {
+                mqtt_netx_publish ( g_topic_name, "{\"reconnected\":true}", 0 );
+            }
+        }
     }
 }

@@ -51,7 +51,7 @@
  **/
 
 void sensor_humidity_temperature_thread_entry ( void );
-unsigned int formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr, char * payload,
+unsigned int sensor_humidity_temperature_formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr, char * payload,
                                          size_t payloadLength );
 
 double g_temperatureCelsius = -40.0, g_temperatureFahrenheit = -40.0, g_humidityPercent = 0.0; // minimum values sensor can read
@@ -116,7 +116,7 @@ void sensor_humidity_temperature_thread_entry ( void )
     }
     while ( !isCloudConnected );
 
-    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id, formatDataForCloudPublish );
+    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id, sensor_humidity_temperature_formatDataForCloudPublish );
 
     err = g_ams_en210_temp_humid.p_api->open ( g_ams_en210_temp_humid.p_ctrl, g_ams_en210_temp_humid.p_cfg );
     APP_ERR_TRAP (err)
@@ -143,7 +143,7 @@ void sensor_humidity_temperature_thread_entry ( void )
                 if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE )
                 {
                     isCloudConnected = true;
-                    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id, formatDataForCloudPublish );
+                    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id, sensor_humidity_temperature_formatDataForCloudPublish );
                 }
                 else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED )
                 {
@@ -305,7 +305,7 @@ bool parseSensorData ( float * destination, uint8_t byte2, uint8_t byte1, uint8_
 
 #endif
 
-unsigned int formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr, char * payload,
+unsigned int sensor_humidity_temperature_formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr, char * payload,
                                          size_t payloadLength )
 {
     int bytesProcessed = 0;

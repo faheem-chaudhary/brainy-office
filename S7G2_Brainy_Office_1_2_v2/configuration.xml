@@ -261,7 +261,6 @@
     <eventClass display="System" header="event_system_api.h" id="eventClass.1095746090" payload="event_system_payload" payloadType="event_system_payload_t" value="SF_MESSAGE_EVENT_CLASS_SYSTEM"/>
     <eventClass display="Sensor" header="event_sensor_api.h" id="eventClass.1363358315" payload="event_sensor_payload" payloadType="event_sensor_payload_t" value="SF_MESSAGE_EVENT_CLASS_SENSOR"/>
     <eventClass display="Config" header="event_config_api.h" id="eventClass.1942317328" payload="event_config_payload" payloadType="event_config_payload_t" value="SF_MESSAGE_EVENT_CLASS_CONFIG"/>
-    <eventClass display="ADC Framework Mic Data" header="event_adc_framework_mic_data_api.h" id="eventClass.1733438827" payload="event_adc_framework_mic_data_payload" payloadType="event_adc_framework_mic_data_payload_t" value="SF_MESSAGE_EVENT_CLASS_ADC_FRAMEWORK_MIC_DATA"/>
     <subscriber context="rtos.threadx.thread.733700626" end="0" id="subscriber.1787569172" start="0"/>
     <subscriber context="rtos.threadx.thread.721736288" end="0" id="subscriber.1015849023" start="0">
       <subscribe eventClass="module.framework.sf_touch_panel.eventClass.eventClassTouch"/>
@@ -273,44 +272,22 @@
       <subscribe eventClass="eventClass.1095746090"/>
       <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
-    <subscriber context="rtos.threadx.thread.1517547309" end="0" id="subscriber.449652337" start="0">
-      <subscribe eventClass="eventClass.1095746090"/>
-      <subscribe eventClass="eventClass.1942317328"/>
-    </subscriber>
-    <subscriber context="rtos.threadx.thread.924298567" end="0" id="subscriber.1610198113" start="0">
-      <subscribe eventClass="eventClass.1095746090"/>
-      <subscribe eventClass="eventClass.1942317328"/>
-    </subscriber>
+    <subscriber context="rtos.threadx.thread.1517547309" end="0" id="subscriber.449652337" start="0"/>
+    <subscriber context="rtos.threadx.thread.924298567" end="0" id="subscriber.1610198113" start="0"/>
     <subscriber context="rtos.threadx.thread.2138308075" end="0" id="subscriber.1319785664" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
       <subscribe eventClass="eventClass.1363358315"/>
       <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
-    <subscriber context="rtos.threadx.thread.282027456" end="0" id="subscriber.1766188524" start="0">
-      <subscribe eventClass="eventClass.1095746090"/>
-      <subscribe eventClass="eventClass.1942317328"/>
-    </subscriber>
-    <subscriber context="rtos.threadx.thread.785910637" end="0" id="subscriber.297692598" start="0">
-      <subscribe eventClass="eventClass.1095746090"/>
-      <subscribe eventClass="eventClass.1942317328"/>
-    </subscriber>
-    <subscriber context="rtos.threadx.thread.1882901370" end="0" id="subscriber.1009286085" start="0">
-      <subscribe eventClass="eventClass.1095746090"/>
-      <subscribe eventClass="eventClass.1942317328"/>
-    </subscriber>
+    <subscriber context="rtos.threadx.thread.282027456" end="0" id="subscriber.1766188524" start="0"/>
+    <subscriber context="rtos.threadx.thread.785910637" end="0" id="subscriber.297692598" start="0"/>
+    <subscriber context="rtos.threadx.thread.1882901370" end="0" id="subscriber.1009286085" start="0"/>
     <subscriber context="rtos.threadx.thread.1358427708" end="0" id="subscriber.520303301" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
       <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
-    <subscriber context="rtos.threadx.thread.2024768991" end="0" id="subscriber.1938077575" start="0">
-      <subscribe eventClass="eventClass.1095746090"/>
-      <subscribe eventClass="eventClass.1942317328"/>
-    </subscriber>
-    <subscriber context="rtos.threadx.thread.407260935" end="0" id="subscriber.331782468" start="0">
-      <subscribe eventClass="eventClass.1095746090"/>
-      <subscribe eventClass="eventClass.1942317328"/>
-      <subscribe eventClass="eventClass.1733438827"/>
-    </subscriber>
+    <subscriber context="rtos.threadx.thread.2024768991" end="0" id="subscriber.1938077575" start="0"/>
+    <subscriber context="rtos.threadx.thread.407260935" end="0" id="subscriber.331782468" start="0"/>
   </synergyMessagingConfiguration>
   <synergyModuleConfiguration>
     <module id="module.driver.cgc_on_cgc.0">
@@ -771,7 +748,7 @@
     <context id="rtos.threadx.thread.2138308075">
       <property id="_symbol" value="cloud_data_thread"/>
       <property id="rtos.threadx.thread.name" value="Cloud Data Thread"/>
-      <property id="rtos.threadx.thread.stack" value="8192"/>
+      <property id="rtos.threadx.thread.stack" value="4096"/>
       <property id="rtos.threadx.thread.priority" value="7"/>
       <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>

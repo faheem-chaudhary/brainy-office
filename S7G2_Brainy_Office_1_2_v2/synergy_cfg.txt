@@ -665,7 +665,7 @@ Synergy Configuration
   Thread "Cloud Data Thread"
     Symbol: cloud_data_thread
     Name: Cloud Data Thread
-    Stack size (bytes): 8192
+    Stack size (bytes): 4096
     Priority: 7
     Auto start: Enabled
     Time slicing interval (ticks): 1
@@ -955,13 +955,6 @@ Synergy Configuration
       Payload: event_config_payload
       Payload type: event_config_payload_t
       
-    Event Class "ADC Framework Mic Data"
-      Symbol: SF_MESSAGE_EVENT_CLASS_ADC_FRAMEWORK_MIC_DATA
-      Name: ADC Framework Mic Data
-      Payload header file: event_adc_framework_mic_data_api.h
-      Payload: event_adc_framework_mic_data_payload
-      Payload type: event_adc_framework_mic_data_payload_t
-      
     Subscriber "System Main Thread" 0 0
       
     Subscriber "System Blinker Thread" 0 0
@@ -975,12 +968,8 @@ Synergy Configuration
       Event Class "Config"
       
     Subscriber "System Display Thread" 0 0
-      Event Class "System"
-      Event Class "Config"
       
     Subscriber "System File Logger Thread" 0 0
-      Event Class "System"
-      Event Class "Config"
       
     Subscriber "Cloud Data Thread" 0 0
       Event Class "System"
@@ -988,27 +977,16 @@ Synergy Configuration
       Event Class "Config"
       
     Subscriber "Sensor Vibration and Compass (BMC150) Thread" 0 0
-      Event Class "System"
-      Event Class "Config"
       
     Subscriber "Sensor Color and Proximity (AMS TMD3782) Thread" 0 0
-      Event Class "System"
-      Event Class "Config"
       
     Subscriber "Sensor Lightning (AMS AS3935) Thread" 0 0
-      Event Class "System"
-      Event Class "Config"
       
     Subscriber "Sensor Humidity and Temperature (AMS EN210) Thread" 0 0
       Event Class "System"
       Event Class "Config"
       
     Subscriber "Sensor Air Quality (AMS iAQ) Thread" 0 0
-      Event Class "System"
-      Event Class "Config"
       
     Subscriber "Sensor Microphone (ADC) Thread" 0 0
-      Event Class "System"
-      Event Class "Config"
-      Event Class "ADC Framework Mic Data"
       

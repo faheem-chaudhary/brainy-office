@@ -1,9 +1,5 @@
 #include "sys_main_thread.h"
 #include "commons.h"
-#include "cloud_medium1_adapter.h"
-
-#define APP_USB_INS_FLAG    (0x1UL)
-#define APP_USB_REM_FLAG    (0x2UL)
 
 UINT usb_host_event_notification_callback ( ULONG event, UX_HOST_CLASS * class, VOID * instance );
 
@@ -21,21 +17,6 @@ uint8_t get_sys_main_thread_Id ()
     return sys_main_thread_id;
 }
 
-//extern TX_THREAD cloud_data_thread;
-//extern TX_THREAD sensor_air_quality_thread;
-//extern TX_THREAD sensor_color_proximity_thread;
-//extern TX_THREAD sensor_humidity_temperature_thread;
-//extern TX_THREAD sensor_lightning_thread;
-//extern TX_THREAD sensor_microphone_thread;
-//extern TX_THREAD sensor_vibration_compass_thread;
-//
-//extern TX_THREAD sys_blinker_thread;
-//extern TX_THREAD sys_display_thread;
-//extern TX_THREAD sys_file_logger_thread;
-//extern TX_THREAD sys_main_thread;
-//extern TX_THREAD sys_network_thread;
-//extern TX_THREAD sys_touch_thread;
-
 ULONG sys_main_thread_wait = 10;
 
 // System Main Thread entry function
@@ -47,30 +28,8 @@ void sys_main_thread_entry ( void )
     g_button_s5_irq10.p_api->open ( g_button_s5_irq10.p_ctrl, g_button_s5_irq10.p_cfg );
     g_button_s5_irq10.p_api->enable ( g_button_s5_irq10.p_ctrl );
 
-//    setCloudImplementationFunctions ( mediumOneConfigImpl, mediumOneInitImpl, mediumOnePublishImpl );
-
     while ( 1 )
     {
-//        msgStatus = messageQueuePend ( &sys_main_thread_message_queue, (void **) &message, sys_main_thread_wait );
-//
-//        if ( msgStatus == SSP_SUCCESS )
-//        {
-//            if ( message->event_b.class_code == SF_MESSAGE_EVENT_CLASS_TOUCH )
-//            {
-//                if ( nextThreadToActivate < CURRENT_ACTIVE_THREADS )
-//                {
-//                    tx_thread_resume ( threadPointerArray [ nextThreadToActivate ] );
-//
-//                    nextThreadToActivate++;
-//                }
-//            }
-//
-//            messageQueueReleaseBuffer ( (void **) &message );
-//        }
-//        else if ( msgStatus != SSP_ERR_MESSAGE_QUEUE_EMPTY )
-//        {
-//            // if any error other than empty queue
-//        }
         tx_thread_sleep ( 10 );
     }
 }

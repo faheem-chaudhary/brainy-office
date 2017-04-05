@@ -207,7 +207,8 @@ int mqtt_netx_unsubscribe ( const char* topic, uint16_t* message_id )
 
 int mqtt_netx_ping ()
 {
-    return mqtt_ping ( &g_broker );
+    int pingResponse = mqtt_ping ( &g_broker );
+    return pingResponse;
 }
 
 //unsigned int g_keepalive = 30;

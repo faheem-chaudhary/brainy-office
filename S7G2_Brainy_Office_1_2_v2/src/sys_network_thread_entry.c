@@ -111,8 +111,9 @@ void setMacAddress ( nx_mac_address_t *p_mac_config )
     //  REA's Vendor MAC range: 00:30:55:xx:xx:xx
     fmi_unique_id_t id;
     g_fmi.p_api->uniqueIdGet ( &id );
+    ULONG lowerHalfMac = ( ( 0x55000000 ) | ( id.unique_id [ 0 ] & ( 0x00FFFFFF ) ) );
 
     p_mac_config->nx_mac_address_h = 0x0030;
-    p_mac_config->nx_mac_address_l = ( ( 0x55000000 ) | ( id.unique_id [ 0 ] & ( 0x00FFFFFF ) ) );
+    p_mac_config->nx_mac_address_l = lowerHalfMac;
 }
 

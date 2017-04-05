@@ -294,10 +294,13 @@ int mqtt_connect(mqtt_broker_handle_t* broker)
 		offset += passwordlen;
 	}
 
-	// Send the packet
-	if(broker->send(broker->socket_info, packet, sizeof(packet)) < sizeof(packet)) {
-		return -1;
-	}
+    // Send the packet
+    int packetSize = (int) sizeof ( packet );
+    int bytesSent = broker->send ( broker->socket_info, packet, packetSize );
+    if ( bytesSent < packetSize )
+    {
+        return -1;
+    }
 
 	return 1;
 }
@@ -308,10 +311,13 @@ int mqtt_disconnect(mqtt_broker_handle_t* broker) {
 		0x00 // Remaining length
 	};
 
-	// Send the packet
-	if(broker->send(broker->socket_info, packet, sizeof(packet)) < sizeof(packet)) {
-		return -1;
-	}
+    // Send the packet
+    int packetSize = (int) sizeof ( packet );
+    int bytesSent = broker->send ( broker->socket_info, packet, packetSize );
+    if ( bytesSent < packetSize )
+    {
+        return -1;
+    }
 
 	return 1;
 }
@@ -322,10 +328,13 @@ int mqtt_ping(mqtt_broker_handle_t* broker) {
 		0x00 // Remaining length
 	};
 
-	// Send the packet
-	if(broker->send(broker->socket_info, packet, sizeof(packet)) < sizeof(packet)) {
-		return -1;
-	}
+    // Send the packet
+    int packetSize = (int) sizeof ( packet );
+    int bytesSent = broker->send ( broker->socket_info, packet, packetSize );
+    if ( bytesSent < packetSize )
+    {
+        return -1;
+    }
 
 	return 1;
 }
@@ -397,10 +406,13 @@ int mqtt_publish_with_qos(mqtt_broker_handle_t* broker, const char* topic, const
 	memcpy(packet+sizeof(fixed_header), var_header, sizeof(var_header));
 	memcpy(packet+sizeof(fixed_header)+sizeof(var_header), msg, msglen);
 
-	// Send the packet
-	if(broker->send(broker->socket_info, packet, sizeof(packet)) < sizeof(packet)) {
-		return -1;
-	}
+    // Send the packet
+    int packetSize = (int) sizeof ( packet );
+    int bytesSent = broker->send ( broker->socket_info, packet, packetSize );
+    if ( bytesSent < packetSize )
+    {
+        return -1;
+    }
 
 	return 1;
 }
@@ -413,10 +425,13 @@ int mqtt_pubrel(mqtt_broker_handle_t* broker, uint16_t message_id) {
 		message_id&0xFF
 	};
 
-	// Send the packet
-	if(broker->send(broker->socket_info, packet, sizeof(packet)) < sizeof(packet)) {
-		return -1;
-	}
+    // Send the packet
+    int packetSize = (int) sizeof ( packet );
+    int bytesSent = broker->send ( broker->socket_info, packet, packetSize );
+    if ( bytesSent < packetSize )
+    {
+        return -1;
+    }
 
 	return 1;
 }
@@ -452,10 +467,13 @@ int mqtt_subscribe(mqtt_broker_handle_t* broker, const char* topic, uint16_t* me
 	memcpy(packet+sizeof(fixed_header), var_header, sizeof(var_header));
 	memcpy(packet+sizeof(fixed_header)+sizeof(var_header), utf_topic, sizeof(utf_topic));
 
-	// Send the packet
-	if(broker->send(broker->socket_info, packet, sizeof(packet)) < sizeof(packet)) {
-		return -1;
-	}
+    // Send the packet
+    int packetSize = (int) sizeof ( packet );
+    int bytesSent = broker->send ( broker->socket_info, packet, packetSize );
+    if ( bytesSent < packetSize )
+    {
+        return -1;
+    }
 
 	return 1;
 }
@@ -491,10 +509,13 @@ int mqtt_unsubscribe(mqtt_broker_handle_t* broker, const char* topic, uint16_t* 
 	memcpy(packet+sizeof(fixed_header), var_header, sizeof(var_header));
 	memcpy(packet+sizeof(fixed_header)+sizeof(var_header), utf_topic, sizeof(utf_topic));
 
-	// Send the packet
-	if(broker->send(broker->socket_info, packet, sizeof(packet)) < sizeof(packet)) {
-		return -1;
-	}
+    // Send the packet
+    int packetSize = (int) sizeof ( packet );
+    int bytesSent = broker->send ( broker->socket_info, packet, packetSize );
+    if ( bytesSent < packetSize )
+    {
+        return -1;
+    }
 
 	return 1;
 }
