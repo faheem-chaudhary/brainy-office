@@ -1,8 +1,5 @@
 #include "sys_network_thread.h"
 #include "commons.h"
-#include "cloud_medium1_adapter.h"
-#include "libemqtt.h"
-#include "libemqtt_netx_impl.h"
 
 ULONG g_ip_address;
 ULONG g_network_mask;

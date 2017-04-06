@@ -127,6 +127,9 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
         g_mqttConnection.isRetryOnDisconnect = true;
         g_mqttConnection.retrylimit = 5;
         g_mqttConnection.retryDelay = 5;
+#if (LIBEMQTT_NETX_SOCKETS_IMPL==LIBEMQTT_NETX_IMPL_DEFAULT)
+        g_mqttConnection.ipStackPtr = &g_ip;
+#endif
     }
 
     status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );

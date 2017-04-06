@@ -36,56 +36,50 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
-#include "nx_bsd.h"
-#include <signal.h>
-#include "tx_api.h"
+//#include <unistd.h>
+
+#if (LIBEMQTT_NETX_SOCKETS_IMPL==LIBEMQTT_NETX_IMPL_BSD)
+    #include "nx_bsd.h"
+    #elif(LIBEMQTT_NETX_SOCKETS_IMPL==LIBEMQTT_NETX_IMPL_DEFAULT)
+    #include "nx_api.h"
+#endif
 
 #define RCVBUFSIZE 1024
 uint8_t packet_buffer [ RCVBUFSIZE ];
 
-int socket_id;
 mqtt_broker_handle_t g_broker;
-TX_THREAD * gp_thread;
+NX_TCP_SOCKET tcpSocket;
 
-void alive ( int sig );
+void socketUrgentDataCallback ( NX_TCP_SOCKET * socketPtr );
+void socketDisconnectCallback ( NX_TCP_SOCKET * socketPtr );
+
+//void alive ( int sig );
 int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * connection );
 int send_packet ( void* socket_info, const void* buf, unsigned int count );
 int close_socket ( mqtt_broker_handle_t* broker );
-int read_packet ( int timeout );
-
-int send_packet ( void* socket_info, const void* buf, unsigned int count )
-{
-    int fd = * ( (int*) socket_info );
-    int bytesSend = (int) send ( fd, buf, (int) count, 0 );
-    return bytesSend;
-}
+int read_packet ( mqtt_broker_handle_t* broker, int timeout );
+int loadBufferFromNetXSocket ( NX_TCP_SOCKET * socketPtr, unsigned int bufferStartIndex, int timeout );
 
 int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * connection )
 {
-    int socketStatus = 0;
-
-    // Create the socket
-    socketStatus = ( socket_id = socket ( PF_INET, SOCK_STREAM, 0 ) );
-    if ( socketStatus < 0 )
+    unsigned int socketStatus = nx_tcp_socket_create ( connection->ipStackPtr, &tcpSocket, "LibeMqttClient",
+                                                       NX_IP_NORMAL, NX_DONT_FRAGMENT, NX_IP_TIME_TO_LIVE, 512,
+                                                       socketUrgentDataCallback, socketDisconnectCallback );
+    if ( socketStatus != NX_SUCCESS )
     {
         return -1;
     }
 
-    // Disable Nagle Algorithm ... disabling this because NetX BSD has this as default option
-//    socketStatus = setsockopt ( socket_id, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof ( flag ) );
-//    if ( socketStatus < 0 )
-//        return -2;
+    socketStatus = nx_tcp_client_socket_bind ( &tcpSocket, NX_ANY_PORT, NX_WAIT_FOREVER );
 
-    struct sockaddr_in socket_address;
-    // Create the stuff we need to connect
-    socket_address.sin_family = AF_INET;
-    socket_address.sin_port = connection->port;
-    socket_address.sin_addr.s_addr = connection->hostIpAddress;
+    if ( socketStatus != NX_SUCCESS )
+    {
+        return -1;
+    }
 
-    // Connect the socket
-    socketStatus = ( connect ( socket_id, (struct sockaddr*) &socket_address, sizeof ( socket_address ) ) );
-    if ( socketStatus < 0 )
+    socketStatus = nx_tcp_client_socket_connect ( &tcpSocket, connection->hostIpAddress, connection->port,
+                                                  NX_WAIT_FOREVER );
+    if ( socketStatus != NX_SUCCESS )
     {
         return -1;
     }
@@ -95,75 +89,148 @@ int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * co
     {
         mqtt_set_alive ( broker, connection->keepAliveDelay );
     }
-    broker->socket_info = (void*) &socket_id;
+    broker->socket_info = (void*) &tcpSocket;
     broker->send = send_packet;
 
-    gp_thread = tx_thread_identify ();
     return 0;
+}
+
+void socketUrgentDataCallback ( NX_TCP_SOCKET * socketPtr )
+{
+
+}
+
+void socketDisconnectCallback ( NX_TCP_SOCKET * socketPtr )
+{
+
+}
+
+int send_packet ( void* socket_info, const void* buf, unsigned int count )
+{
+    int retVal = -1;
+    NX_TCP_SOCKET * socketPtr = (NX_TCP_SOCKET *) socket_info;
+    NX_PACKET_POOL * poolPtr = socketPtr->nx_tcp_socket_ip_ptr->nx_ip_default_packet_pool;
+    NX_PACKET * netxPacketPtr;
+    unsigned int status = 0;
+
+    status = nx_packet_allocate ( poolPtr, &netxPacketPtr, NX_TCP_PACKET, NX_WAIT_FOREVER );
+    if ( status == NX_SUCCESS )
+    {
+        status = nx_packet_data_append ( netxPacketPtr, buf, count, poolPtr, NX_WAIT_FOREVER );
+        if ( status == NX_SUCCESS )
+        {
+            status = nx_tcp_socket_send ( socketPtr, netxPacketPtr, NX_WAIT_FOREVER );
+
+            if ( status == NX_SUCCESS )
+            {
+                retVal = count;
+            }
+        }
+
+        if ( status != NX_SUCCESS )
+        {
+            // release only if there is any error.  For success cases, network driver takes care of it.
+            nx_packet_release ( netxPacketPtr );
+        }
+    }
+
+    return retVal;
 }
 
 int close_socket ( mqtt_broker_handle_t* broker )
 {
-    int fd = * ( (int*) broker->socket_info );
-    return close ( fd );
+    NX_TCP_SOCKET * socketPtr = (NX_TCP_SOCKET *) broker->socket_info;
+
+    unsigned int status = nx_tcp_socket_disconnect ( socketPtr, NX_WAIT_FOREVER );
+    if ( status != NX_SUCCESS )
+    {
+        return -1;
+    }
+
+    status = nx_tcp_client_socket_unbind ( socketPtr );
+    if ( status != NX_SUCCESS )
+    {
+        return -1;
+    }
+
+    return 0;
 }
 
-int read_packet ( int timeout )
+int loadBufferFromNetXSocket ( NX_TCP_SOCKET * socketPtr, unsigned int bufferStartIndex, int timeout )
 {
+    int retVal = -1;
+
+    NX_PACKET_POOL * poolPtr = socketPtr->nx_tcp_socket_ip_ptr->nx_ip_default_packet_pool;
+    NX_PACKET * netxPacketPtr;
+    unsigned int status = 0;
+
     if ( timeout > 0 )
     {
-        fd_set readfds;
-        struct timeval tmv;
-
-        // Initialize the file descriptor set
-        FD_ZERO ( &readfds );
-        FD_SET ( socket_id, &readfds );
-
-        // Initialize the timeout data structure
-        tmv.tv_sec = timeout;
-        tmv.tv_usec = 0;
-
-//        readfds [ 0 ] = socket_id;
-
-// select returns 0 if successful, > 0 for found descriptors, -1 if error
-        int selectStatus = select ( NX_BSD_SOCKFD_START + 1, &readfds, NULL, NULL, &tmv );
-        if ( selectStatus < 0 )
-            return -2;
+        status = nx_tcp_socket_receive ( socketPtr, &netxPacketPtr, timeout );
+    }
+    else
+    {
+        status = nx_tcp_socket_receive ( socketPtr, &netxPacketPtr, NX_WAIT_FOREVER );
     }
 
-    int total_bytes = 0, bytes_rcvd, packet_length;
+    if ( status == NX_SUCCESS )
+    {
+        if ( netxPacketPtr->nx_packet_length >= 2 )
+        {
+            memcpy ( &packet_buffer [ bufferStartIndex ], netxPacketPtr->nx_packet_prepend_ptr,
+                     netxPacketPtr->nx_packet_length );
+            retVal = netxPacketPtr->nx_packet_length;
+        }
+        else
+        {
+            retVal = -1;
+        }
+        nx_packet_release ( netxPacketPtr );
+    }
+
+    return retVal;
+}
+
+int read_packet ( mqtt_broker_handle_t* broker, int timeout )
+{
+    int retVal = -1;
+    NX_TCP_SOCKET * socketPtr = (NX_TCP_SOCKET *) broker->socket_info;
+    unsigned int total_bytes = 0;
+
     memset ( packet_buffer, 0, sizeof ( packet_buffer ) );
 
-    if ( ( bytes_rcvd = recv ( socket_id, ( packet_buffer + total_bytes ), RCVBUFSIZE, 0 ) ) <= 0 )
+    int dataLength = loadBufferFromNetXSocket ( socketPtr, total_bytes, timeout );
+    total_bytes += dataLength;
+
+    if ( total_bytes >= 2 )
     {
-        return -1;
-    }
+        // now we have the full fixed header in packet_buffer
+        // parse it for remaining length and number of bytes
+        uint16_t rem_len = mqtt_parse_rem_len ( packet_buffer );
+        uint8_t rem_len_bytes = mqtt_num_rem_len_bytes ( packet_buffer );
 
-    total_bytes += bytes_rcvd; // Keep tally of total bytes
-    if ( total_bytes < 2 )
-    {
-        return -1;
-    }
+        //packet_length = packet_buffer[1] + 2; // Remaining length + fixed header length
+        // total packet length = remaining length + byte 1 of fixed header + remaning length part of fixed header
+        int packet_length = rem_len + rem_len_bytes + 1;
 
-    // now we have the full fixed header in packet_buffer
-    // parse it for remaining length and number of bytes
-    uint16_t rem_len = mqtt_parse_rem_len ( packet_buffer );
-    uint8_t rem_len_bytes = mqtt_num_rem_len_bytes ( packet_buffer );
-
-    //packet_length = packet_buffer[1] + 2; // Remaining length + fixed header length
-    // total packet length = remaining length + byte 1 of fixed header + remaning length part of fixed header
-    packet_length = rem_len + rem_len_bytes + 1;
-
-    while ( total_bytes < packet_length )    // Reading the packet
-    {
-        if ( ( bytes_rcvd = recv ( socket_id, ( packet_buffer + total_bytes ), RCVBUFSIZE, 0 ) ) <= 0 )
+        while ( total_bytes < packet_length )    // Reading the packet
         {
-            return -1;
+            dataLength = loadBufferFromNetXSocket ( socketPtr, total_bytes, timeout );
+            if ( dataLength <= -1 )
+            {
+                return -1;
+            }
+            total_bytes += dataLength; // Keep tally of total bytes
         }
-        total_bytes += bytes_rcvd; // Keep tally of total bytes
+
+        retVal = packet_length;
+    }
+    else
+    {
+        retVal = -1;
     }
 
-    return packet_length;
+    return retVal;
 }
 
 int mqtt_netx_disconnect ()
@@ -211,15 +278,6 @@ int mqtt_netx_ping ()
     return pingResponse;
 }
 
-//unsigned int g_keepalive = 30;
-//void alive ( int sig )
-//{
-//    SSP_PARAMETER_NOT_USED ( sig );
-//
-//    mqtt_ping ( &g_broker );
-//    alarm ( g_keepalive );
-//}
-
 int mqtt_netx_connect ( const char * client_id, const MqttConnection_t * connection )
 {
     int status = 0;
@@ -228,37 +286,29 @@ int mqtt_netx_connect ( const char * client_id, const MqttConnection_t * connect
     init_netx_socket ( &g_broker, connection );
     status = mqtt_connect ( &g_broker );
 
-    int packet_length = read_packet ( 1 );
+    int packet_length = read_packet ( &g_broker, 0 );
 
     if ( packet_length < 0 )
     {
-        fprintf ( stderr, "Error(%d) on read packet!\n", packet_length );
+//        fprintf ( stderr, "Error(%d) on read packet!\n", packet_length );
         return -1;
     }
 
     if ( MQTTParseMessageType ( packet_buffer ) != MQTT_MSG_CONNACK )
     {
-        fprintf ( stderr, "CONNACK expected!\n" );
+//        fprintf ( stderr, "CONNACK expected!\n" );
         return -2;
     }
 
     if ( packet_buffer [ 3 ] != 0x00 )
     {
-        fprintf ( stderr, "CONNACK failed!\n" );
+//        fprintf ( stderr, "CONNACK failed!\n" );
         return -2;
     }
 
-//    if ( connection->isKeepAlive )
-//    {
-//        g_keepalive = connection->keepAliveDelay;
-
-    // Signals after connect MQTT
-//        signal ( SIGALRM, alive );
-//        alarm ( g_keepalive );
-//    }
-
     return status;
 }
+
 #if 0
 int pub_test ( int argc, char* argv [] )
 {

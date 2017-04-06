@@ -13,8 +13,30 @@
     #include "stdbool.h"
     #include "libemqtt.h"
 
+    #define LIBEMQTT_NETX_IMPL_BSD      1
+    #define LIBEMQTT_NETX_IMPL_DEFAULT  2
+    #define LIBEMQTT_NETX_SOCKETS_IMPL   LIBEMQTT_NETX_IMPL_DEFAULT
+
+    #if (LIBEMQTT_NETX_SOCKETS_IMPL==LIBEMQTT_NETX_IMPL_BSD)
 typedef struct
 {
+    char userName [ MQTT_CONF_USERNAME_LENGTH ];
+    char password [ MQTT_CONF_PASSWORD_LENGTH ];
+    unsigned long hostIpAddress;
+    unsigned short port;
+    bool isKeepAlive;
+    uint8_t keepAliveDelay;
+    bool isRetryOnDisconnect;
+    uint8_t retrylimit;
+    uint8_t retryDelay;
+}MqttConnection_t;
+
+        #elif(LIBEMQTT_NETX_SOCKETS_IMPL==LIBEMQTT_NETX_IMPL_DEFAULT)
+        #include "nx_api.h"
+
+typedef struct
+{
+        NX_IP * ipStackPtr;
         char userName [ MQTT_CONF_USERNAME_LENGTH ];
         char password [ MQTT_CONF_PASSWORD_LENGTH ];
         unsigned long hostIpAddress;
@@ -25,6 +47,11 @@ typedef struct
         uint8_t retrylimit;
         uint8_t retryDelay;
 } MqttConnection_t;
+    #endif
+
+    #if (LIBEMQTT_NETX_SOCKETS_IMPL==LIBEMQTT_NETX_IMPL_BSD)
+        #elif(LIBEMQTT_NETX_SOCKETS_IMPL==LIBEMQTT_NETX_IMPL_DEFAULT)
+    #endif
 
 int mqtt_netx_connect ( const char * client_id, const MqttConnection_t * connection );
 
