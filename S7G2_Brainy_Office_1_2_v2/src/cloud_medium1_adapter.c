@@ -132,6 +132,7 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
 #endif
     }
 
+    mqtt_netx_disconnect (); // Just in case if there is any socket residue, clean it up first.
     status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
 
     if ( status == 1 )
@@ -152,6 +153,8 @@ char g_publishMessageBuffer [ 512 ];
 
 unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
 {
+    SSP_PARAMETER_NOT_USED ( messageLength );
+
     int status = sprintf ( g_publishMessageBuffer, "{\"event_data\":{\"%s\":%s}}", g_mediumOneDeviceCredentials.name,
                            message );
     if ( status > 0 )
@@ -160,11 +163,15 @@ unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
 
         if ( status <= 0 ) // Connection Issues, try to connect again
         {
+            mqtt_netx_disconnect ();
             status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
 
             if ( status == 1 )
             {
-                mqtt_netx_publish ( g_topic_name, "{\"reconnected\":true}", 0 );
+                char reconnectMessage [ 256 ];
+                sprintf ( reconnectMessage, "{\"event_data\":{\"%s\":{\"reconnected\":true}}}",
+                          g_mediumOneDeviceCredentials.name );
+                status = mqtt_netx_publish ( g_topic_name, reconnectMessage, 0 );
                 status = mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
             }
         }
@@ -181,11 +188,15 @@ void mediumOneHouseKeepImpl ( void )
 
         if ( status <= 0 ) // Connection Issues, try to connect again
         {
+            mqtt_netx_disconnect ();
             status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
 
             if ( status == 1 )
             {
-                mqtt_netx_publish ( g_topic_name, "{\"reconnected\":true}", 0 );
+                char reconnectMessage [ 256 ];
+                sprintf ( reconnectMessage, "{\"event_data\":{\"%s\":{\"reconnected\":true}}}",
+                          g_mediumOneDeviceCredentials.name );
+                status = mqtt_netx_publish ( g_topic_name, reconnectMessage, 0 );
             }
         }
     }

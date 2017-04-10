@@ -50,20 +50,21 @@ uint8_t packet_buffer [ RCVBUFSIZE ];
 mqtt_broker_handle_t g_broker;
 NX_TCP_SOCKET tcpSocket;
 
+uint32_t g_serverDisconnectCount = 0;
+
 void socketUrgentDataCallback ( NX_TCP_SOCKET * socketPtr );
 void socketDisconnectCallback ( NX_TCP_SOCKET * socketPtr );
 
 //void alive ( int sig );
 int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * connection );
 int send_packet ( void* socket_info, const void* buf, unsigned int count );
-int close_socket ( mqtt_broker_handle_t* broker );
 int read_packet ( mqtt_broker_handle_t* broker, int timeout );
 int loadBufferFromNetXSocket ( NX_TCP_SOCKET * socketPtr, unsigned int bufferStartIndex, int timeout );
 
 int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * connection )
 {
     unsigned int socketStatus = nx_tcp_socket_create ( connection->ipStackPtr, &tcpSocket, "LibeMqttClient",
-                                                       NX_IP_NORMAL, NX_DONT_FRAGMENT, NX_IP_TIME_TO_LIVE, 512,
+                                                       NX_IP_MAX_RELIABLE, NX_FRAGMENT_OKAY, NX_IP_TIME_TO_LIVE, 512,
                                                        socketUrgentDataCallback, socketDisconnectCallback );
     if ( socketStatus != NX_SUCCESS )
     {
@@ -71,7 +72,6 @@ int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * co
     }
 
     socketStatus = nx_tcp_client_socket_bind ( &tcpSocket, NX_ANY_PORT, NX_WAIT_FOREVER );
-
     if ( socketStatus != NX_SUCCESS )
     {
         return -1;
@@ -97,76 +97,68 @@ int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * co
 
 void socketUrgentDataCallback ( NX_TCP_SOCKET * socketPtr )
 {
-
+    SSP_PARAMETER_NOT_USED ( socketPtr );
 }
 
 void socketDisconnectCallback ( NX_TCP_SOCKET * socketPtr )
 {
-
+    SSP_PARAMETER_NOT_USED ( socketPtr );
+    g_serverDisconnectCount++;
 }
 
 int send_packet ( void* socket_info, const void* buf, unsigned int count )
 {
     int retVal = -1;
-    NX_TCP_SOCKET * socketPtr = (NX_TCP_SOCKET *) socket_info;
-    NX_PACKET_POOL * poolPtr = socketPtr->nx_tcp_socket_ip_ptr->nx_ip_default_packet_pool;
-    NX_PACKET * netxPacketPtr;
-    unsigned int status = 0;
-
-    status = nx_packet_allocate ( poolPtr, &netxPacketPtr, NX_TCP_PACKET, NX_WAIT_FOREVER );
-    if ( status == NX_SUCCESS )
+    if ( socket_info != NULL )
     {
-        status = nx_packet_data_append ( netxPacketPtr, buf, count, poolPtr, NX_WAIT_FOREVER );
+        NX_TCP_SOCKET * socketPtr = (NX_TCP_SOCKET *) socket_info;
+        NX_PACKET_POOL * poolPtr = socketPtr->nx_tcp_socket_ip_ptr->nx_ip_default_packet_pool;
+        NX_PACKET * netxPacketPtr;
+        unsigned int status = 0;
+
+        status = nx_packet_allocate ( poolPtr, &netxPacketPtr, NX_TCP_PACKET, NX_WAIT_FOREVER );
         if ( status == NX_SUCCESS )
         {
-            status = nx_tcp_socket_send ( socketPtr, netxPacketPtr, NX_WAIT_FOREVER );
-
+            status = nx_packet_data_append ( netxPacketPtr, (void *) buf, count, poolPtr, NX_WAIT_FOREVER );
             if ( status == NX_SUCCESS )
             {
-                retVal = count;
+                status = nx_tcp_socket_send ( socketPtr, netxPacketPtr, NX_WAIT_FOREVER );
+
+                if ( status == NX_SUCCESS )
+                {
+                    retVal = (int) count;
+                }
+            }
+
+            if ( status != NX_SUCCESS )
+            {
+                // release only if there is any error.  For success cases, network driver takes care of it.
+                nx_packet_release ( netxPacketPtr );
             }
         }
-
-        if ( status != NX_SUCCESS )
+        else if ( status == NX_WAIT_ABORTED )
         {
-            // release only if there is any error.  For success cases, network driver takes care of it.
-            nx_packet_release ( netxPacketPtr );
+            retVal = -1;
+        }
+        else if ( status == NX_NO_PACKET )
+        {
+            retVal = -1;
         }
     }
 
     return retVal;
 }
 
-int close_socket ( mqtt_broker_handle_t* broker )
-{
-    NX_TCP_SOCKET * socketPtr = (NX_TCP_SOCKET *) broker->socket_info;
-
-    unsigned int status = nx_tcp_socket_disconnect ( socketPtr, NX_WAIT_FOREVER );
-    if ( status != NX_SUCCESS )
-    {
-        return -1;
-    }
-
-    status = nx_tcp_client_socket_unbind ( socketPtr );
-    if ( status != NX_SUCCESS )
-    {
-        return -1;
-    }
-
-    return 0;
-}
-
 int loadBufferFromNetXSocket ( NX_TCP_SOCKET * socketPtr, unsigned int bufferStartIndex, int timeout )
 {
     int retVal = -1;
 
-    NX_PACKET_POOL * poolPtr = socketPtr->nx_tcp_socket_ip_ptr->nx_ip_default_packet_pool;
     NX_PACKET * netxPacketPtr;
     unsigned int status = 0;
 
     if ( timeout > 0 )
     {
-        status = nx_tcp_socket_receive ( socketPtr, &netxPacketPtr, timeout );
+        status = nx_tcp_socket_receive ( socketPtr, &netxPacketPtr, (ULONG) timeout );
     }
     else
     {
@@ -179,7 +171,7 @@ int loadBufferFromNetXSocket ( NX_TCP_SOCKET * socketPtr, unsigned int bufferSta
         {
             memcpy ( &packet_buffer [ bufferStartIndex ], netxPacketPtr->nx_packet_prepend_ptr,
                      netxPacketPtr->nx_packet_length );
-            retVal = netxPacketPtr->nx_packet_length;
+            retVal = (int) netxPacketPtr->nx_packet_length;
         }
         else
         {
@@ -197,46 +189,79 @@ int read_packet ( mqtt_broker_handle_t* broker, int timeout )
     NX_TCP_SOCKET * socketPtr = (NX_TCP_SOCKET *) broker->socket_info;
     unsigned int total_bytes = 0;
 
-    memset ( packet_buffer, 0, sizeof ( packet_buffer ) );
-
-    int dataLength = loadBufferFromNetXSocket ( socketPtr, total_bytes, timeout );
-    total_bytes += dataLength;
-
-    if ( total_bytes >= 2 )
+    if ( socketPtr != NULL )
     {
-        // now we have the full fixed header in packet_buffer
-        // parse it for remaining length and number of bytes
-        uint16_t rem_len = mqtt_parse_rem_len ( packet_buffer );
-        uint8_t rem_len_bytes = mqtt_num_rem_len_bytes ( packet_buffer );
 
-        //packet_length = packet_buffer[1] + 2; // Remaining length + fixed header length
-        // total packet length = remaining length + byte 1 of fixed header + remaning length part of fixed header
-        int packet_length = rem_len + rem_len_bytes + 1;
+        memset ( packet_buffer, 0, sizeof ( packet_buffer ) );
 
-        while ( total_bytes < packet_length )    // Reading the packet
+        int dataLength = loadBufferFromNetXSocket ( socketPtr, total_bytes, timeout );
+
+        if ( dataLength >= 2 )
         {
-            dataLength = loadBufferFromNetXSocket ( socketPtr, total_bytes, timeout );
-            if ( dataLength <= -1 )
+            total_bytes += (unsigned int) dataLength;
+
+            // now we have the full fixed header in packet_buffer
+            // parse it for remaining length and number of bytes
+            uint16_t rem_len = mqtt_parse_rem_len ( packet_buffer );
+            uint8_t rem_len_bytes = mqtt_num_rem_len_bytes ( packet_buffer );
+
+            //packet_length = packet_buffer[1] + 2; // Remaining length + fixed header length
+            // total packet length = remaining length + byte 1 of fixed header + remaning length part of fixed header
+            uint16_t packet_length = ( uint16_t ) ( ( uint16_t ) ( rem_len + rem_len_bytes ) + 1 );
+
+            while ( total_bytes < packet_length )    // Reading the packet
             {
-                return -1;
+                dataLength = loadBufferFromNetXSocket ( socketPtr, total_bytes, timeout );
+                if ( dataLength <= -1 )
+                {
+                    return -1;
+                }
+                total_bytes += (unsigned int) dataLength; // Keep tally of total bytes
             }
-            total_bytes += dataLength; // Keep tally of total bytes
+
+            retVal = packet_length;
         }
-
-        retVal = packet_length;
+        else
+        {
+            retVal = -1;
+        }
     }
-    else
-    {
-        retVal = -1;
-    }
-
     return retVal;
 }
 
 int mqtt_netx_disconnect ()
 {
-    int status = mqtt_disconnect ( &g_broker );
-    return status;
+    int retVal = 0;
+    int status = 0;
+
+    if ( tcpSocket.nx_tcp_socket_state == NX_TCP_ESTABLISHED )
+    {
+        status = mqtt_disconnect ( &g_broker );
+    }
+
+    g_broker.socket_info = NULL;
+
+    status = nx_tcp_socket_disconnect ( &tcpSocket, NX_WAIT_FOREVER );
+    if ( status != NX_SUCCESS )
+    {
+        retVal = -1;
+    }
+
+    status = nx_tcp_client_socket_unbind ( &tcpSocket );
+    if ( status != NX_SUCCESS )
+    {
+        retVal = -1;
+    }
+
+    status = nx_tcp_socket_delete ( &tcpSocket );
+    if ( status != NX_SUCCESS )
+    {
+        retVal = -1;
+    }
+
+    memset ( &tcpSocket, 0, sizeof(NX_TCP_SOCKET) );
+
+    return retVal;
 }
 
 int mqtt_netx_publish ( const char* topic, const char* msg, uint8_t retain )
@@ -290,19 +315,16 @@ int mqtt_netx_connect ( const char * client_id, const MqttConnection_t * connect
 
     if ( packet_length < 0 )
     {
-//        fprintf ( stderr, "Error(%d) on read packet!\n", packet_length );
         return -1;
     }
 
     if ( MQTTParseMessageType ( packet_buffer ) != MQTT_MSG_CONNACK )
     {
-//        fprintf ( stderr, "CONNACK expected!\n" );
         return -2;
     }
 
     if ( packet_buffer [ 3 ] != 0x00 )
     {
-//        fprintf ( stderr, "CONNACK failed!\n" );
         return -2;
     }
 

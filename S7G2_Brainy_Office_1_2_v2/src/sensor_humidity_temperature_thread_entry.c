@@ -51,8 +51,8 @@
  **/
 
 void sensor_humidity_temperature_thread_entry ( void );
-unsigned int sensor_humidity_temperature_formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr, char * payload,
-                                         size_t payloadLength );
+unsigned int sensor_humidity_temperature_formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr,
+                                                                     char * payload, size_t payloadLength );
 
 double g_temperatureCelsius = -40.0, g_temperatureFahrenheit = -40.0, g_humidityPercent = 0.0; // minimum values sensor can read
 
@@ -88,10 +88,13 @@ void sensor_humidity_temperature_thread_entry ( void )
     double tempThresholdInCelsius = 0.2;
     double humidityThresholdInPercent = 3.5;
 
-    uint16_t temperatureThreshold = ( uint16_t ) ( ( ( uint16_t ) ( tempThresholdInCelsius + 273.15 ) ) * 64 );
-    uint16_t humidityThreshold = ( uint16_t ) ( 3.5 * 512 );
+//    uint16_t temperatureThreshold = ( uint16_t ) ( ( ( uint16_t ) ( tempThresholdInCelsius + 273.15 ) ) * 64 );
+//    uint16_t humidityThreshold = ( uint16_t ) ( 3.5 * 512 );
 
-    double prevTemperatureCelsius = -200.0, prevTemperatureFahrenheit = -200.0, prevHumidityPercent = -100.0; // impossible minimum values for sensor to detect
+    // impossible minimum values for sensor to detect
+    double prevTemperatureCelsius = -200.0;
+//    double prevTemperatureFahrenheit = -200.0;
+    double prevHumidityPercent = -100.0;
 
     sf_message_header_t * message;
     ssp_err_t msgStatus;
@@ -116,7 +119,8 @@ void sensor_humidity_temperature_thread_entry ( void )
     }
     while ( !isCloudConnected );
 
-    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id, sensor_humidity_temperature_formatDataForCloudPublish );
+    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id,
+                                    sensor_humidity_temperature_formatDataForCloudPublish );
 
     err = g_ams_en210_temp_humid.p_api->open ( g_ams_en210_temp_humid.p_ctrl, g_ams_en210_temp_humid.p_cfg );
     APP_ERR_TRAP (err)
@@ -143,7 +147,8 @@ void sensor_humidity_temperature_thread_entry ( void )
                 if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE )
                 {
                     isCloudConnected = true;
-                    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id, sensor_humidity_temperature_formatDataForCloudPublish );
+                    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id,
+                                                    sensor_humidity_temperature_formatDataForCloudPublish );
                 }
                 else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED )
                 {
@@ -192,7 +197,7 @@ void sensor_humidity_temperature_thread_entry ( void )
                                          &g_temperatureFahrenheit );
 
                 prevTemperatureCelsius = g_temperatureCelsius;
-                prevTemperatureFahrenheit = g_temperatureFahrenheit;
+//                prevTemperatureFahrenheit = g_temperatureFahrenheit;
             }
         }
 
@@ -305,8 +310,8 @@ bool parseSensorData ( float * destination, uint8_t byte2, uint8_t byte1, uint8_
 
 #endif
 
-unsigned int sensor_humidity_temperature_formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr, char * payload,
-                                         size_t payloadLength )
+unsigned int sensor_humidity_temperature_formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr,
+                                                                     char * payload, size_t payloadLength )
 {
     int bytesProcessed = 0;
     if ( eventPtr != NULL )
