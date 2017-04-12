@@ -101,6 +101,7 @@ void sensor_humidity_temperature_thread_entry ( void )
 
     const uint8_t sensor_humidity_temperature_thread_id = getUniqueThreadId ();
 
+    //TODO: Fix this hard-coded cloud connectivity dependency
     bool isCloudConnected = false;
     do
     {

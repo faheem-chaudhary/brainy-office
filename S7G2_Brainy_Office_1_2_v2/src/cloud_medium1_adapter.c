@@ -26,6 +26,8 @@
 #define MQTT_CONF_USERNAME_LENGTH   (M1_CONFIG_VALUE_LENGTH + M1_CONFIG_VALUE_LENGTH + 2)
 #define MQTT_CONF_PASSWORD_LENGTH   (M1_CONFIG_VALUE_LENGTH + M1_API_KEY_VALUE_LENGTH + 2)
 
+bool mqttReconnect ();
+
 typedef struct
 {
         char name [ M1_CONFIG_VALUE_LENGTH ];
@@ -150,7 +152,6 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
 }
 
 char g_publishMessageBuffer [ 512 ];
-
 unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
 {
     SSP_PARAMETER_NOT_USED ( messageLength );
@@ -163,15 +164,8 @@ unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
 
         if ( status <= 0 ) // Connection Issues, try to connect again
         {
-            mqtt_netx_disconnect ();
-            status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
-
-            if ( status == 1 )
+            if ( mqttReconnect () == true )
             {
-                char reconnectMessage [ 256 ];
-                sprintf ( reconnectMessage, "{\"event_data\":{\"%s\":{\"reconnected\":true}}}",
-                          g_mediumOneDeviceCredentials.name );
-                status = mqtt_netx_publish ( g_topic_name, reconnectMessage, 0 );
                 status = mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
             }
         }
@@ -188,16 +182,36 @@ void mediumOneHouseKeepImpl ( void )
 
         if ( status <= 0 ) // Connection Issues, try to connect again
         {
-            mqtt_netx_disconnect ();
-            status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
-
-            if ( status == 1 )
-            {
-                char reconnectMessage [ 256 ];
-                sprintf ( reconnectMessage, "{\"event_data\":{\"%s\":{\"reconnected\":true}}}",
-                          g_mediumOneDeviceCredentials.name );
-                status = mqtt_netx_publish ( g_topic_name, reconnectMessage, 0 );
-            }
+            mqttReconnect ();
         }
     }
+}
+
+int g_connectFailureRetries = 0;
+bool mqttReconnect ()
+{
+    int status;
+
+    mqtt_netx_disconnect ();
+    status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
+
+    if ( status == 1 )
+    {
+        char reconnectMessage [ 256 ];
+        sprintf ( reconnectMessage, "{\"event_data\":{\"%s\":{\"reconnected\":true}}}",
+                  g_mediumOneDeviceCredentials.name );
+        status = mqtt_netx_publish ( g_topic_name, reconnectMessage, 0 );
+    }
+    else
+    {
+        g_connectFailureRetries++;
+
+        // Make a hard reboot, and let system take care of it
+        if ( g_connectFailureRetries > 5 )
+        {
+            NVIC_SystemReset ();
+        }
+    }
+
+    return ( status > 0 );
 }
