@@ -146,6 +146,7 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
                   g_mediumOneDeviceCredentials.userId, g_mediumOneDeviceCredentials.name );
 
         mediumOnePublishImpl ( "{\"connected\":true}", 0 );
+        tx_thread_sleep ( 50 ); // wait for half a second to let the message processed by the broker
     }
 
     return ( status == 1 );
@@ -201,6 +202,11 @@ bool mqttReconnect ()
         sprintf ( reconnectMessage, "{\"event_data\":{\"%s\":{\"reconnected\":true}}}",
                   g_mediumOneDeviceCredentials.name );
         status = mqtt_netx_publish ( g_topic_name, reconnectMessage, 0 );
+
+        if ( status > 0 )
+        {
+            tx_thread_sleep ( 50 ); // wait for half a second to let the message processed by the broker
+        }
     }
     else
     {

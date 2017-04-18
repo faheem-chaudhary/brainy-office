@@ -22,11 +22,18 @@ ULONG sys_main_thread_wait = 10;
 // System Main Thread entry function
 void sys_main_thread_entry ( void )
 {
+    extern TX_THREAD sensor_microphone_thread;
+    extern TX_THREAD sensor_temperature_thread;
+
     g_button_s4_irq11.p_api->open ( g_button_s4_irq11.p_ctrl, g_button_s4_irq11.p_cfg );
     g_button_s4_irq11.p_api->enable ( g_button_s4_irq11.p_ctrl );
 
     g_button_s5_irq10.p_api->open ( g_button_s5_irq10.p_ctrl, g_button_s5_irq10.p_cfg );
     g_button_s5_irq10.p_api->enable ( g_button_s5_irq10.p_ctrl );
+
+    tx_thread_resume ( &sensor_temperature_thread );
+    tx_thread_sleep ( 100 ); // wait for a second
+    tx_thread_resume ( &sensor_microphone_thread );
 
     while ( 1 )
     {

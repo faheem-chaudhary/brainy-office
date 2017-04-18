@@ -123,11 +123,12 @@ void sensor_humidity_temperature_thread_entry ( void )
     registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id,
                                     sensor_humidity_temperature_formatDataForCloudPublish );
 
-    err = g_ams_en210_temp_humid.p_api->open ( g_ams_en210_temp_humid.p_ctrl, g_ams_en210_temp_humid.p_cfg );
+    err = g_i2c_device_en210_temp_humid.p_api->open ( g_i2c_device_en210_temp_humid.p_ctrl,
+                                                      g_i2c_device_en210_temp_humid.p_cfg );
     APP_ERR_TRAP (err)
 
-    err = g_ams_en210_temp_humid.p_api->write ( g_ams_en210_temp_humid.p_ctrl, ENS210_init_seq,
-                                                sizeof ( ENS210_init_seq ), false, 10 );
+    err = g_i2c_device_en210_temp_humid.p_api->write ( g_i2c_device_en210_temp_humid.p_ctrl, ENS210_init_seq,
+                                                       sizeof ( ENS210_init_seq ), false, 10 );
     APP_ERR_TRAP (err)
 
     tx_thread_sleep ( 13 ); // 122 ms conversion time
@@ -165,18 +166,20 @@ void sensor_humidity_temperature_thread_entry ( void )
             messageQueueReleaseBuffer ( (void **) &message );
         }
 
-        err = g_ams_en210_temp_humid.p_api->write ( g_ams_en210_temp_humid.p_ctrl, &commandTemperature, 1, false, 10 );
+        err = g_i2c_device_en210_temp_humid.p_api->write ( g_i2c_device_en210_temp_humid.p_ctrl, &commandTemperature, 1,
+                                                           false, 10 );
         APP_ERR_TRAP (err)
 
-        err = g_ams_en210_temp_humid.p_api->read ( g_ams_en210_temp_humid.p_ctrl, temperatureSensorReading.bytes, 3,
-                                                   false, 10 );
+        err = g_i2c_device_en210_temp_humid.p_api->read ( g_i2c_device_en210_temp_humid.p_ctrl,
+                                                          temperatureSensorReading.bytes, 3, false, 10 );
         APP_ERR_TRAP (err)
 
-        err = g_ams_en210_temp_humid.p_api->write ( g_ams_en210_temp_humid.p_ctrl, &commandHumidity, 1, false, 10 );
+        err = g_i2c_device_en210_temp_humid.p_api->write ( g_i2c_device_en210_temp_humid.p_ctrl, &commandHumidity, 1,
+                                                           false, 10 );
         APP_ERR_TRAP (err)
 
-        err = g_ams_en210_temp_humid.p_api->read ( g_ams_en210_temp_humid.p_ctrl, humiditySensorReading.bytes, 3, false,
-                                                   10 );
+        err = g_i2c_device_en210_temp_humid.p_api->read ( g_i2c_device_en210_temp_humid.p_ctrl,
+                                                          humiditySensorReading.bytes, 3, false, 10 );
         APP_ERR_TRAP (err)
 
         if ( validateEns210SensorData ( &temperatureSensorReading ) == true )

@@ -116,7 +116,8 @@ int send_packet ( void* socket_info, const void* buf, unsigned int count )
         NX_PACKET * netxPacketPtr;
         unsigned int status = 0;
 
-        status = nx_packet_allocate ( poolPtr, &netxPacketPtr, NX_TCP_PACKET, NX_WAIT_FOREVER );
+        status = nx_packet_allocate ( poolPtr, &netxPacketPtr, NX_TCP_PACKET, 100 ); // 1 second timeout
+
         if ( status == NX_SUCCESS )
         {
             status = nx_packet_data_append ( netxPacketPtr, (void *) buf, count, poolPtr, NX_WAIT_FOREVER );

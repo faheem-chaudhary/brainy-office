@@ -72,7 +72,7 @@ Synergy Configuration
       P000 169 ADC0_AN00 GPIO29 - - "Analog mode" - - "ADC0: AN00; CMP0: IVCMP2; IRQ0: IRQ06" 
       P001 168 ADC0_AN01 GPIO28 - - "Analog mode" - - "ADC0: AN01; CMP0: IVCMP2; IRQ0: IRQ07" 
       P002 167 ADC0_AN02 GPIO27 - - "Analog mode" - - "ADC0: AN02; CMP0: IVCMP2; IRQ0: IRQ08" 
-      P003 166 - - - - Disabled - - "ADC0: PGAVSS0" 
+      P003 166 GPIO - - - "Input mode" - - "ADC0: PGAVSS0" 
       P004 165 GPIO GPIO26 - IRQ9-DS "Input mode" - - "ADC1: AN00; CMP0: IVCMP2; IRQ0: IRQ09" 
       P005 164 GPIO GPIO25 - IRQ10-DS "Input mode" - - "ADC1: AN01; CMP0: IVCMP2; IRQ0: IRQ10" 
       P006 163 GPIO GPIO24 - IRQ11-DS "Input mode" - - "ADC1: AN02; CMP0: IVCMP2; IRQ0: IRQ11" 
@@ -86,9 +86,9 @@ Synergy Configuration
       P101 131 SPI0_MOSI SPI0__Pin_Option_A_MOSIA_A Medium None "Peripheral mode" CMOS None "AGT0: AGTEE; BUS0: D1_DQ1; GLCDC0: LCD_CLK; IIC1: SDA; IRQ0: IRQ01; KINT0: KRM1; POEG1: GTETRG; SCI0: SDA; SCI0: TXD_MOSI; SCI1: CTS_RTS_SS; SPI0: MOSI" 
       P102 130 SPI0_RSPCK SPI0__Pin_Option_A_RSPCKA_A Medium - "Peripheral mode" CMOS None "ADC0: ADTRG; AGT0: AGTO; BUS0: D2_DQ2; GLCDC0: LCD_TCON0; GPT2: GTIOCB; KINT0: KRM2; OPS0: GTOWLO; SCI0: SCK; SPI0: RSPCK" 
       P103 129 SPI0_SSL0 SPI0__Pin_Option_A_SSLA0_A Medium - "Peripheral mode" CMOS None "BUS0: D3_DQ3; GLCDC0: LCD_TCON1; GPT2: GTIOCA; KINT0: KRM3; OPS0: GTOWUP; SCI0: CTS_RTS_SS; SPI0: SSL0" 
-      P104 128 SCI8_RXD_MISO SCI8_RXD8_SCL8_MISO8 Medium None "Peripheral mode" CMOS None "BUS0: D4_DQ4; GLCDC0: LCD_TCON2; IRQ0: IRQ01; KINT0: KRM4; POEG1: GTETRG; SCI8: RXD_MISO; SCI8: SCL; SPI0: SSL1" 
-      P105 127 SCI8_TXD_MOSI SCI8_TXD8_SDA8_MOSI8 Medium None "Peripheral mode" CMOS None "BUS0: D5_DQ5; GLCDC0: LCD_TCON3; IRQ0: IRQ00; KINT0: KRM5; POEG0: GTETRG; SCI8: SDA; SCI8: TXD_MOSI; SPI0: SSL2" 
-      P106 126 SCI8_SCK SCI8_SCK8 High - "Peripheral mode" CMOS None "BUS0: D6_DQ6; GLCDC0: LCD_DATA00; GPT8: GTIOCB; KINT0: KRM6; SCI8: SCK; SPI0: SSL3" 
+      P104 128 SCI8_SCL - Low None "Peripheral mode" "n-ch open drain" None "BUS0: D4_DQ4; GLCDC0: LCD_TCON2; IRQ0: IRQ01; KINT0: KRM4; POEG1: GTETRG; SCI8: RXD_MISO; SCI8: SCL; SPI0: SSL1" 
+      P105 127 SCI8_SDA - Low None "Peripheral mode" "n-ch open drain" None "BUS0: D5_DQ5; GLCDC0: LCD_TCON3; IRQ0: IRQ00; KINT0: KRM5; POEG0: GTETRG; SCI8: SDA; SCI8: TXD_MOSI; SPI0: SSL2" 
+      P106 126 - - - - Disabled - - "BUS0: D6_DQ6; GLCDC0: LCD_DATA00; GPT8: GTIOCB; KINT0: KRM6; SCI8: SCK; SPI0: SSL3" 
       P107 125 GPIO GPIO12 Medium - "Output mode (Initial Low)" CMOS None "BUS0: D7_DQ7; GLCDC0: LCD_DATA01; GPT8: GTIOCA; KINT0: KRM7; SCI8: CTS_RTS_SS" 
       P108 89 DEBUG0_TMS JTAG_TMS Low - "Peripheral mode" CMOS None "DEBUG0: SWDIO; DEBUG0: TMS; GPT0: GTIOCB; SCI9: CTS_RTS_SS; SPI1: SSL0" 
       P109 90 DEBUG0_TDO JTAG_TDO Low - "Peripheral mode" CMOS None "CAN1: CTX; CGC0: CLKOUT; DEBUG0: SWO; DEBUG0: TDO; GPT1: GTIOCA; OPS0: GTOVUP; SCI9: SDA; SCI9: TXD_MOSI; SPI1: MOSI" 
@@ -134,9 +134,9 @@ Synergy Configuration
       P407 44 USBFS0_VBUS USB_Full_Speed_USB0_VBUS Low - "Peripheral mode" CMOS None "ADC0: ADTRG; CTSU0: TS03; ETHERC0: EXOUT; IIC0: SDA; RTC0: RTCOUT; SCI4: CTS_RTS_SS; SPI1: SSL3; USBFS0: VBUS" 
       P408 43 CTSU0_TS04 Cap_Touch_Sensing_Unit_TS04 Low None "Peripheral mode" CMOS None "CTSU0: TS04; ETHERC0: CRS_DV; GPT10: GTIOCB; IRQ0: IRQ07; OPS0: GTOWLO; SCI3: RXD_MISO; SCI3: SCL; USBFS0: ID; USBHS0: ID" 
       P409 42 CTSU0_TS05 Cap_Touch_Sensing_Unit_TS05 Low None "Peripheral mode" CMOS None "CTSU0: TS05; ETHERC0: RX_ER; GPT10: GTIOCA; IRQ0: IRQ06; OPS0: GTOWUP; SCI3: SDA; SCI3: TXD_MOSI; USBFS0: EXICEN; USBHS0: EXICEN" 
-      P410 41 SCI0_RXD_MISO - Low None "Peripheral mode" CMOS None "AGT1: AGTOB; CTSU0: TS06; ETHERC0: RXD1; GPT9: GTIOCB; IRQ0: IRQ05; OPS0: GTOVLO; SCI0: RXD_MISO; SCI0: SCL; SCI3: SCK; SDHI0: DAT1; SPI0: MISO" 
-      P411 40 SCI0_TXD_MOSI - Low None "Peripheral mode" CMOS None "AGT1: AGTOA; CTSU0: TS07; ETHERC0: RXD0; GPT9: GTIOCA; IRQ0: IRQ04; OPS0: GTOVUP; SCI0: SDA; SCI0: TXD_MOSI; SCI3: CTS_RTS_SS; SDHI0: DAT0; SPI0: MOSI" 
-      P412 39 SCI0_SCK - Low - "Peripheral mode" CMOS None "CTSU0: TS08; ETHERC0: REF50CK; OPS0: GTOULO; SCI0: SCK; SDHI0: CMD; SPI0: RSPCK" 
+      P410 41 - - - - Disabled - - "AGT1: AGTOB; CTSU0: TS06; ETHERC0: RXD1; GPT9: GTIOCB; IRQ0: IRQ05; OPS0: GTOVLO; SCI0: RXD_MISO; SCI0: SCL; SCI3: SCK; SDHI0: DAT1; SPI0: MISO" 
+      P411 40 - - - - Disabled - - "AGT1: AGTOA; CTSU0: TS07; ETHERC0: RXD0; GPT9: GTIOCA; IRQ0: IRQ04; OPS0: GTOVUP; SCI0: SDA; SCI0: TXD_MOSI; SCI3: CTS_RTS_SS; SDHI0: DAT0; SPI0: MOSI" 
+      P412 39 - - - - Disabled - - "CTSU0: TS08; ETHERC0: REF50CK; OPS0: GTOULO; SCI0: SCK; SDHI0: CMD; SPI0: RSPCK" 
       P413 38 GPIO GPIO15 Medium - "Output mode (Initial Low)" CMOS None "CTSU0: TS09; ETHERC0: TXD0; OPS0: GTOUUP; SCI0: CTS_RTS_SS; SDHI0: CLK; SPI0: SSL0" 
       P414 37 CTSU0_TS10 Cap_Touch_Sensing_Unit_TS10 Low - "Peripheral mode" CMOS None "CTSU0: TS10; ETHERC0: TXD1; SDHI0: WP; SPI0: SSL1" 
       P415 36 CTSU0_TS11 Cap_Touch_Sensing_Unit_TS11 Low - "Peripheral mode" CMOS None "CTSU0: TS11; ETHERC0: TXD_EN; SPI0: SSL2" 
@@ -341,7 +341,7 @@ Synergy Configuration
     
     Instance "g_sf_message Messaging Framework on sf_message"
       Name: g_sf_message
-      Work memory size in bytes: 2048
+      Work memory size in bytes: 4096
       Pointer to subscriber list array: p_subscriber_lists
       name of the block pool internally used in the messaging framework: sf_msg_blk_pool
       
@@ -399,7 +399,7 @@ Synergy Configuration
       
       Instance "g_sf_message Messaging Framework on sf_message"
         Name: g_sf_message
-        Work memory size in bytes: 2048
+        Work memory size in bytes: 4096
         Pointer to subscriber list array: p_subscriber_lists
         name of the block pool internally used in the messaging framework: sf_msg_blk_pool
         
@@ -594,14 +594,14 @@ Synergy Configuration
     Name: Sensor Humidity and Temperature (AMS EN210) Thread
     Stack size (bytes): 1024
     Priority: 8
-    Auto start: Enabled
+    Auto start: Disabled
     Time slicing interval (ticks): 1
     
-    Instance "g_ams_en210_temp_humid I2C Framework Device on sf_i2c"
-      Name: g_ams_en210_temp_humid
+    Instance "g_i2c_device_en210_temp_humid I2C Framework Device on sf_i2c"
+      Name: g_i2c_device_en210_temp_humid
       
-      Instance "g_i2c_temp_humid I2C Master Driver on r_sci_i2c"
-        Name: g_i2c_temp_humid
+      Instance "g_i2c_driver_ens210_temp_humid I2C Master Driver on r_sci_i2c"
+        Name: g_i2c_driver_ens210_temp_humid
         Channel: 0
         Rate: Standard
         Slave Address : 0x43
@@ -613,8 +613,8 @@ Synergy Configuration
         Transmit Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
         Transmit End Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
         
-      Instance "g_sf_i2c_bus0 I2C Framework Shared Bus on sf_i2c"
-        Name: g_sf_i2c_bus0
+      Instance "g_sf_i2c_shared_bus_chanel_0 I2C Framework Shared Bus on sf_i2c"
+        Name: g_sf_i2c_shared_bus_chanel_0
         I2C Implementation: SCI I2C
         Channel: 0
         
@@ -631,7 +631,7 @@ Synergy Configuration
     Name: Sensor Microphone (ICS-40181) Thread
     Stack size (bytes): 1024
     Priority: 8
-    Auto start: Enabled
+    Auto start: Disabled
     Time slicing interval (ticks): 1
     
     Instance "g_sf_adc_periodic0 ADC Periodic Framework on sf_adc_periodic"
@@ -764,6 +764,35 @@ Synergy Configuration
       Data Format: Right Justified
       Output Amplifier: Disable
       
+  Thread "Sensor Temperature (HIH6030-021-001 & MS5637-02BA03-50) Thread"
+    Symbol: sensor_temperature_thread
+    Name: Sensor Temperature (HIH6030-021-001 & MS5637-02BA03-50) Thread
+    Stack size (bytes): 1024
+    Priority: 8
+    Auto start: Disabled
+    Time slicing interval (ticks): 1
+    
+    Instance "g_i2c_device_hih6030_temp I2C Framework Device on sf_i2c"
+      Name: g_i2c_device_hih6030_temp
+      
+      Instance "g_i2c_driver_hih6030_temp I2C Master Driver on r_sci_i2c"
+        Name: g_i2c_driver_hih6030_temp
+        Channel: 8
+        Rate: Standard
+        Slave Address : 0x27
+        Address Mode: 7-Bit
+        SDA Output Delay (nano seconds): 990
+        Bit Rate Modulation Enable: Enable
+        Callback: NULL
+        Receive Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
+        Transmit Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
+        Transmit End Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
+        
+      Instance "g_sf_i2c_shared_bus_chanel_8 I2C Framework Shared Bus on sf_i2c"
+        Name: g_sf_i2c_shared_bus_chanel_8
+        I2C Implementation: SCI I2C
+        Channel: 8
+        
   Messaging
     Event "System Network Available"
       Symbol: SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE
@@ -878,12 +907,14 @@ Synergy Configuration
     Subscriber "Sensor Lightning (AMS AS3935) Thread" 0 0
       
     Subscriber "Sensor Humidity and Temperature (AMS EN210) Thread" 0 0
-      Event Class "System"
-      Event Class "Config"
       
     Subscriber "Sensor Air Quality (AMS iAQ) Thread" 0 0
       
     Subscriber "Sensor Microphone (ICS-40181) Thread" 0 0
+      Event Class "System"
+      Event Class "Config"
+      
+    Subscriber "Sensor Temperature (HIH6030-021-001 & MS5637-02BA03-50) Thread" 0 0
       Event Class "System"
       Event Class "Config"
       

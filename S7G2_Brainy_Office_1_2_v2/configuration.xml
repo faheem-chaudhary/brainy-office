@@ -258,12 +258,13 @@
     <subscriber context="rtos.threadx.thread.282027456" end="0" id="subscriber.1766188524" start="0"/>
     <subscriber context="rtos.threadx.thread.785910637" end="0" id="subscriber.297692598" start="0"/>
     <subscriber context="rtos.threadx.thread.1882901370" end="0" id="subscriber.1009286085" start="0"/>
-    <subscriber context="rtos.threadx.thread.1358427708" end="0" id="subscriber.520303301" start="0">
+    <subscriber context="rtos.threadx.thread.1358427708" end="0" id="subscriber.520303301" start="0"/>
+    <subscriber context="rtos.threadx.thread.2024768991" end="0" id="subscriber.1938077575" start="0"/>
+    <subscriber context="rtos.threadx.thread.407260935" end="0" id="subscriber.331782468" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
       <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
-    <subscriber context="rtos.threadx.thread.2024768991" end="0" id="subscriber.1938077575" start="0"/>
-    <subscriber context="rtos.threadx.thread.407260935" end="0" id="subscriber.331782468" start="0">
+    <subscriber context="rtos.threadx.thread.652541274" end="0" id="subscriber.1724913462" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
       <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
@@ -283,7 +284,7 @@
     </module>
     <module id="module.framework.sf_message.1429754242">
       <property id="module.framework.sf_message.name" value="g_sf_message"/>
-      <property id="module.framework.sf_message.work_memory_size" value="2048"/>
+      <property id="module.framework.sf_message.work_memory_size" value="4096"/>
       <property id="module.framework.sf_message.pp_subscriber_lists" value="p_subscriber_lists"/>
       <property id="module.framework.sf_message.p_blk_pool_name" value="sf_msg_blk_pool"/>
     </module>
@@ -451,15 +452,15 @@
       <property id="module.driver.dac.output_amplifier_enabled" value="module.driver.dac.output_amplifier_enabled.false"/>
     </module>
     <module id="module.framework.sf_i2c_on_sf_i2c.1780733882">
-      <property id="module.framework.sf_i2c.name" value="g_ams_en210_temp_humid"/>
+      <property id="module.framework.sf_i2c.name" value="g_i2c_device_en210_temp_humid"/>
     </module>
     <module id="module.framework.sf_i2c_bus_on_sf_i2c.1415618611">
-      <property id="module.framework.sf_i2c_bus.name" value="g_sf_i2c_bus0"/>
+      <property id="module.framework.sf_i2c_bus.name" value="g_sf_i2c_shared_bus_chanel_0"/>
       <property id="module.framework.sf_i2c_bus.i2c_interface" value="module.framework.sf_i2c_bus.i2c_interface.sci"/>
       <property id="module.framework.sf_i2c_bus.channel" value="0"/>
     </module>
     <module id="module.driver.i2c_on_sci_i2c.1214508694">
-      <property id="module.driver.i2c.name" value="g_i2c_temp_humid"/>
+      <property id="module.driver.i2c.name" value="g_i2c_driver_ens210_temp_humid"/>
       <property id="module.driver.i2c.channel" value="0"/>
       <property id="module.driver.i2c.rate" value="module.driver.i2c.rate.rate_standard"/>
       <property id="module.driver.i2c.slave" value="0x43"/>
@@ -551,6 +552,27 @@
       <property id="module.framework.sf_touch_panel.pin" value="IOPORT_PORT_06_PIN_09"/>
       <property id="module.framework.sf_touch_panel.ev_class_instance_number" value="0"/>
       <property id="module.framework.sf_touch_panel.rotation_angle" value="module.framework.sf_touch_panel.rotation_angle.angle0"/>
+    </module>
+    <module id="module.framework.sf_i2c_on_sf_i2c.1463534915">
+      <property id="module.framework.sf_i2c.name" value="g_i2c_device_hih6030_temp"/>
+    </module>
+    <module id="module.framework.sf_i2c_bus_on_sf_i2c.846094286">
+      <property id="module.framework.sf_i2c_bus.name" value="g_sf_i2c_shared_bus_chanel_8"/>
+      <property id="module.framework.sf_i2c_bus.i2c_interface" value="module.framework.sf_i2c_bus.i2c_interface.sci"/>
+      <property id="module.framework.sf_i2c_bus.channel" value="8"/>
+    </module>
+    <module id="module.driver.i2c_on_sci_i2c.1962179879">
+      <property id="module.driver.i2c.name" value="g_i2c_driver_hih6030_temp"/>
+      <property id="module.driver.i2c.channel" value="8"/>
+      <property id="module.driver.i2c.rate" value="module.driver.i2c.rate.rate_standard"/>
+      <property id="module.driver.i2c.slave" value="0x27"/>
+      <property id="module.driver.i2c.addr_mode" value="module.driver.i2c.addr_mode.addr_mode_7bit"/>
+      <property id="module.driver.i2c.sda_delay" value="990"/>
+      <property id="module.driver.i2c.bitrate_modulation" value="module.driver.i2c.bitrate_modulation.true"/>
+      <property id="module.driver.i2c.p_callback" value="NULL"/>
+      <property id="module.driver.i2c.rxi_ipl" value="board.icu.common.irq.priority6"/>
+      <property id="module.driver.i2c.txi_ipl" value="board.icu.common.irq.priority6"/>
+      <property id="module.driver.i2c.tei_ipl" value="board.icu.common.irq.priority6"/>
     </module>
     <context id="_hal.0">
       <stack module="module.driver.fmi_on_fmi.0"/>
@@ -686,7 +708,7 @@
       <property id="rtos.threadx.thread.name" value="Sensor Humidity and Temperature (AMS EN210) Thread"/>
       <property id="rtos.threadx.thread.stack" value="1024"/>
       <property id="rtos.threadx.thread.priority" value="8"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
       <stack module="module.framework.sf_i2c_on_sf_i2c.1780733882">
         <stack module="module.driver.i2c_on_sci_i2c.1214508694" requires="module.framework.sf_i2c_on_sf_i2c.requires.i2c"/>
@@ -706,7 +728,7 @@
       <property id="rtos.threadx.thread.name" value="Sensor Microphone (ICS-40181) Thread"/>
       <property id="rtos.threadx.thread.stack" value="1024"/>
       <property id="rtos.threadx.thread.priority" value="8"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
       <stack module="module.framework.sf_adc_periodic_on_sf_adc_periodic.1842730638">
         <stack module="module.driver.adc_on_adc.196131891" requires="module.framework.sf_adc_periodic.requires.adc"/>
@@ -714,6 +736,18 @@
         <stack module="module.driver.transfer_on_dtc.1916045898" requires="module.framework.sf_adc_periodic.requires.transfer"/>
       </stack>
       <stack module="module.driver.dac_on_dac.1745159952"/>
+    </context>
+    <context id="rtos.threadx.thread.652541274">
+      <property id="_symbol" value="sensor_temperature_thread"/>
+      <property id="rtos.threadx.thread.name" value="Sensor Temperature (HIH6030-021-001 &amp; MS5637-02BA03-50) Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="8"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="1"/>
+      <stack module="module.framework.sf_i2c_on_sf_i2c.1463534915">
+        <stack module="module.driver.i2c_on_sci_i2c.1962179879" requires="module.framework.sf_i2c_on_sf_i2c.requires.i2c"/>
+        <stack module="module.framework.sf_i2c_bus_on_sf_i2c.846094286" requires="module.framework.sf_i2c_on_sf_i2c.requires.sf_i2c_bus"/>
+      </stack>
     </context>
     <config id="config.el.ux_v2"/>
     <config id="config.el.nx_dhcp_client">
@@ -852,7 +886,7 @@
       <property id="config.driver.gpt.param_checking_enable" value="config.driver.gpt.param_checking_enable.bsp"/>
     </config>
     <config id="config.driver.sci_i2c">
-      <property id="config.driver.sci_i2c.param_checking_enable" value="config.driver.sci_i2c.param_checking_enable.bsp"/>
+      <property id="config.driver.sci_i2c.param_checking_enable" value="config.driver.sci_i2c.param_checking_enable.enabled"/>
     </config>
     <config id="config.framework.sf_i2c">
       <property id="config.framework.sf_i2c.param_checking_enable" value="config.framework.sf_i2c.param_checking_enable.enabled"/>
