@@ -1,15 +1,46 @@
 #include "sys_network_thread.h"
 #include "commons.h"
 
-ULONG g_ip_address;
-ULONG g_network_mask;
-ULONG g_dns_ip [ 2 ];
+/// -------------------------------------------------------- ///
+///   SECTION: Macro Definitions                             ///
+#define NETWORK_STATUS_CHECK_MASK (NX_IP_LINK_ENABLED | NX_IP_ADDRESS_RESOLVED | NX_IP_INTERFACE_LINK_ENABLED | NX_IP_INITIALIZE_DONE)
 
-ULONG sys_network_thread_wait = 10;
+/// --  END OF: Macro Definitions -------------------------  ///
 
+/// -------------------------------------------------------- ///
+///   SECTION: Global/extern Variable Declarations           ///
+///                        -- None --                        ///
+
+/// --  END OF: Global/extern Variable Declarations -------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Local Type Definitions                        ///
+///                        -- None --                        ///
+
+/// --  END OF: Local Type Definitions --------------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Variable Declarations     ///
+static ULONG ip_address;
+static ULONG network_mask;
+static ULONG dns_ip [ 2 ];
+static nx_mac_address_t *p_mac_address = NULL;
+static ULONG sys_network_thread_wait = 10;
+
+/// --  END OF: Static (file scope) Variable Declarations -- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Global Function Declarations                  ///
+void sys_network_thread_entry ( void );
 void setMacAddress ( nx_mac_address_t *p_mac_config );
 
-#define NETWORK_STATUS_CHECK_MASK (NX_IP_LINK_ENABLED | NX_IP_ADDRESS_RESOLVED | NX_IP_INTERFACE_LINK_ENABLED | NX_IP_INITIALIZE_DONE)
+/// --  END OF: Global Function Declarations --------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Function Declarations     ///
+///                        -- None --                        ///
+
+/// --  END OF: Static (file scope) Function Declarations -- ///
 
 /* System Network (Ethernet) Thread entry function */
 void sys_network_thread_entry ( void )
@@ -27,34 +58,34 @@ void sys_network_thread_entry ( void )
     {
         { // Wait for init to finish.
             ULONG status;
-            applicationErrorTrap (
+            handleError (
                     nx_ip_interface_status_check ( &g_ip, 0, NX_IP_LINK_ENABLED, &status, NX_WAIT_FOREVER ) );
         }
 
         { // DHCP Setup
-            applicationErrorTrap ( nx_dhcp_start ( &g_dhcp_client ) );
+            handleError ( nx_dhcp_start ( &g_dhcp_client ) );
         }
 
         { // Sanity check for IP Address Verification
             ULONG status;
-            applicationErrorTrap ( nx_ip_status_check ( &g_ip, NX_IP_ADDRESS_RESOLVED, &status, TX_WAIT_FOREVER ) );
+            handleError ( nx_ip_status_check ( &g_ip, NX_IP_ADDRESS_RESOLVED, &status, TX_WAIT_FOREVER ) );
         }
 
         { // IP Address Setup
-            applicationErrorTrap ( nx_ip_address_get ( &g_ip, &g_ip_address, &g_network_mask ) );
+            handleError ( nx_ip_address_get ( &g_ip, &ip_address, &network_mask ) );
         }
 
         { // DNS Setup
-            UINT dns_ip_str_size = sizeof ( g_dns_ip );
-            applicationErrorTrap (
-                    nx_dhcp_user_option_retrieve ( &g_dhcp_client, NX_DHCP_OPTION_DNS_SVR, (UCHAR *) g_dns_ip,
+            UINT dns_ip_str_size = sizeof ( dns_ip );
+            handleError (
+                    nx_dhcp_user_option_retrieve ( &g_dhcp_client, NX_DHCP_OPTION_DNS_SVR, (UCHAR *) dns_ip,
                                                    &dns_ip_str_size ) );
             {
-                applicationErrorTrap ( nx_dns_server_add ( &g_dns_client, g_dns_ip [ 0 ] ) );
+                handleError ( nx_dns_server_add ( &g_dns_client, dns_ip [ 0 ] ) );
 
                 if ( dns_ip_str_size > 4 ) // Get the secondary DNS IP, if available
                 {
-                    applicationErrorTrap ( nx_dns_server_add ( &g_dns_client, g_dns_ip [ 1 ] ) );
+                    handleError ( nx_dns_server_add ( &g_dns_client, dns_ip [ 1 ] ) );
                 }
             }
         }
@@ -112,5 +143,7 @@ void setMacAddress ( nx_mac_address_t *p_mac_config )
 
     p_mac_config->nx_mac_address_h = 0x0030;
     p_mac_config->nx_mac_address_l = lowerHalfMac;
+
+    p_mac_address = p_mac_config;
 }
 

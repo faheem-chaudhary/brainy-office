@@ -432,11 +432,6 @@ Synergy Configuration
       Instance "Touch Panel Driver on touch_panel_sx8654"
         Name: g_sf_touch_panel_i2c_chip_sx8654
         
-    Object "g_generate_thread_id_mutex Mutex"
-      Name: Generate Thread ID Mutex
-      Symbol: g_generate_thread_id_mutex
-      Priority inheritance: Disabled
-      
   Thread "System Blinker Thread"
     Symbol: sys_blinker_thread
     Name: System Blinker Thread
@@ -552,9 +547,9 @@ Synergy Configuration
   Thread "System File Logger Thread"
     Symbol: sys_file_logger_thread
     Name: System File Logger Thread
-    Stack size (bytes): 1024
+    Stack size (bytes): 4096
     Priority: 7
-    Auto start: Disabled
+    Auto start: Enabled
     Time slicing interval (ticks): 1
     
   Thread "Cloud Data Thread"
@@ -858,6 +853,18 @@ Synergy Configuration
       Symbol: SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED
       Name: System Button S5 Pressed
       
+    Event "System File Logging Available"
+      Symbol: SF_MESSAGE_EVENT_SYSTEM_FILE_LOGGING_AVAILABLE
+      Name: System File Logging Available
+      
+    Event "System File Logging Unavailable"
+      Symbol: SF_MESSAGE_EVENT_SYSTEM_FILE_LOGGING_UNAVAILABLE
+      Name: System File Logging Unavailable
+      
+    Event "Logging New Data"
+      Symbol: SF_MESSAGE_EVENT_LOGGING_NEW_DATA
+      Name: Logging New Data
+      
     Event Class "System"
       Symbol: SF_MESSAGE_EVENT_CLASS_SYSTEM
       Name: System
@@ -879,6 +886,13 @@ Synergy Configuration
       Payload: event_config_payload
       Payload type: event_config_payload_t
       
+    Event Class "Logging"
+      Symbol: SF_MESSAGE_EVENT_CLASS_LOGGING
+      Name: Logging
+      Payload header file: event_logging_api.h
+      Payload: event_logging_payload
+      Payload type: event_logging_payload_t
+      
     Subscriber "System Main Thread" 0 0
       
     Subscriber "System Blinker Thread" 0 0
@@ -894,6 +908,10 @@ Synergy Configuration
     Subscriber "System Display Thread" 0 0
       
     Subscriber "System File Logger Thread" 0 0
+      Event Class "System"
+      Event Class "Sensor"
+      Event Class "Config"
+      Event Class "Logging"
       
     Subscriber "Cloud Data Thread" 0 0
       Event Class "System"

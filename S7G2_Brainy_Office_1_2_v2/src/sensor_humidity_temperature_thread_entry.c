@@ -2,6 +2,69 @@
 #include "commons.h"
 #include "math.h"
 
+/// -------------------------------------------------------- ///
+///   SECTION: Macro Definitions                             ///
+// 7654 3210
+// Polynomial 0b 1000 1001 ~ x^7+x^3+x^0
+// 0x 8 9
+#define CRC7WIDTH 7 // 7 bits CRC has polynomial of 7th order (has 8 terms)
+#define CRC7POLY 0x89 // The 8 coefficients of the polynomial
+#define CRC7IVEC 0x7F // Initial vector has all 7 bits high
+// Payload data
+#define DATA7WIDTH 17
+#define DATA7MASK ((1UL<<DATA7WIDTH)-1) // 0b 0 1111 1111 1111 1111
+#define DATA7MSB (1UL<<(DATA7WIDTH-1)) // 0b 1 0000 0000 0000 0000
+
+/// --  END OF: Macro Definitions -------------------------  ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Global/extern Variable Declarations           ///
+///                        -- None --                        ///
+
+/// --  END OF: Global/extern Variable Declarations -------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Local Type Definitions                        ///
+typedef union AMS_ENS210_DATA
+{
+        uint32_t lword;
+        uint8_t bytes [ 4 ];
+        struct
+        {
+                uint16_t data;
+                uint8_t valid :1;
+                uint8_t crc :7;
+                uint8_t :8;
+        } bit;
+} AmsEns210Data_t;
+
+/// --  END OF: Local Type Definitions --------------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Variable Declarations     ///
+// minimum values sensor can read
+static double temperatureCelsius = -40.0;
+static double temperatureFahrenheit = -40.0;
+static double humidityPercent = 0.0;
+static ULONG sensor_humidity_temperature_thread_wait = 20;
+
+/// --  END OF: Static (file scope) Variable Declarations -- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Global Function Declarations                  ///
+void sensor_humidity_temperature_thread_entry ( void );
+
+/// --  END OF: Global Function Declarations --------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Function Declarations     ///
+static unsigned int sensor_humidity_temperature_formatDataForCloudPublish (
+        const event_sensor_payload_t * const eventPtr, char * payload, size_t payloadLength );
+static bool validateEns210SensorData ( AmsEns210Data_t * value );
+static uint32_t calculateCrc7 ( uint32_t val );
+
+/// --  END OF: Static (file scope) Function Declarations -- ///
+
 /**
  +-------------------------------------------------------------------------------------------------------+
  |Symbol  |   Parameter                 |    Conditions                 | Min  | Typ   | Max   | Unit    |
@@ -50,29 +113,6 @@
  +-------------------------------------------------------------------------------------------------------+
  **/
 
-void sensor_humidity_temperature_thread_entry ( void );
-unsigned int sensor_humidity_temperature_formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr,
-                                                                     char * payload, size_t payloadLength );
-
-double g_temperatureCelsius = -40.0, g_temperatureFahrenheit = -40.0, g_humidityPercent = 0.0; // minimum values sensor can read
-
-typedef union AMS_ENS210_DATA
-{
-        uint32_t lword;
-        uint8_t bytes [ 4 ];
-        struct
-        {
-                uint16_t data;
-                uint8_t valid :1;
-                uint8_t crc :7;
-                uint8_t :8;
-        } bit;
-} AmsEns210Data_t;
-
-bool validateEns210SensorData ( AmsEns210Data_t * value );
-
-ULONG sensor_humidity_temperature_thread_wait = 20;
-
 /* Sensor Humidity and Temperature (AMS EN210) Thread entry function */
 void sensor_humidity_temperature_thread_entry ( void )
 {
@@ -100,36 +140,15 @@ void sensor_humidity_temperature_thread_entry ( void )
     ssp_err_t msgStatus;
 
     const uint8_t sensor_humidity_temperature_thread_id = getUniqueThreadId ();
-
-    //TODO: Fix this hard-coded cloud connectivity dependency
-    bool isCloudConnected = false;
-    do
-    {
-        msgStatus = messageQueuePend ( &sensor_humidity_temperature_thread_message_queue, (void **) &message,
-                                       TX_WAIT_FOREVER );
-
-        if ( msgStatus == SSP_SUCCESS )
-        {
-            if ( message->event_b.class_code == SF_MESSAGE_EVENT_CLASS_SYSTEM )
-            {
-                isCloudConnected = ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE );
-            }
-
-            messageQueueReleaseBuffer ( (void **) &message );
-        }
-    }
-    while ( !isCloudConnected );
-
-    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id,
-                                    sensor_humidity_temperature_formatDataForCloudPublish );
+    registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id, NULL );
 
     err = g_i2c_device_en210_temp_humid.p_api->open ( g_i2c_device_en210_temp_humid.p_ctrl,
                                                       g_i2c_device_en210_temp_humid.p_cfg );
-    APP_ERR_TRAP (err)
+    handleError ( err );
 
     err = g_i2c_device_en210_temp_humid.p_api->write ( g_i2c_device_en210_temp_humid.p_ctrl, ENS210_init_seq,
                                                        sizeof ( ENS210_init_seq ), false, 10 );
-    APP_ERR_TRAP (err)
+    handleError ( err );
 
     tx_thread_sleep ( 13 ); // 122 ms conversion time
 
@@ -148,13 +167,11 @@ void sensor_humidity_temperature_thread_entry ( void )
 
                 if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE )
                 {
-                    isCloudConnected = true;
                     registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id,
                                                     sensor_humidity_temperature_formatDataForCloudPublish );
                 }
                 else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED )
                 {
-                    isCloudConnected = false;
                     registerSensorForCloudPublish ( sensor_humidity_temperature_thread_id, NULL );
                 }
                 else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_BUTTON_S4_PRESSED )
@@ -168,19 +185,19 @@ void sensor_humidity_temperature_thread_entry ( void )
 
         err = g_i2c_device_en210_temp_humid.p_api->write ( g_i2c_device_en210_temp_humid.p_ctrl, &commandTemperature, 1,
                                                            false, 10 );
-        APP_ERR_TRAP (err)
+        handleError ( err );
 
         err = g_i2c_device_en210_temp_humid.p_api->read ( g_i2c_device_en210_temp_humid.p_ctrl,
                                                           temperatureSensorReading.bytes, 3, false, 10 );
-        APP_ERR_TRAP (err)
+        handleError ( err );
 
         err = g_i2c_device_en210_temp_humid.p_api->write ( g_i2c_device_en210_temp_humid.p_ctrl, &commandHumidity, 1,
                                                            false, 10 );
-        APP_ERR_TRAP (err)
+        handleError ( err );
 
         err = g_i2c_device_en210_temp_humid.p_api->read ( g_i2c_device_en210_temp_humid.p_ctrl,
                                                           humiditySensorReading.bytes, 3, false, 10 );
-        APP_ERR_TRAP (err)
+        handleError ( err );
 
         if ( validateEns210SensorData ( &temperatureSensorReading ) == true )
         {
@@ -188,37 +205,36 @@ void sensor_humidity_temperature_thread_entry ( void )
             // float TinC = TinK - 273.15; // Temperature in Celsius
             // float TinF = TinC * 1.8 + 32.0; // Temperature in Fahrenheit
 
-            g_temperatureCelsius = ( ( ( (double) temperatureSensorReading.bit.data ) / 64 ) - 273.15 );
+            temperatureCelsius = ( ( ( (double) temperatureSensorReading.bit.data ) / 64 ) - 273.15 );
 
-            difference = fabs ( g_temperatureCelsius - prevTemperatureCelsius );
+            difference = fabs ( temperatureCelsius - prevTemperatureCelsius );
 
             if ( difference > tempThresholdInCelsius || isForedDataCalculation )
             {
-                g_temperatureFahrenheit = ( ( g_temperatureCelsius * 1.8 ) + 32.0 );
+                temperatureFahrenheit = ( ( temperatureCelsius * 1.8 ) + 32.0 );
 
                 // post Sensor Message
                 postSensorEventMessage ( sensor_humidity_temperature_thread_id, SF_MESSAGE_EVENT_SENSOR_NEW_DATA,
-                                         &g_temperatureFahrenheit );
+                                         &temperatureFahrenheit );
 
-                prevTemperatureCelsius = g_temperatureCelsius;
-//                prevTemperatureFahrenheit = g_temperatureFahrenheit;
+                prevTemperatureCelsius = temperatureCelsius;
             }
         }
 
         if ( validateEns210SensorData ( &humiditySensorReading ) == true )
         {
             // float H = (double) h_data / 512; // relative humidity (in %)
-            g_humidityPercent = ( ( (double) humiditySensorReading.bit.data ) / 512 );
+            humidityPercent = ( ( (double) humiditySensorReading.bit.data ) / 512 );
 
-            difference = fabs ( g_humidityPercent - prevHumidityPercent );
+            difference = fabs ( humidityPercent - prevHumidityPercent );
 
             if ( difference > humidityThresholdInPercent || isForedDataCalculation )
             {
                 // post sensor message
                 postSensorEventMessage ( sensor_humidity_temperature_thread_id, SF_MESSAGE_EVENT_SENSOR_NEW_DATA,
-                                         &g_humidityPercent );
+                                         &humidityPercent );
 
-                prevHumidityPercent = g_humidityPercent;
+                prevHumidityPercent = humidityPercent;
             }
         }
 
@@ -226,22 +242,9 @@ void sensor_humidity_temperature_thread_entry ( void )
     }
 }
 
-uint32_t calculateCrc7 ( uint32_t val );
-
 // Compute the CRC-7 of 'val' (should only have 17 bits)
 uint32_t calculateCrc7 ( uint32_t val )
 {
-    // 7654 3210
-    // Polynomial 0b 1000 1001 ~ x^7+x^3+x^0
-    // 0x 8 9
-#define CRC7WIDTH 7 // 7 bits CRC has polynomial of 7th order (has 8 terms)
-#define CRC7POLY 0x89 // The 8 coefficients of the polynomial
-#define CRC7IVEC 0x7F // Initial vector has all 7 bits high
-    // Payload data
-#define DATA7WIDTH 17
-#define DATA7MASK ((1UL<<DATA7WIDTH)-1) // 0b 0 1111 1111 1111 1111
-#define DATA7MSB (1UL<<(DATA7WIDTH-1)) // 0b 1 0000 0000 0000 0000
-
     // Setup polynomial
     uint32_t pol = CRC7POLY;
 
@@ -286,52 +289,24 @@ bool validateEns210SensorData ( AmsEns210Data_t * value )
     return false;
 }
 
-#if 0
-
-bool parseSensorData ( float * destination, uint8_t byte2, uint8_t byte1, uint8_t byte0 );
-
-bool parseSensorData ( float * destination, uint8_t byte2, uint8_t byte1, uint8_t byte0 )
-{
-    uint32_t wordValue = ( uint32_t ) ( ( byte2 << 16 ) | ( byte1 << 8 ) | ( byte0 ) );
-    uint32_t sensorData = ( uint32_t ) ( ( wordValue >> 0 ) & 0xFFFF );
-    uint32_t validBit = ( wordValue >> 16 ) & 0x1;
-
-    if ( validBit == 1 )
-    {
-        uint32_t dataCrc = ( wordValue >> 17 ) & 0x7F;
-        // Check the CRC
-        uint32_t crcPayload = ( wordValue >> 0 ) & 0x1FFFF;
-        uint32_t calculatedCrc = calculateCrc7 ( crcPayload );
-        if ( calculatedCrc == dataCrc )
-        {
-            ( *destination ) = (float) wordValue;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-#endif
-
 unsigned int sensor_humidity_temperature_formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr,
                                                                      char * payload, size_t payloadLength )
 {
     int bytesProcessed = 0;
     if ( eventPtr != NULL )
     {
-        if ( ( eventPtr->dataPointer ) == &g_temperatureFahrenheit )
+        if ( ( eventPtr->dataPointer ) == &temperatureFahrenheit )
         {
             // it's a temperature publish event
             bytesProcessed = snprintf ( payload, payloadLength,
                                         "{\"temperature\":{\"fahrenheit\": %.3f,\"celsius\": %.3f}}",
-                                        g_temperatureFahrenheit, g_temperatureCelsius );
+                                        temperatureFahrenheit, temperatureCelsius );
         }
-        else if ( ( eventPtr->dataPointer ) == &g_humidityPercent )
+        else if ( ( eventPtr->dataPointer ) == &humidityPercent )
         {
             // it's a humidity publish event
             bytesProcessed = snprintf ( payload, payloadLength, "{\"relative_humidity\":{\"percent\":%.3f}}",
-                                        g_humidityPercent );
+                                        humidityPercent );
         }
     }
 

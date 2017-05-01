@@ -17,8 +17,26 @@
 #include "event_sensor_api.h"
 #include "event_config_api.h"
 
+/// -------------------------------------------------------- ///
+///   SECTION: Macro Definitions                             ///
 #define KEY_VALUE_DELIMITER   '\n'
 
+/// --  END OF: Macro Definitions -------------------------  ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Global/extern Variable Declarations           ///
+///                        -- None --                        ///
+
+/// --  END OF: Global/extern Variable Declarations -------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Local Type Definitions                        ///
+///                        -- None --                        ///
+
+/// --  END OF: Local Type Definitions --------------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Variable Declarations     ///
 static sf_message_post_cfg_t post_cfg =
 {   .priority = 3, .p_callback = NULL, .p_context = NULL};
 
@@ -27,6 +45,20 @@ static sf_message_post_err_t post_err =
 
 static sf_message_acquire_cfg_t acquire_cfg =
 {   .buffer_keep = false};
+
+/// --  END OF: Static (file scope) Variable Declarations -- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Global Function Declarations                  ///
+///                        -- None --                        ///
+
+/// --  END OF: Global Function Declarations --------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Function Declarations     ///
+///                        -- None --                        ///
+
+/// --  END OF: Static (file scope) Function Declarations -- ///
 
 ssp_err_t messageQueuePend ( TX_QUEUE * queue, void ** message, ULONG wait_option )
 {
@@ -93,8 +125,11 @@ ssp_err_t postSensorEventMessage ( uint8_t threadId, sf_message_event_t eventCod
     return status;
 }
 
-ssp_err_t postConfigEventMessage ( uint8_t threadId, sf_message_event_t eventCode, stringDataFunction dataFunctionPtr )
+ssp_err_t postConfigEventMessage ( uint8_t threadId, sf_message_event_t eventCode,
+                                   stringDataFunction_t dataFunctionPtr )
 {
+    SSP_PARAMETER_NOT_USED ( dataFunctionPtr );
+
     event_config_payload_t* message;
     ssp_err_t status = messageQueueAcquireBuffer ( (void **) &message );
     if ( status == SSP_SUCCESS )
@@ -102,7 +137,7 @@ ssp_err_t postConfigEventMessage ( uint8_t threadId, sf_message_event_t eventCod
         message->header.event_b.class_code = SF_MESSAGE_EVENT_CLASS_CONFIG;
         message->header.event_b.code = eventCode;
         message->senderId = threadId;
-        message->stringDataFunctionPtr = dataFunctionPtr;
+//        message->stringDataFunctionPtr = dataFunctionPtr;
 
         status = messageQueuePost ( (void **) &message );
 
@@ -179,7 +214,12 @@ bool readValueForKey ( const char * buffer, const size_t bufferSize, const char 
 
                 if ( valueEnd != NULL )
                 {
-                    int valueLength = min ( ( valueEnd - valueStart ), maxValueLength );
+                    int lengthDifference = ( valueEnd - valueStart );
+                    int valueLength = maxValueLength;
+                    if ( lengthDifference < maxValueLength )
+                    {
+                        valueLength = lengthDifference;
+                    }
                     memcpy ( value, valueStart, (size_t) valueLength );
                     value [ valueLength ] = 0;
                     retVal = true;
@@ -209,3 +249,26 @@ bool readValueForKey ( const char * buffer, const size_t bufferSize, const char 
 
     return retVal;
 }
+
+//char * translateLogLevel ( LogLevel_t level )
+//{
+//    switch ( level )
+//    {
+//        case ERROR :
+//            return "ERROR";
+//        case WARN :
+//            return "WARN";
+//        case INFO :
+//            return "INFO";
+//        case DEBUG :
+//            return "DEBUG";
+//        case TRACE :
+//            return "TRACE";
+//        case NONE :
+//            return "NONE";
+//        default :
+//            return "NOT-DEFINED";
+//    }
+//    return "NONE";
+//}
+

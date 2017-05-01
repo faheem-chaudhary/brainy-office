@@ -17,6 +17,8 @@
 #include "nx_dns.h"
 #include "libemqtt_netx_impl.h"
 
+/// -------------------------------------------------------- ///
+///   SECTION: Macro Definitions                             ///
 #define M1_CONFIG_VALUE_LENGTH  33
 #define M1_API_KEY_VALUE_LENGTH 65
 
@@ -26,8 +28,16 @@
 #define MQTT_CONF_USERNAME_LENGTH   (M1_CONFIG_VALUE_LENGTH + M1_CONFIG_VALUE_LENGTH + 2)
 #define MQTT_CONF_PASSWORD_LENGTH   (M1_CONFIG_VALUE_LENGTH + M1_API_KEY_VALUE_LENGTH + 2)
 
-bool mqttReconnect ();
+/// --  END OF: Macro Definitions -------------------------  ///
 
+/// -------------------------------------------------------- ///
+///   SECTION: Global/extern Variable Declarations           ///
+extern NX_DNS g_dns_client;
+
+/// --  END OF: Global/extern Variable Declarations -------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Local Type Definitions                        ///
 typedef struct
 {
         char name [ M1_CONFIG_VALUE_LENGTH ];
@@ -40,8 +50,29 @@ typedef struct
 
 } MediumOneDeviceCredentials_t;
 
-MediumOneDeviceCredentials_t g_mediumOneDeviceCredentials;
-MqttConnection_t g_mqttConnection;
+/// --  END OF: Local Type Definitions --------------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Variable Declarations     ///
+static MediumOneDeviceCredentials_t mediumOneDeviceCredentials;
+static MqttConnection_t mqttConnection;
+static int connectFailureRetries = 0;
+static char topic_name [ 255 ];
+static char publishMessageBuffer [ 512 ];
+
+/// --  END OF: Static (file scope) Variable Declarations -- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Global Function Declarations                  ///
+///                        -- None --                        ///
+
+/// --  END OF: Global Function Declarations --------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Function Declarations     ///
+static bool mqttReconnect ();
+
+/// --  END OF: Static (file scope) Function Declarations -- ///
 
 unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
 {
@@ -90,22 +121,19 @@ unsigned int mediumOneConfigImpl ( char * configData, size_t dataLength )
 
     if ( keysRead == 7 )
     {
-        memcpy ( g_mediumOneDeviceCredentials.name, m1Creds.name, M1_CONFIG_VALUE_LENGTH );
-        memcpy ( g_mediumOneDeviceCredentials.apiKey, m1Creds.apiKey, M1_API_KEY_VALUE_LENGTH );
-        memcpy ( g_mediumOneDeviceCredentials.projectId, m1Creds.projectId, M1_CONFIG_VALUE_LENGTH );
-        memcpy ( g_mediumOneDeviceCredentials.userId, m1Creds.userId, M1_CONFIG_VALUE_LENGTH );
-        memcpy ( g_mediumOneDeviceCredentials.password, m1Creds.password, M1_CONFIG_VALUE_LENGTH );
-        memcpy ( g_mediumOneDeviceCredentials.hostName, m1Creds.hostName, M1_API_KEY_VALUE_LENGTH );
-        g_mediumOneDeviceCredentials.port = m1Creds.port;
+        memcpy ( mediumOneDeviceCredentials.name, m1Creds.name, M1_CONFIG_VALUE_LENGTH );
+        memcpy ( mediumOneDeviceCredentials.apiKey, m1Creds.apiKey, M1_API_KEY_VALUE_LENGTH );
+        memcpy ( mediumOneDeviceCredentials.projectId, m1Creds.projectId, M1_CONFIG_VALUE_LENGTH );
+        memcpy ( mediumOneDeviceCredentials.userId, m1Creds.userId, M1_CONFIG_VALUE_LENGTH );
+        memcpy ( mediumOneDeviceCredentials.password, m1Creds.password, M1_CONFIG_VALUE_LENGTH );
+        memcpy ( mediumOneDeviceCredentials.hostName, m1Creds.hostName, M1_API_KEY_VALUE_LENGTH );
+        mediumOneDeviceCredentials.port = m1Creds.port;
 
         return keysRead;
     }
 
     return 0;
 }
-
-char g_topic_name [ 255 ];
-extern NX_DNS g_dns_client;
 
 unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
 {
@@ -114,36 +142,36 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
 
     int status = 0;
 
-    sprintf ( g_mqttConnection.userName, "%s/%s", g_mediumOneDeviceCredentials.projectId,
-              g_mediumOneDeviceCredentials.userId );
-    sprintf ( g_mqttConnection.password, "%s/%s", g_mediumOneDeviceCredentials.apiKey,
-              g_mediumOneDeviceCredentials.password );
+    sprintf ( mqttConnection.userName, "%s/%s", mediumOneDeviceCredentials.projectId,
+              mediumOneDeviceCredentials.userId );
+    sprintf ( mqttConnection.password, "%s/%s", mediumOneDeviceCredentials.apiKey,
+              mediumOneDeviceCredentials.password );
 
     { // resolve the hostName to IP Address
-        nx_dns_host_by_name_get ( &g_dns_client, (UCHAR *) g_mediumOneDeviceCredentials.hostName,
-                                  &g_mqttConnection.hostIpAddress, TX_WAIT_FOREVER );
+        nx_dns_host_by_name_get ( &g_dns_client, (UCHAR *) mediumOneDeviceCredentials.hostName,
+                                  &mqttConnection.hostIpAddress, TX_WAIT_FOREVER );
 
-        g_mqttConnection.port = (unsigned short) g_mediumOneDeviceCredentials.port;
-        g_mqttConnection.isKeepAlive = true;
-        g_mqttConnection.keepAliveDelay = 60;
-        g_mqttConnection.isRetryOnDisconnect = true;
-        g_mqttConnection.retrylimit = 5;
-        g_mqttConnection.retryDelay = 5;
+        mqttConnection.port = (unsigned short) mediumOneDeviceCredentials.port;
+        mqttConnection.isKeepAlive = true;
+        mqttConnection.keepAliveDelay = 60;
+        mqttConnection.isRetryOnDisconnect = true;
+        mqttConnection.retrylimit = 5;
+        mqttConnection.retryDelay = 5;
 #if (LIBEMQTT_NETX_SOCKETS_IMPL==LIBEMQTT_NETX_IMPL_DEFAULT)
-        g_mqttConnection.ipStackPtr = &g_ip;
+        mqttConnection.ipStackPtr = &g_ip;
 #endif
     }
 
     mqtt_netx_disconnect (); // Just in case if there is any socket residue, clean it up first.
-    status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
+    status = mqtt_netx_connect ( mediumOneDeviceCredentials.name, &mqttConnection );
 
     if ( status == 1 )
     {
         //TODO: Setup Subscription function here, at some point in time
 
         ///    0/<project_mqtt_id>/<user_mqtt_id>/<device_id>/
-        sprintf ( g_topic_name, "0/%s/%s/%s", g_mediumOneDeviceCredentials.projectId,
-                  g_mediumOneDeviceCredentials.userId, g_mediumOneDeviceCredentials.name );
+        sprintf ( topic_name, "0/%s/%s/%s", mediumOneDeviceCredentials.projectId, mediumOneDeviceCredentials.userId,
+                  mediumOneDeviceCredentials.name );
 
         mediumOnePublishImpl ( "{\"connected\":true}", 0 );
         tx_thread_sleep ( 50 ); // wait for half a second to let the message processed by the broker
@@ -152,22 +180,21 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
     return ( status == 1 );
 }
 
-char g_publishMessageBuffer [ 512 ];
 unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
 {
     SSP_PARAMETER_NOT_USED ( messageLength );
 
-    int status = sprintf ( g_publishMessageBuffer, "{\"event_data\":{\"%s\":%s}}", g_mediumOneDeviceCredentials.name,
+    int status = sprintf ( publishMessageBuffer, "{\"event_data\":{\"%s\":%s}}", mediumOneDeviceCredentials.name,
                            message );
     if ( status > 0 )
     {
-        status = mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
+        status = mqtt_netx_publish ( topic_name, publishMessageBuffer, 0 );
 
         if ( status <= 0 ) // Connection Issues, try to connect again
         {
             if ( mqttReconnect () == true )
             {
-                status = mqtt_netx_publish ( g_topic_name, g_publishMessageBuffer, 0 );
+                status = mqtt_netx_publish ( topic_name, publishMessageBuffer, 0 );
             }
         }
     }
@@ -177,7 +204,7 @@ unsigned int mediumOnePublishImpl ( char * message, size_t messageLength )
 
 void mediumOneHouseKeepImpl ( void )
 {
-    if ( g_mqttConnection.isKeepAlive )
+    if ( mqttConnection.isKeepAlive )
     {
         int status = mqtt_netx_ping ();
 
@@ -188,20 +215,25 @@ void mediumOneHouseKeepImpl ( void )
     }
 }
 
-int g_connectFailureRetries = 0;
 bool mqttReconnect ()
 {
     int status;
 
     mqtt_netx_disconnect ();
-    status = mqtt_netx_connect ( g_mediumOneDeviceCredentials.name, &g_mqttConnection );
+
+    // test if NetX stack is working.  HostName should resolve in order to make it to application protocol.  Otherwise, make it a system trap
+    handleError (
+            nx_dns_host_by_name_get ( &g_dns_client, (UCHAR *) mediumOneDeviceCredentials.hostName,
+                                      &mqttConnection.hostIpAddress, TX_WAIT_FOREVER ) );
+
+    status = mqtt_netx_connect ( mediumOneDeviceCredentials.name, &mqttConnection );
 
     if ( status == 1 )
     {
         char reconnectMessage [ 256 ];
         sprintf ( reconnectMessage, "{\"event_data\":{\"%s\":{\"reconnected\":true}}}",
-                  g_mediumOneDeviceCredentials.name );
-        status = mqtt_netx_publish ( g_topic_name, reconnectMessage, 0 );
+                  mediumOneDeviceCredentials.name );
+        status = mqtt_netx_publish ( topic_name, reconnectMessage, 0 );
 
         if ( status > 0 )
         {
@@ -210,10 +242,10 @@ bool mqttReconnect ()
     }
     else
     {
-        g_connectFailureRetries++;
+        connectFailureRetries++;
 
         // Make a hard reboot, and let system take care of it
-        if ( g_connectFailureRetries > 5 )
+        if ( connectFailureRetries > 5 )
         {
             NVIC_SystemReset ();
         }

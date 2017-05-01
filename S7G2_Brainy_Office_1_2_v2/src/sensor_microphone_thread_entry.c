@@ -3,17 +3,51 @@
 #include "sf_message_api.h"
 #include "bsp_cfg.h"
 
+/// -------------------------------------------------------- ///
+///   SECTION: Macro Definitions                             ///
+///                        -- None --                        ///
+
+/// --  END OF: Macro Definitions -------------------------  ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Global/extern Variable Declarations           ///
+///                        -- None --                        ///
+
+/// --  END OF: Global/extern Variable Declarations -------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Local Type Definitions                        ///
+///                        -- None --                        ///
+
+/// --  END OF: Local Type Definitions --------------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Variable Declarations     ///
+static uint32_t sampleAverageCount = 2000U;        // Sampling at 4Khz, average over .5 sec
+static uint16_t noiseLevelMin = 20U;
+static uint16_t noiseLevelMax = 200U;
+static volatile uint16_t max_sound;
+static volatile uint16_t sound_level = 0;
+static volatile uint16_t prev_sound_level = 0;
+static volatile int sound_level_difference = 0;
+static ULONG sensor_microphone_thread_wait = 10; //TX_WAIT_FOREVER;
+static uint8_t sensor_microphone_thread_id;
+
+/// --  END OF: Static (file scope) Variable Declarations -- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Global Function Declarations                  ///
+void sensor_microphone_thread_entry ( void );
 void g_adc_framework_microphone_callback ( sf_adc_periodic_callback_args_t * p_args );
-unsigned int sensor_microphone_formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr,
-                                                           char * payload, size_t payloadLength );
 
-uint32_t g_sampleAverageCount = 2000U;        // Sampling at 4Khz, average over .5 sec
-uint16_t g_noiseLevelMin = 20U;
-uint16_t g_noiseLevelMax = 200U;
+/// --  END OF: Global Function Declarations --------------- ///
 
-ULONG sensor_microphone_thread_wait = 10; //TX_WAIT_FOREVER;
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Function Declarations     ///
+static unsigned int sensor_microphone_formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr,
+                                                                  char * payload, size_t payloadLength );
 
-uint8_t g_sensor_microphone_thread_id;
+/// --  END OF: Static (file scope) Function Declarations -- ///
 
 /* Sensor Microphone (ICS-40181) Thread entry function */
 void sensor_microphone_thread_entry ( void )
@@ -22,8 +56,8 @@ void sensor_microphone_thread_entry ( void )
     sf_message_header_t * message;
     ssp_err_t msgStatus;
 
-    g_sensor_microphone_thread_id = getUniqueThreadId ();
-    registerSensorForCloudPublish ( g_sensor_microphone_thread_id, NULL );
+    sensor_microphone_thread_id = getUniqueThreadId ();
+    registerSensorForCloudPublish ( sensor_microphone_thread_id, NULL );
 
     /*
      * We have to setup the PGA for the MIC input because the SSP dosen't support it yet...
@@ -42,7 +76,7 @@ void sensor_microphone_thread_entry ( void )
     p_adc->ADPGAGS0_b.P000GAIN = 1; // Gain of 2.5
 
     err = g_sf_adc_periodic0.p_api->start ( g_sf_adc_periodic0.p_ctrl );
-    APP_ERR_TRAP (err)
+    handleError ( err );
 
     while ( 1 )
     {
@@ -58,17 +92,16 @@ void sensor_microphone_thread_entry ( void )
                     //TODO: anything related to System Message Processing goes here
                     if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE )
                     {
-                        registerSensorForCloudPublish ( g_sensor_microphone_thread_id,
+                        registerSensorForCloudPublish ( sensor_microphone_thread_id,
                                                         sensor_microphone_formatDataForCloudPublish );
                     }
                     else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED )
                     {
-                        registerSensorForCloudPublish ( g_sensor_microphone_thread_id, NULL );
+                        registerSensorForCloudPublish ( sensor_microphone_thread_id, NULL );
                     }
                     else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED )
                     {
-                        postSensorEventMessage ( g_sensor_microphone_thread_id, SF_MESSAGE_EVENT_SENSOR_NEW_DATA,
-                                                 NULL );
+                        postSensorEventMessage ( sensor_microphone_thread_id, SF_MESSAGE_EVENT_SENSOR_NEW_DATA, NULL );
                     }
                     break;
             }
@@ -77,11 +110,6 @@ void sensor_microphone_thread_entry ( void )
         }
     }
 }
-
-volatile uint16_t max_sound;
-volatile uint16_t g_sound_level = 0;
-volatile uint16_t g_prev_sound_level = 0;
-volatile int g_difference = 0;
 
 void g_adc_framework_microphone_callback ( sf_adc_periodic_callback_args_t * p_args )
 {
@@ -101,27 +129,27 @@ void g_adc_framework_microphone_callback ( sf_adc_periodic_callback_args_t * p_a
 
     sample_count++;
 
-    if ( sample_count > g_sampleAverageCount )
+    if ( sample_count > sampleAverageCount )
     {
         sample_count = 0;
-        g_sound_level = ( uint16_t ) ( max - min );
+        sound_level = ( uint16_t ) ( max - min );
         max = 0U;
         min = 4095U;
 
-        if ( g_sound_level > max_sound )
+        if ( sound_level > max_sound )
         {
-            max_sound = g_sound_level;
+            max_sound = sound_level;
         }
 
-        g_difference = g_sound_level - g_prev_sound_level;
-        uint16_t difference = (uint16_t) abs ( g_difference );
+        sound_level_difference = sound_level - prev_sound_level;
+        uint16_t difference = (uint16_t) abs ( sound_level_difference );
 
-        if ( difference > g_noiseLevelMin )
+        if ( difference > noiseLevelMin )
         {
-            postSensorEventMessage ( g_sensor_microphone_thread_id, SF_MESSAGE_EVENT_SENSOR_NEW_DATA, NULL );
+            postSensorEventMessage ( sensor_microphone_thread_id, SF_MESSAGE_EVENT_SENSOR_NEW_DATA, NULL );
         }
 
-        g_prev_sound_level = g_sound_level;
+        prev_sound_level = sound_level;
     }
 }
 
@@ -134,7 +162,8 @@ unsigned int sensor_microphone_formatDataForCloudPublish ( const event_sensor_pa
         // it's a temperature publish event
         bytesProcessed = snprintf ( payload, payloadLength,
                                     "{\"noise\":{\"current_level\": %d, \"previous_level\":%d, \"difference\":%d}}",
-                                    g_sound_level, ( g_sound_level - g_difference ), abs ( g_difference ) );
+                                    sound_level, ( sound_level - sound_level_difference ),
+                                    abs ( sound_level_difference ) );
     }
 
     if ( bytesProcessed < 0 )

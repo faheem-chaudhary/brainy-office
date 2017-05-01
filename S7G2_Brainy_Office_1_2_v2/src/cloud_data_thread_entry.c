@@ -7,32 +7,81 @@
 #include "sf_message.h"
 #include "tx_api.h"
 
-bool configureUSBCloudProvisioning ();
+/// -------------------------------------------------------- ///
+///   SECTION: Macro Definitions                             ///
+#define __CLOUD_ADAPTER_MEDIUM_ONE__    1
+#define __CLOUD_ADAPTER_BUG_LABS__      2
 
-void processConfigMessage ( event_config_payload_t *configEventMsg );
-void processSensorMessage ( event_sensor_payload_t *sensorEventMsg );
-void processSystemMessage ( event_system_payload_t *systemEventMsg );
+#define __CLOUD_SERVICE_CONNECTOR__ __CLOUD_ADAPTER_MEDIUM_ONE__
 
-ULONG cloud_data_thread_wait = 5;
+#define CURR_NET_STATUS_BIT_MASK    0x02
+#define CURR_CLOUD_PROV_BIT_MASK    0x01
+#define CURR_CLOUD_INIT_BIT_MASK    0x04
+#define isCloudConnectable  ((cloudInitImpl!=NULL)&&((cloudAvailabilityStatus&0x3)==0x3))
+#define isCloudAvailable    ((cloudPublishImpl!=NULL)&&((cloudAvailabilityStatus&0x7)==0x7))
 
-uint8_t g_cloud_data_thread_id;
+#define CLOUD_MESSAGE_BUFFER_LENGTH   256
+#define CONFIG_FILE "config.txt"
 
-/// Configuration function to set the Cloud Implementation Adapter
-/// @param [in]  configImpl  Implementation Function Pointer to setup Cloud Connection.  Use NULL to remove the existing implementation.
-/// @param [in]  initImpl    Implementation Function Pointer to initialize Cloud Connection.  Use NULL to remove the existing implementation.  This function will be called right after successful execution of configImpl and is not NULL.  This function will also be called whenever network connection is successfully established.
-/// @param [in]  publishImpl   Implementation Function Pointer to publish payload to cloud.  Use NULL to remove the existing implementation.
-void setCloudImplementationFunctions ( stringDataFunction configImpl, stringDataFunction initImpl,
-                                       stringDataFunction publishImpl, void (*houseKeepImpl) ( void ) );
+/// --  END OF: Macro Definitions -------------------------  ///
 
-void (*g_houseKeepImpl) ( void ) = NULL;
+/// -------------------------------------------------------- ///
+///   SECTION: Global/extern Variable Declarations           ///
+extern FX_MEDIA * gp_media;
+
+/// --  END OF: Global/extern Variable Declarations -------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Local Type Definitions                        ///
+///                        -- None --                        ///
+
+/// --  END OF: Local Type Definitions --------------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Variable Declarations     ///
+static ULONG cloud_data_thread_wait = 5;
+static uint8_t cloud_data_thread_id;
+static stringDataFunction_t cloudPublishImpl = NULL;
+static stringDataFunction_t cloudConfigImpl = NULL;
+static stringDataFunction_t cloudInitImpl = NULL;
+static cloudHouseKeepFunction_t cloudHouseKeepImpl = NULL;
+static sensorFormatFunction_t registeredCloudPublishers [ MAX_THREAD_COUNT ] =
+{ NULL };
+static int cloudAvailabilityStatus = 0;
+static char cloudMessageBuffer [ CLOUD_MESSAGE_BUFFER_LENGTH ];
+
+/// --  END OF: Static (file scope) Variable Declarations -- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Global Function Declarations                  ///
+void cloud_data_thread_entry ( void );
+
+/// --  END OF: Global Function Declarations --------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Function Declarations     ///
+static bool cloud_data_thread_provisionFromUsbConfiguration ();
+static void cloud_data_thread_processConfigMessage ( event_config_payload_t *configEventMsg );
+static void cloud_data_thread_processSensorMessage ( event_sensor_payload_t *sensorEventMsg );
+static void cloud_data_thread_processSystemMessage ( event_system_payload_t *systemEventMsg );
+
+/// --  END OF: Static (file scope) Function Declarations -- ///
 
 /* Cloud Data Thread entry function */
 void cloud_data_thread_entry ( void )
 {
-    g_cloud_data_thread_id = getUniqueThreadId ();
+    cloud_data_thread_id = getUniqueThreadId ();
 
-    setCloudImplementationFunctions ( mediumOneConfigImpl, mediumOneInitImpl, mediumOnePublishImpl,
-                                      mediumOneHouseKeepImpl );
+#if ( __CLOUD_SERVICE_CONNECTOR__ == __CLOUD_ADAPTER_MEDIUM_ONE__ )
+
+    cloudPublishImpl = mediumOnePublishImpl;
+    cloudConfigImpl = mediumOneConfigImpl;
+    cloudInitImpl = mediumOneInitImpl;
+    cloudHouseKeepImpl = mediumOneHouseKeepImpl;
+
+#elif ( __CLOUD_SERVICE_CONNECTOR__ == __CLOUD_ADAPTER_BUG_LABS__ )
+
+#endif
 
     sf_message_header_t * message;
     ssp_err_t msgStatus;
@@ -46,19 +95,18 @@ void cloud_data_thread_entry ( void )
 
         if ( msgStatus == SSP_SUCCESS )
         {
-            // TODO: Process System Message here
             switch ( message->event_b.class_code )
             {
                 case SF_MESSAGE_EVENT_CLASS_CONFIG :
-                    processConfigMessage ( (event_config_payload_t *) message );
+                    cloud_data_thread_processConfigMessage ( (event_config_payload_t *) message );
                     break;
 
                 case SF_MESSAGE_EVENT_CLASS_SENSOR :
-                    processSensorMessage ( (event_sensor_payload_t *) message );
+                    cloud_data_thread_processSensorMessage ( (event_sensor_payload_t *) message );
                     break;
 
                 case SF_MESSAGE_EVENT_CLASS_SYSTEM :
-                    processSystemMessage ( (event_system_payload_t *) message );
+                    cloud_data_thread_processSystemMessage ( (event_system_payload_t *) message );
                     break;
             }
 
@@ -69,45 +117,27 @@ void cloud_data_thread_entry ( void )
             // if any error other than empty queue
         }
 
-        if ( g_houseKeepImpl != NULL )
+        if ( cloudHouseKeepImpl != NULL )
         {
             currTime = tx_time_get ();
             if ( currTime - prevTime >= houseKeepInterval )
             {
                 prevTime = currTime;
-                g_houseKeepImpl ();
+                cloudHouseKeepImpl ();
             }
         }
     }
 }
 
-stringDataFunction g_cloudPublishImpl = NULL;
-stringDataFunction g_cloudConfigImpl = NULL;
-stringDataFunction g_cloudInitImpl = NULL;
-
-sensorFormatFunction g_registeredSenders [ MAX_THREAD_COUNT ] =
-{ NULL };
-
-extern FX_MEDIA * gp_media;
-
-void registerSensorForCloudPublish ( uint8_t threadId, sensorFormatFunction cloudDataFormatter )
+void registerSensorForCloudPublish ( uint8_t threadId, sensorFormatFunction_t cloudDataFormatter )
 {
     if ( threadId < MAX_THREAD_COUNT )
     {
-        g_registeredSenders [ threadId ] = cloudDataFormatter;
+        registeredCloudPublishers [ threadId ] = cloudDataFormatter;
     }
 }
 
-void setCloudImplementationFunctions ( stringDataFunction configImpl, stringDataFunction initImpl,
-                                       stringDataFunction publishImpl, void (*houseKeepImpl) ( void ) )
-{
-    g_cloudPublishImpl = publishImpl;
-    g_cloudConfigImpl = configImpl;
-    g_cloudInitImpl = initImpl;
-    g_houseKeepImpl = houseKeepImpl;
-}
-
-void processConfigMessage ( event_config_payload_t *configEventMsg )
+void cloud_data_thread_processConfigMessage ( event_config_payload_t *configEventMsg )
 {
     switch ( configEventMsg->header.event_b.code )
     {
@@ -119,35 +149,24 @@ void processConfigMessage ( event_config_payload_t *configEventMsg )
     }
 }
 
-#define CURR_NET_STATUS_BIT_MASK    0x02
-#define CURR_CLOUD_PROV_BIT_MASK    0x01
-#define CURR_CLOUD_INIT_BIT_MASK    0x04
-
-int g_cloudAvailabilityStatus = 0;
-
-#define isCloudConnectable  ((g_cloudInitImpl!=NULL)&&((g_cloudAvailabilityStatus&0x3)==0x3))
-#define isCloudAvailable    ((g_cloudPublishImpl!=NULL)&&((g_cloudAvailabilityStatus&0x7)==0x7))
-
-#define BUFFER_LENGTH   256
-char buffer [ BUFFER_LENGTH ];
-
-void processSensorMessage ( event_sensor_payload_t *sensorEventMsg )
+void cloud_data_thread_processSensorMessage ( event_sensor_payload_t *sensorEventMsg )
 {
     switch ( sensorEventMsg->header.event_b.code )
     {
         case SF_MESSAGE_EVENT_SENSOR_NEW_DATA :
             if ( isCloudAvailable )
             {
-                if ( g_registeredSenders [ sensorEventMsg->senderId ] != NULL )
+                if ( registeredCloudPublishers [ sensorEventMsg->senderId ] != NULL )
                 {
                     // Get the data Payload
-                    unsigned int dataLength = g_registeredSenders [ sensorEventMsg->senderId ] ( sensorEventMsg, buffer,
-                    BUFFER_LENGTH );
+                    unsigned int dataLength = registeredCloudPublishers [ sensorEventMsg->senderId ] (
+                            sensorEventMsg, cloudMessageBuffer,
+                            CLOUD_MESSAGE_BUFFER_LENGTH );
 
                     if ( dataLength > 0 )
                     {
                         // publish to Implemented Adapter
-                        g_cloudPublishImpl ( buffer, dataLength );
+                        cloudPublishImpl ( cloudMessageBuffer, dataLength );
                     }
                 }
             }
@@ -155,7 +174,7 @@ void processSensorMessage ( event_sensor_payload_t *sensorEventMsg )
     }
 }
 
-void processSystemMessage ( event_system_payload_t *systemEventMsg )
+void cloud_data_thread_processSystemMessage ( event_system_payload_t *systemEventMsg )
 {
     bool existingCloudConnectable = isCloudConnectable;
     bool existingCloudAvailability = isCloudAvailable;
@@ -163,23 +182,23 @@ void processSystemMessage ( event_system_payload_t *systemEventMsg )
     switch ( systemEventMsg->header.event_b.code )
     {
         case SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE :
-            g_cloudAvailabilityStatus |= CURR_NET_STATUS_BIT_MASK;
+            cloudAvailabilityStatus |= CURR_NET_STATUS_BIT_MASK;
             break;
 
         case SF_MESSAGE_EVENT_SYSTEM_USB_STORAGE_READY :
             //TODO: Provision from USB
-            if ( configureUSBCloudProvisioning () == true )
+            if ( cloud_data_thread_provisionFromUsbConfiguration () == true )
             {
-                g_cloudAvailabilityStatus |= CURR_CLOUD_PROV_BIT_MASK;
+                cloudAvailabilityStatus |= CURR_CLOUD_PROV_BIT_MASK;
             }
             else
             {
-                g_cloudAvailabilityStatus &= ~CURR_CLOUD_PROV_BIT_MASK;
+                cloudAvailabilityStatus &= ~CURR_CLOUD_PROV_BIT_MASK;
             }
             break;
 
         case SF_MESSAGE_EVENT_SYSTEM_NETWORK_DISCONNECTED :
-            g_cloudAvailabilityStatus &= ~CURR_NET_STATUS_BIT_MASK;
+            cloudAvailabilityStatus &= ~CURR_NET_STATUS_BIT_MASK;
             break;
 
         case SF_MESSAGE_EVENT_SYSTEM_USB_STORAGE_REMOVED :
@@ -188,29 +207,27 @@ void processSystemMessage ( event_system_payload_t *systemEventMsg )
 
     if ( existingCloudConnectable == false && isCloudConnectable )
     {
-        if ( g_cloudInitImpl ( NULL, 0 ) )
+        if ( cloudInitImpl ( NULL, 0 ) )
         {
-            g_cloudAvailabilityStatus |= CURR_CLOUD_INIT_BIT_MASK;
+            cloudAvailabilityStatus |= CURR_CLOUD_INIT_BIT_MASK;
             // publish Cloud available system message
 
-            postSystemEventMessage ( g_cloud_data_thread_id, SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE );
+            postSystemEventMessage ( cloud_data_thread_id, SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE );
         }
         else
         {
-            g_cloudAvailabilityStatus &= ~CURR_CLOUD_INIT_BIT_MASK;
+            cloudAvailabilityStatus &= ~CURR_CLOUD_INIT_BIT_MASK;
         }
     }
 
     if ( existingCloudAvailability == true && !isCloudAvailable )
     {
         // publish Cloud NOT available system message
-        postSystemEventMessage ( g_cloud_data_thread_id, SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED );
+        postSystemEventMessage ( cloud_data_thread_id, SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED );
     }
 }
 
-#define CONFIG_FILE "config.txt"
-
-bool configureUSBCloudProvisioning ()
+bool cloud_data_thread_provisionFromUsbConfiguration ()
 {
     UINT keysRead = 0;
     FX_FILE file;
@@ -220,7 +237,7 @@ bool configureUSBCloudProvisioning ()
     char configurationBuffer [ bufferSize ];
     ULONG bytesRead;
 
-    if ( g_cloudConfigImpl != NULL )
+    if ( cloudConfigImpl != NULL )
     {
         status = fx_file_open ( gp_media, &file, CONFIG_FILE, FX_OPEN_FOR_READ );
 
@@ -229,7 +246,7 @@ bool configureUSBCloudProvisioning ()
             if ( fx_file_read ( &file, configurationBuffer, bufferSize, &bytesRead ) == FX_SUCCESS )
             {
                 // bytesRead will contain the number of bytes read, from this call
-                keysRead = g_cloudConfigImpl ( configurationBuffer, bytesRead );
+                keysRead = cloudConfigImpl ( configurationBuffer, bytesRead );
             }
 
             fx_file_close ( &file );

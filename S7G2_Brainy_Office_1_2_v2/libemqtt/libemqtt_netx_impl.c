@@ -37,29 +37,55 @@
 #include <stdio.h>
 #include <string.h>
 //#include <unistd.h>
-
 #if (LIBEMQTT_NETX_SOCKETS_IMPL==LIBEMQTT_NETX_IMPL_BSD)
     #include "nx_bsd.h"
     #elif(LIBEMQTT_NETX_SOCKETS_IMPL==LIBEMQTT_NETX_IMPL_DEFAULT)
     #include "nx_api.h"
 #endif
 
+/// -------------------------------------------------------- ///
+///   SECTION: Macro Definitions                             ///
 #define RCVBUFSIZE 1024
-uint8_t packet_buffer [ RCVBUFSIZE ];
 
-mqtt_broker_handle_t g_broker;
-NX_TCP_SOCKET tcpSocket;
+/// --  END OF: Macro Definitions -------------------------  ///
 
-uint32_t g_serverDisconnectCount = 0;
+/// -------------------------------------------------------- ///
+///   SECTION: Global/extern Variable Declarations           ///
+///                        -- None --                        ///
 
-void socketUrgentDataCallback ( NX_TCP_SOCKET * socketPtr );
-void socketDisconnectCallback ( NX_TCP_SOCKET * socketPtr );
+/// --  END OF: Global/extern Variable Declarations -------- ///
 
-//void alive ( int sig );
-int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * connection );
-int send_packet ( void* socket_info, const void* buf, unsigned int count );
-int read_packet ( mqtt_broker_handle_t* broker, int timeout );
-int loadBufferFromNetXSocket ( NX_TCP_SOCKET * socketPtr, unsigned int bufferStartIndex, int timeout );
+/// -------------------------------------------------------- ///
+///   SECTION: Local Type Definitions                        ///
+///                        -- None --                        ///
+
+/// --  END OF: Local Type Definitions --------------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Variable Declarations     ///
+static uint8_t packet_buffer [ RCVBUFSIZE ];
+static mqtt_broker_handle_t g_broker;
+static NX_TCP_SOCKET tcpSocket;
+static uint32_t g_serverDisconnectCount = 0;
+
+/// --  END OF: Static (file scope) Variable Declarations -- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Global Function Declarations                  ///
+///                        -- None --                        ///
+
+/// --  END OF: Global Function Declarations --------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Function Declarations     ///
+static void socketUrgentDataCallback ( NX_TCP_SOCKET * socketPtr );
+static void socketDisconnectCallback ( NX_TCP_SOCKET * socketPtr );
+static int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * connection );
+static int send_packet ( void* socket_info, const void* buf, unsigned int count );
+static int read_packet ( mqtt_broker_handle_t* broker, int timeout );
+static int loadBufferFromNetXSocket ( NX_TCP_SOCKET * socketPtr, unsigned int bufferStartIndex, int timeout );
+
+/// --  END OF: Static (file scope) Function Declarations -- ///
 
 int init_netx_socket ( mqtt_broker_handle_t* broker, const MqttConnection_t * connection )
 {

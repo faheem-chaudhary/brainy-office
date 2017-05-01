@@ -1,38 +1,50 @@
 #include "sys_blinker_thread.h"
 #include "commons.h"
 
+/// -------------------------------------------------------- ///
+///   SECTION: Macro Definitions                             ///
 #define TOTAL_LED_COUNT 3
 
-ULONG sys_blinker_thread_wait = 10;
+/// --  END OF: Macro Definitions -------------------------  ///
 
-void ledToggle ( LED _led );
-void ledOn ( LED _led );
-void ledOff ( LED _led );
+/// -------------------------------------------------------- ///
+///   SECTION: Global/extern Variable Declarations           ///
+///                        -- None --                        ///
 
-void ledToggle ( LED _led )
-{
-    ioport_level_t ledValue;
-    g_ioport.p_api->pinRead ( g_bsp_leds.p_leds [ _led ], &ledValue );
-    g_ioport.p_api->pinWrite ( g_bsp_leds.p_leds [ _led ], !ledValue );
-}
+/// --  END OF: Global/extern Variable Declarations -------- ///
 
-void ledOn ( LED _led )
-{
-    g_ioport.p_api->pinWrite ( g_bsp_leds.p_leds [ _led ], LED_ON );
-}
-
-void ledOff ( LED _led )
-{
-    g_ioport.p_api->pinWrite ( g_bsp_leds.p_leds [ _led ], LED_OFF );
-}
-
+/// -------------------------------------------------------- ///
+///   SECTION: Local Type Definitions                        ///
 typedef enum
 {
-    OFF = 0, TOGGLE = 1, ON = 2,
+    OFF = 0,    //
+    TOGGLE = 1, //
+    ON = 2,
 } LedMode_t;
 
-LedMode_t ledModes [ TOTAL_LED_COUNT ] =
+/// --  END OF: Local Type Definitions --------------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Variable Declarations     ///
+static ULONG sys_blinker_thread_wait = 10;
+static LedMode_t ledModes [ TOTAL_LED_COUNT ] =
 { OFF };
+
+/// --  END OF: Static (file scope) Variable Declarations -- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Global Function Declarations                  ///
+void sys_blinker_thread_entry ( void );
+
+/// --  END OF: Global Function Declarations --------------- ///
+
+/// -------------------------------------------------------- ///
+///   SECTION: Static (file scope) Function Declarations     ///
+static void ledToggle ( LED _led );
+static void ledOn ( LED _led );
+static void ledOff ( LED _led );
+
+/// --  END OF: Static (file scope) Function Declarations -- ///
 
 // System Blinker Thread entry function
 void sys_blinker_thread_entry ( void )
@@ -71,31 +83,15 @@ void sys_blinker_thread_entry ( void )
                     case SF_MESSAGE_EVENT_SYSTEM_USB_STORAGE_REMOVED :
                         ledModes [ AMBER ]--;
                         break;
-
-                    case SF_MESSAGE_EVENT_SYSTEM_BUTTON_S4_PRESSED :
-                        ledModes [ RED ] = ON;
-                        break;
-
-                    case SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED :
-                        ledModes [ RED ] = OFF;
-                        break;
                 }
             }
             else if ( message->event_b.class_code == SF_MESSAGE_EVENT_CLASS_SENSOR )
             {
                 ledModes [ GREEN ] = TOGGLE;
             }
-            else if ( message->event_b.class_code == SF_MESSAGE_EVENT_CLASS_TOUCH )
-            {
-                if ( ledModes [ RED ] != ON )
-                {
-                    ledModes [ RED ] = ON;
-                }
-                else
-                {
-                    ledModes [ RED ] = OFF;
-                }
-            }
+//            else if ( message->event_b.class_code == SF_MESSAGE_EVENT_CLASS_TOUCH )
+//            {
+//            }
 
             messageQueueReleaseBuffer ( (void **) &message );
         }
@@ -123,3 +119,21 @@ void sys_blinker_thread_entry ( void )
         }
     }
 }
+
+void ledToggle ( LED _led )
+{
+    ioport_level_t ledValue;
+    g_ioport.p_api->pinRead ( g_bsp_leds.p_leds [ _led ], &ledValue );
+    g_ioport.p_api->pinWrite ( g_bsp_leds.p_leds [ _led ], !ledValue );
+}
+
+void ledOn ( LED _led )
+{
+    g_ioport.p_api->pinWrite ( g_bsp_leds.p_leds [ _led ], LED_ON );
+}
+
+void ledOff ( LED _led )
+{
+    g_ioport.p_api->pinWrite ( g_bsp_leds.p_leds [ _led ], LED_OFF );
+}
+

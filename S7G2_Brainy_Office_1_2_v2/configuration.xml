@@ -234,9 +234,13 @@
     <event display="System Cloud Disconnected" value="SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED"/>
     <event display="System Button S4 Pressed" value="SF_MESSAGE_EVENT_SYSTEM_BUTTON_S4_PRESSED"/>
     <event display="System Button S5 Pressed" value="SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED"/>
+    <event display="System File Logging Available" value="SF_MESSAGE_EVENT_SYSTEM_FILE_LOGGING_AVAILABLE"/>
+    <event display="System File Logging Unavailable" value="SF_MESSAGE_EVENT_SYSTEM_FILE_LOGGING_UNAVAILABLE"/>
+    <event display="Logging New Data" value="SF_MESSAGE_EVENT_LOGGING_NEW_DATA"/>
     <eventClass display="System" header="event_system_api.h" id="eventClass.1095746090" payload="event_system_payload" payloadType="event_system_payload_t" value="SF_MESSAGE_EVENT_CLASS_SYSTEM"/>
     <eventClass display="Sensor" header="event_sensor_api.h" id="eventClass.1363358315" payload="event_sensor_payload" payloadType="event_sensor_payload_t" value="SF_MESSAGE_EVENT_CLASS_SENSOR"/>
     <eventClass display="Config" header="event_config_api.h" id="eventClass.1942317328" payload="event_config_payload" payloadType="event_config_payload_t" value="SF_MESSAGE_EVENT_CLASS_CONFIG"/>
+    <eventClass display="Logging" header="event_logging_api.h" id="eventClass.1488822318" payload="event_logging_payload" payloadType="event_logging_payload_t" value="SF_MESSAGE_EVENT_CLASS_LOGGING"/>
     <subscriber context="rtos.threadx.thread.733700626" end="0" id="subscriber.1787569172" start="0"/>
     <subscriber context="rtos.threadx.thread.721736288" end="0" id="subscriber.1015849023" start="0">
       <subscribe eventClass="module.framework.sf_touch_panel.eventClass.eventClassTouch"/>
@@ -249,7 +253,12 @@
       <subscribe eventClass="eventClass.1942317328"/>
     </subscriber>
     <subscriber context="rtos.threadx.thread.1517547309" end="0" id="subscriber.449652337" start="0"/>
-    <subscriber context="rtos.threadx.thread.924298567" end="0" id="subscriber.1610198113" start="0"/>
+    <subscriber context="rtos.threadx.thread.924298567" end="0" id="subscriber.1610198113" start="0">
+      <subscribe eventClass="eventClass.1095746090"/>
+      <subscribe eventClass="eventClass.1363358315"/>
+      <subscribe eventClass="eventClass.1942317328"/>
+      <subscribe eventClass="eventClass.1488822318"/>
+    </subscriber>
     <subscriber context="rtos.threadx.thread.2138308075" end="0" id="subscriber.1319785664" start="0">
       <subscribe eventClass="eventClass.1095746090"/>
       <subscribe eventClass="eventClass.1363358315"/>
@@ -607,11 +616,6 @@
         </stack>
         <stack module="module.external.ex_touch_panel_i2c_sx8654_on_ex_touch_panel_i2c_sx8654.619982185" requires="module.framework.sf_touch_panel_on_sf_touch_panel_i2c.requires.ex_touch_panel"/>
       </stack>
-      <object id="rtos.threadx.object.mutex.1157569269">
-        <property id="rtos.threadx.object.mutex.name" value="Generate Thread ID Mutex"/>
-        <property id="rtos.threadx.object.mutex.symbol" value="g_generate_thread_id_mutex"/>
-        <property id="rtos.threadx.object.mutex.inherit" value="rtos.threadx.object.mutex.inherit.disabled"/>
-      </object>
     </context>
     <context id="rtos.threadx.thread.721736288">
       <property id="_symbol" value="sys_blinker_thread"/>
@@ -666,9 +670,9 @@
     <context id="rtos.threadx.thread.924298567">
       <property id="_symbol" value="sys_file_logger_thread"/>
       <property id="rtos.threadx.thread.name" value="System File Logger Thread"/>
-      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.stack" value="4096"/>
       <property id="rtos.threadx.thread.priority" value="7"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
       <property id="rtos.threadx.thread.timeslice" value="1"/>
     </context>
     <context id="rtos.threadx.thread.2138308075">
