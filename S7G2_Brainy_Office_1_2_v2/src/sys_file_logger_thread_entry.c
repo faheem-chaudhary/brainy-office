@@ -9,7 +9,7 @@
 #define FILE_LOG_MESSAGE_BUFFER_LENGTH      256
 #define LOG_FILE_SIZE_LIMIT                 (128*1024)
 #define FILE_NAME_LENGTH                    32
-#define FILE_NAME_EXTENSION                 "csv"
+//#define FILE_NAME_EXTENSION                 "csv"
 #define ERROR_LOG_SINGLE_MESSAGE_MAX_LENGTH 256
 #define ERROR_LOG_MESSAGE_BUFFER_SIZE       8
 
@@ -26,6 +26,7 @@ extern FX_MEDIA* gp_media; // global pointer to USB media
 typedef struct LogFileDescriptor
 {
         char fileNamePrefix [ 7 ];
+        char fileNameExtension [ 4 ];
         FX_FILE file;
         char fileName [ FILE_NAME_LENGTH ];
         char fileExtension [ 4 ];
@@ -84,6 +85,7 @@ void sys_file_logger_thread_entry ( void )
     tx_mutex_create ( &errorLogEventMutex, (CHAR *) "Error Log Event Mutex", TX_NO_INHERIT );
 
     strcpy ( logFileDescriptor.fileNamePrefix, "system" );
+    strcpy ( logFileDescriptor.fileNameExtension, "log" );
 
     while ( 1 )
     {
@@ -126,12 +128,13 @@ void sys_file_logger_thread_processConfigMessage ( event_config_payload_t *confi
     }
 }
 
-void registerSensorForFileLogging ( uint8_t threadId, const char * fileNameStart,
+void registerSensorForFileLogging ( uint8_t threadId, const char * fileNameStart, const char * fileExtension,
                                     stringDataFunction_t fileHeaderFormatter, sensorFormatFunction_t logDataFormatter )
 {
     if ( threadId < MAX_THREAD_COUNT )
     {
         strncpy ( registeredFileLogPublishers [ threadId ].fileDescriptor.fileNamePrefix, fileNameStart, 6 );
+        strncpy ( registeredFileLogPublishers [ threadId ].fileDescriptor.fileNameExtension, fileExtension, 3 );
         registeredFileLogPublishers [ threadId ].fileDescriptor.fileNamePrefix [ 6 ] = '\0';
         registeredFileLogPublishers [ threadId ].headerFormatter = fileHeaderFormatter;
         registeredFileLogPublishers [ threadId ].dataFormatter = logDataFormatter;
@@ -221,7 +224,7 @@ UINT openLogFile ( LogFileDescriptor_t * fileDescriptor, stringDataFunction_t he
             do
             {
                 sprintf ( fileDescriptor->fileName, "%s_%04X.%s", fileDescriptor->fileNamePrefix,
-                          fileDescriptor->fileNameCounter, FILE_NAME_EXTENSION );
+                          fileDescriptor->fileNameCounter, fileDescriptor->fileNameExtension );
                 fileDescriptor->fileNameCounter++;
                 fileStatus = fx_file_create ( gp_media, fileDescriptor->fileName );
             }

@@ -58,8 +58,7 @@ void sys_network_thread_entry ( void )
     {
         { // Wait for init to finish.
             ULONG status;
-            handleError (
-                    nx_ip_interface_status_check ( &g_ip, 0, NX_IP_LINK_ENABLED, &status, NX_WAIT_FOREVER ) );
+            handleError ( nx_ip_interface_status_check ( &g_ip, 0, NX_IP_LINK_ENABLED, &status, NX_WAIT_FOREVER ) );
         }
 
         { // DHCP Setup
@@ -120,6 +119,16 @@ void sys_network_thread_entry ( void )
                 if ( message->event_b.class_code == SF_MESSAGE_EVENT_CLASS_SYSTEM )
                 {
                     //TODO: anything related to System Message Processing goes here
+                    if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_BUTTON_S4_PRESSED )
+                    {
+                        logInfo ( "Button %s is pressed", "S4" );
+                    }
+                    else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED )
+                    {
+                        logDebug ( "Button S-5 is pressed with code: %d", SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED );
+                        UINT testError = 3;
+                        handleError ( testError );
+                    }
                 }
 
                 messageQueueReleaseBuffer ( (void **) &message );

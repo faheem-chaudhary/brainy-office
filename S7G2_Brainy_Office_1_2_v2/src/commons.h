@@ -154,15 +154,14 @@ void registerSensorForCloudPublish ( uint8_t threadId, sensorFormatFunction_t cl
 ///                                     This identifier will become part of the log file name, and will help in
 ///                                     avoiding confusion of getting all the logs from all the sensorts into the
 ///                                     same file.
+/// @param [in]  fileExtension          Max of Three(3)-letter extension of log file.  Good examples are "log" or "csv".
 /// @param [in]  fileHeaderFormatter    String function that will be called to add the header line whenever a new file
 ///                                     for the sensor is generated.  This function can return empty string, if no header
 ///                                     line log is required.
 /// @param [in]  logDataFormatter       Implementation Function Pointer to format data for File Logging
-void registerSensorForFileLogging ( uint8_t threadId, const char * fileNameStart,
+void registerSensorForFileLogging ( uint8_t threadId, const char * fileNameStart, const char * fileExtension,
                                     stringDataFunction_t fileHeaderFormatter, sensorFormatFunction_t logDataFormatter );
 
-//char * translateLogLevel ( LogLevel_t level );
-//
 bool logApplicationEvent ( const char *format, ... );
 
 bool readValueForKey ( const char * buffer, const size_t bufferSize, const char * key, const int maxValueLength,

@@ -106,13 +106,13 @@ void sensor_temperature_thread_entry ( void )
                             break;
 
                         case SF_MESSAGE_EVENT_SYSTEM_FILE_LOGGING_AVAILABLE :
-                            registerSensorForFileLogging ( sensor_temperature_thread_id, "temp",
+                            registerSensorForFileLogging ( sensor_temperature_thread_id, "temperature", "csv",
                                                            sensor_temperature_formatFileHeader,
                                                            sensor_temperature_formatDataForFileLogging );
                             break;
 
                         case SF_MESSAGE_EVENT_SYSTEM_FILE_LOGGING_UNAVAILABLE :
-                            registerSensorForFileLogging ( sensor_temperature_thread_id, "", NULL, NULL );
+                            registerSensorForFileLogging ( sensor_temperature_thread_id, "", "", NULL, NULL );
                             break;
                     }
                     break;
@@ -194,15 +194,15 @@ unsigned int sensor_temperature_formatDataForCloudPublish ( const event_sensor_p
     return (unsigned int) bytesProcessed;
 }
 
-static unsigned int sensor_temperature_formatFileHeader ( char * payload, size_t payloadLength )
+unsigned int sensor_temperature_formatFileHeader ( char * payload, size_t payloadLength )
 {
     char * header = "temperature_fahrenheit,temperature_celsius";
     snprintf ( payload, payloadLength, "%s", header );
     return strlen ( header );
 }
 
-static unsigned int sensor_temperature_formatDataForFileLogging ( const event_sensor_payload_t * const eventPtr,
-                                                                  char * payload, size_t payloadLength )
+unsigned int sensor_temperature_formatDataForFileLogging ( const event_sensor_payload_t * const eventPtr,
+                                                           char * payload, size_t payloadLength )
 {
     int bytesProcessed = 0;
     if ( eventPtr != NULL )

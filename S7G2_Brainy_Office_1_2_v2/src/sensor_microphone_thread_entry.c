@@ -46,6 +46,9 @@ void g_adc_framework_microphone_callback ( sf_adc_periodic_callback_args_t * p_a
 ///   SECTION: Static (file scope) Function Declarations     ///
 static unsigned int sensor_microphone_formatDataForCloudPublish ( const event_sensor_payload_t * const eventPtr,
                                                                   char * payload, size_t payloadLength );
+static unsigned int sensor_microphone_formatFileHeader ( char * payload, size_t payloadLength );
+static unsigned int sensor_microphone_formatDataForFileLogging ( const event_sensor_payload_t * const eventPtr,
+                                                                 char * payload, size_t payloadLength );
 
 /// --  END OF: Static (file scope) Function Declarations -- ///
 
@@ -90,18 +93,28 @@ void sensor_microphone_thread_entry ( void )
 
                 case SF_MESSAGE_EVENT_CLASS_SYSTEM :
                     //TODO: anything related to System Message Processing goes here
-                    if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE )
+                    switch ( message->event_b.code )
                     {
-                        registerSensorForCloudPublish ( sensor_microphone_thread_id,
-                                                        sensor_microphone_formatDataForCloudPublish );
-                    }
-                    else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED )
-                    {
-                        registerSensorForCloudPublish ( sensor_microphone_thread_id, NULL );
-                    }
-                    else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED )
-                    {
-                        postSensorEventMessage ( sensor_microphone_thread_id, SF_MESSAGE_EVENT_SENSOR_NEW_DATA, NULL );
+                        case SF_MESSAGE_EVENT_SYSTEM_CLOUD_AVAILABLE :
+                            registerSensorForCloudPublish ( sensor_microphone_thread_id,
+                                                            sensor_microphone_formatDataForCloudPublish );
+                            break;
+                        case SF_MESSAGE_EVENT_SYSTEM_CLOUD_DISCONNECTED :
+                            registerSensorForCloudPublish ( sensor_microphone_thread_id, NULL );
+                            break;
+                        case SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED :
+                            postSensorEventMessage ( sensor_microphone_thread_id, SF_MESSAGE_EVENT_SENSOR_NEW_DATA,
+                                                     NULL );
+                            break;
+                        case SF_MESSAGE_EVENT_SYSTEM_FILE_LOGGING_AVAILABLE :
+                            registerSensorForFileLogging ( sensor_microphone_thread_id, "mic", "csv",
+                                                           sensor_microphone_formatFileHeader,
+                                                           sensor_microphone_formatDataForFileLogging );
+                            break;
+
+                        case SF_MESSAGE_EVENT_SYSTEM_FILE_LOGGING_UNAVAILABLE :
+                            registerSensorForFileLogging ( sensor_microphone_thread_id, "", "", NULL, NULL );
+                            break;
                     }
                     break;
             }
@@ -164,6 +177,31 @@ unsigned int sensor_microphone_formatDataForCloudPublish ( const event_sensor_pa
                                     "{\"noise\":{\"current_level\": %d, \"previous_level\":%d, \"difference\":%d}}",
                                     sound_level, ( sound_level - sound_level_difference ),
                                     abs ( sound_level_difference ) );
+    }
+
+    if ( bytesProcessed < 0 )
+    {
+        return 0;
+    }
+
+    return (unsigned int) bytesProcessed;
+}
+
+unsigned int sensor_microphone_formatFileHeader ( char * payload, size_t payloadLength )
+{
+    char * header = "current_level,previous_level,difference";
+    snprintf ( payload, payloadLength, "%s", header );
+    return strlen ( header );
+}
+
+unsigned int sensor_microphone_formatDataForFileLogging ( const event_sensor_payload_t * const eventPtr, char * payload,
+                                                          size_t payloadLength )
+{
+    int bytesProcessed = 0;
+    if ( eventPtr != NULL )
+    {
+        bytesProcessed = snprintf ( payload, payloadLength, "%d,%d,%d\n", sound_level,
+                                    ( sound_level - sound_level_difference ), abs ( sound_level_difference ) );
     }
 
     if ( bytesProcessed < 0 )
