@@ -261,40 +261,44 @@ bool logApplicationEvent ( const char *format, ... )
     bool retVal = false;
     event_logging_payload_t* message;
 
-    tx_mutex_get ( &errorLogEventMutex, TX_WAIT_FOREVER );
-
-    uint8_t nextIndex = ( uint8_t ) ( errorLogMessageBufferHead + 1 );
-
-    if ( nextIndex >= ERROR_LOG_MESSAGE_BUFFER_SIZE ) // roll over
+    if ( isUsbAvailable == true && ( gp_media != NULL ) )
     {
-        nextIndex = 0;
-    }
 
-    if ( nextIndex != errorLogMessageBufferTail )
-    {
-        va_list args;
-        va_start ( args, format );
-        vsprintf ( errorLogMessageBuffer [ errorLogMessageBufferHead ], format, args );
-        va_end ( args );
-        errorLogMessageBufferHead = nextIndex;
-        retVal = true;
-    }
+        tx_mutex_get ( &errorLogEventMutex, TX_WAIT_FOREVER );
 
-    tx_mutex_put ( &errorLogEventMutex );
+        uint8_t nextIndex = ( uint8_t ) ( errorLogMessageBufferHead + 1 );
 
-    if ( retVal == true ) // if everything is good, publish a logging event
-    {
-        ssp_err_t status = messageQueueAcquireBuffer ( (void **) &message );
-        if ( status == SSP_SUCCESS )
+        if ( nextIndex >= ERROR_LOG_MESSAGE_BUFFER_SIZE ) // roll over
         {
-            message->header.event_b.class_code = SF_MESSAGE_EVENT_CLASS_LOGGING;
-            message->header.event_b.code = SF_MESSAGE_EVENT_LOGGING_NEW_DATA;
+            nextIndex = 0;
+        }
 
-            status = messageQueuePost ( (void **) &message );
+        if ( nextIndex != errorLogMessageBufferTail )
+        {
+            va_list args;
+            va_start ( args, format );
+            vsprintf ( errorLogMessageBuffer [ errorLogMessageBufferHead ], format, args );
+            va_end ( args );
+            errorLogMessageBufferHead = nextIndex;
+            retVal = true;
+        }
 
-            if ( status != SSP_SUCCESS )
+        tx_mutex_put ( &errorLogEventMutex );
+
+        if ( retVal == true ) // if everything is good, publish a logging event
+        {
+            ssp_err_t status = messageQueueAcquireBuffer ( (void **) &message );
+            if ( status == SSP_SUCCESS )
             {
-                messageQueueReleaseBuffer ( (void **) &message );
+                message->header.event_b.class_code = SF_MESSAGE_EVENT_CLASS_LOGGING;
+                message->header.event_b.code = SF_MESSAGE_EVENT_LOGGING_NEW_DATA;
+
+                status = messageQueuePost ( (void **) &message );
+
+                if ( status != SSP_SUCCESS )
+                {
+                    messageQueueReleaseBuffer ( (void **) &message );
+                }
             }
         }
     }
@@ -339,3 +343,24 @@ void sys_file_logger_thread_processLogMessage ( event_logging_payload_t *logging
     }
 }
 
+// compiler switch: -finstrument-functions
+// __attribute__((no_instrument_function))
+// __attribute__ ((destructor))
+// __attribute__ ((constructor))
+
+//__attribute__((no_instrument_function))
+//void __cyg_profile_func_enter ( void *this_fn, void *call_site )
+//{
+//    if ( isUsbAvailable == true && ( gp_media != NULL ) )
+//    {
+//    }
+//}
+//
+//__attribute__((no_instrument_function))
+//void __cyg_profile_func_exit ( void *this_fn, void *call_site )
+//{
+//    if ( isUsbAvailable == true && ( gp_media != NULL ) )
+//    {
+//    }
+//}
+//

@@ -174,6 +174,7 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
                   mediumOneDeviceCredentials.name );
 
         mediumOnePublishImpl ( "{\"connected\":true}", 0 );
+        connectFailureRetries = 0;
         tx_thread_sleep ( 50 ); // wait for half a second to let the message processed by the broker
     }
 
@@ -242,13 +243,13 @@ bool mqttReconnect ()
     }
     else
     {
-        connectFailureRetries++;
+//        connectFailureRetries++;
 
         // Make a hard reboot, and let system take care of it
-        if ( connectFailureRetries > 5 )
-        {
-            NVIC_SystemReset ();
-        }
+//        if ( connectFailureRetries > 5 )
+//        {
+        NVIC_SystemReset ();
+//        }
     }
 
     return ( status > 0 );

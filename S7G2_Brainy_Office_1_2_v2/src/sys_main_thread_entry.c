@@ -66,6 +66,7 @@ void sys_main_thread_entry ( void )
     }
 }
 
+__attribute__((no_instrument_function))
 UINT usb_host_event_notification_callback ( ULONG event, UX_HOST_CLASS * class, VOID * instance )
 {
     UINT status = TX_SUCCESS;
@@ -129,12 +130,14 @@ uint8_t getUniqueThreadId ()
     return threadId;
 }
 
+__attribute__((no_instrument_function))
 void button_s4_irq11_callback ( external_irq_callback_args_t * p_args )
 {
     SSP_PARAMETER_NOT_USED ( p_args );
     postSystemEventMessage ( get_sys_main_thread_Id (), SF_MESSAGE_EVENT_SYSTEM_BUTTON_S4_PRESSED );
 }
 
+__attribute__((no_instrument_function))
 void button_s5_irq10_callback ( external_irq_callback_args_t * p_args )
 {
     SSP_PARAMETER_NOT_USED ( p_args );

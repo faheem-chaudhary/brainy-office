@@ -196,7 +196,7 @@ unsigned int sensor_temperature_formatDataForCloudPublish ( const event_sensor_p
 
 unsigned int sensor_temperature_formatFileHeader ( char * payload, size_t payloadLength )
 {
-    char * header = "temperature_fahrenheit,temperature_celsius";
+    char * header = "temperature_fahrenheit,temperature_celsius\n";
     snprintf ( payload, payloadLength, "%s", header );
     return strlen ( header );
 }

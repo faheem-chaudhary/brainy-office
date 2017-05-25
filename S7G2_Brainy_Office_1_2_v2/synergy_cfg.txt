@@ -788,6 +788,14 @@ Synergy Configuration
         I2C Implementation: SCI I2C
         Channel: 8
         
+  Thread "Hack Reboot Thread"
+    Symbol: hack_reboot_thread
+    Name: Hack Reboot Thread
+    Stack size (bytes): 1024
+    Priority: 1
+    Auto start: Enabled
+    Time slicing interval (ticks): 1
+    
   Messaging
     Event "System Network Available"
       Symbol: SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE

@@ -125,7 +125,8 @@ void sys_network_thread_entry ( void )
                     }
                     else if ( message->event_b.code == SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED )
                     {
-                        logDebug ( "Button S-5 is pressed with code: %d", SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED );
+                        logDebug ( "Button S-5 is pressed with code: %d ... rebooting now!!!",
+                                   SF_MESSAGE_EVENT_SYSTEM_BUTTON_S5_PRESSED );
                         UINT testError = 3;
                         handleError ( testError );
                     }
@@ -143,6 +144,7 @@ void sys_network_thread_entry ( void )
     }
 }
 
+__attribute__((no_instrument_function))
 void setMacAddress ( nx_mac_address_t *p_mac_config )
 {
     //  REA's Vendor MAC range: 00:30:55:xx:xx:xx

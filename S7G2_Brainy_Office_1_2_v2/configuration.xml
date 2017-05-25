@@ -753,6 +753,14 @@
         <stack module="module.framework.sf_i2c_bus_on_sf_i2c.846094286" requires="module.framework.sf_i2c_on_sf_i2c.requires.sf_i2c_bus"/>
       </stack>
     </context>
+    <context id="rtos.threadx.thread.156912166">
+      <property id="_symbol" value="hack_reboot_thread"/>
+      <property id="rtos.threadx.thread.name" value="Hack Reboot Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="1"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="1"/>
+    </context>
     <config id="config.el.ux_v2"/>
     <config id="config.el.nx_dhcp_client">
       <property id="config.el.nx_dhcp_client.priority" value="3"/>

@@ -124,6 +124,7 @@ void sensor_microphone_thread_entry ( void )
     }
 }
 
+__attribute__((no_instrument_function))
 void g_adc_framework_microphone_callback ( sf_adc_periodic_callback_args_t * p_args )
 {
     static uint16_t sample_count = 0;
@@ -189,7 +190,7 @@ unsigned int sensor_microphone_formatDataForCloudPublish ( const event_sensor_pa
 
 unsigned int sensor_microphone_formatFileHeader ( char * payload, size_t payloadLength )
 {
-    char * header = "current_level,previous_level,difference";
+    char * header = "current_level,previous_level,difference\n";
     snprintf ( payload, payloadLength, "%s", header );
     return strlen ( header );
 }
