@@ -63,6 +63,16 @@
                                     }
     #endif
 
+    #define ENABLE_DEBUG_TRACE_LOGGING  0x01
+    #if ( ENABLE_DEBUG_TRACE_LOGGING == 0x01 )
+static unsigned int __loggingIndentLevel__ = 0;
+        #define __enter__(format,...) logApplicationEvent("%*s[ENTER]: %s:%d:%s ( "format" )\r\n",(4*__loggingIndentLevel__++),"",__FILE__,__LINE__,__func__,##__VA_ARGS__);
+        #define __exit__(format,...)  logApplicationEvent("%*s [EXIT]: %s:%d:%s -> "format"\r\n",(4*__loggingIndentLevel__--),"",__FILE__,__LINE__,__func__,##__VA_ARGS__);
+    #else
+        #define __enter__(format,...)
+        #define __exit__(format,...)
+    #endif
+
 /// --  END OF: Macro Definitions -------------------------  ///
 
 /// -------------------------------------------------------- ///

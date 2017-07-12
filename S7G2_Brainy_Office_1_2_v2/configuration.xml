@@ -7,7 +7,7 @@
     <option key="#TargetARCHITECTURE#" value="cortex-m4"/>
     <option key="#RTOS#" value="Express Logic ThreadX"/>
     <option key="#pinconfiguration#" value="S7G2-SK.pincfg"/>
-    <option key="#SSPVersion#" value="1.2.0"/>
+    <option key="#SSPVersion#" value="1.2.1"/>
     <option key="#DefaultLinkerScript#" value="S7G2.ld"/>
     <option key="#ConfigurationFragments#" value="Renesas##BSP##Board##s7g2_sk##"/>
   </generalSettings>
@@ -91,129 +91,129 @@
     <node id="board.clock.fclk.display" option="board.clock.fclk.display.value"/>
   </synergyClockConfiguration>
   <synergyComponentSelection>
-    <component apiversion="" class="BSP" condition="" group="Board" subgroup="s7g2_sk" variant="" vendor="Renesas" version="1.2.0">
-      <description>S7G2_SK Board Support Files</description>
-      <originalPack>Renesas.Synergy_board_s7g2_sk.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="BSP" condition="" group="s7g2" subgroup="device" variant="R7FS7G27H3A01CFC" vendor="Renesas" version="1.2.0">
-      <description>Board support package for R7FS7G27H3A01CFC</description>
-      <originalPack>Renesas.Synergy_mcu_s7g2.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="BSP" condition="" group="s7g2" subgroup="device" variant="" vendor="Renesas" version="1.2.0">
-      <description>Board support package for S7G2</description>
-      <originalPack>Renesas.Synergy_mcu_s7g2.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="BSP" condition="" group="s7g2" subgroup="ssp" variant="" vendor="Renesas" version="1.2.0">
-      <description>Board support package for S7G2</description>
-      <originalPack>Renesas.Synergy_mcu_s7g2.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="Common" condition="" group="all" subgroup="ssp_common" variant="" vendor="Renesas" version="1.2.0">
-      <description>SSP Common Code</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_cgc" variant="" vendor="Renesas" version="1.2.0">
-      <description>Clock Generation Circuit: Provides=[CGC]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_elc" variant="" vendor="Renesas" version="1.2.0">
-      <description>Event Link Controller: Provides=[ELC]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_fmi" variant="" vendor="Renesas" version="1.2.0">
-      <description>Factory MCU Information Module: Provides=[FMI]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_ioport" variant="" vendor="Renesas" version="1.2.0">
-      <description>I/O Port: Provides=[IO Port]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="touch panel" subgroup="touch_panel_i2c_sx8654" variant="" vendor="Renesas" version="1.2.0">
+    <component apiversion="" class="HAL Drivers" condition="" group="touch panel" subgroup="touch_panel_i2c_sx8654" variant="" vendor="Renesas" version="1.2.1">
       <description>TOUCH_PANEL_I2C_SX8654 Drivers</description>
-      <originalPack>Renesas.Synergy_touch_panel_i2c_sx8654.1.2.0.pack</originalPack>
+      <originalPack>Renesas.Synergy_touch_panel_i2c_sx8654.1.2.1.pack</originalPack>
     </component>
-    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_el_ux" variant="" vendor="Renesas" version="1.2.0">
-      <description>Express Logic USBX Synergy Port: Provides=[USBX Driver] , Requires=[USBX ,Transfer]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    <component apiversion="" class="BSP" condition="" group="s7g2" subgroup="device" variant="R7FS7G27H3A01CFC" vendor="Renesas" version="1.2.1">
+      <description>Board support package for R7FS7G27H3A01CFC</description>
+      <originalPack>Renesas.Synergy_mcu_s7g2.1.2.1.pack</originalPack>
     </component>
-    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_external_irq" variant="" vendor="Renesas" version="1.2.0">
-      <description>Framework External IRQ: Provides=[Framework External IRQ] , Requires=[External IRQ ,ThreadX]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    <component apiversion="" class="BSP" condition="" group="s7g2" subgroup="device" variant="" vendor="Renesas" version="1.2.1">
+      <description>Board support package for S7G2</description>
+      <originalPack>Renesas.Synergy_mcu_s7g2.1.2.1.pack</originalPack>
     </component>
-    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_message" variant="" vendor="Renesas" version="1.2.0">
-      <description>Messaging Framework: Provides=[Message] , Requires=[ThreadX]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    <component apiversion="" class="BSP" condition="" group="s7g2" subgroup="ssp" variant="" vendor="Renesas" version="1.2.1">
+      <description>Board support package for S7G2</description>
+      <originalPack>Renesas.Synergy_mcu_s7g2.1.2.1.pack</originalPack>
     </component>
-    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_touch_panel_i2c" variant="" vendor="Renesas" version="1.2.0">
-      <description>Framework Touch Panel using I2C: Provides=[Framework Touch Panel] , Requires=[ThreadX ,Message ,I2C ,Framework External IRQ]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+    <component apiversion="" class="Common" condition="" group="all" subgroup="ssp_common" variant="" vendor="Renesas" version="1.2.1">
+      <description>SSP Common Code</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
     </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_icu" variant="" vendor="Renesas" version="1.2.0">
-      <description>External IRQ: Provides=[External IRQ]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_riic" variant="" vendor="Renesas" version="1.2.0">
-      <description>RIIC: Provides=[I2C Master]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="fx" variant="" vendor="Renesas" version="1.2.0">
-      <description>Express Logic FileX: Provides=[FileX] , Requires=[FileX I/O ,ThreadX]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="tx" variant="" vendor="Renesas" version="1.2.0">
-      <description>Express Logic ThreadX: Provides=[ThreadX]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="ux" variant="" vendor="Renesas" version="1.2.0">
-      <description>Express Logic USBX: Provides=[USBX] , Requires=[ThreadX ,USBX Driver]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="ux_host_class_storage" variant="" vendor="Renesas" version="1.2.0">
-      <description>Express Logic USBX Host Class Storage: Provides=[USBX Host Class Storage] , Requires=[ThreadX ,USBX]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_el_nx" variant="" vendor="Renesas" version="1.2.0">
-      <description>Express Logic NetX Synergy Port: Provides=[NetX Driver] , Requires=[NetX]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="nx" variant="" vendor="Renesas" version="1.2.0">
-      <description>Express Logic NetX: Provides=[NetX] , Requires=[ThreadX ,NetX Driver]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="nx_dhcp" variant="" vendor="Renesas" version="1.2.0">
-      <description>Express Logic NetX DHCP: Provides=[NetX DHCP] , Requires=[NetX]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="nx_dns" variant="" vendor="Renesas" version="1.2.0">
-      <description>Express Logic NetX DNS: Provides=[NetX DNS] , Requires=[NetX]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
-    </component>
-    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_adc_periodic" variant="" vendor="Renesas" version="1.2.0">
+    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_adc_periodic" variant="" vendor="Renesas" version="1.2.1">
       <description>Framework ADC Periodic: Provides=[Framework ADC Periodic] , Requires=[ThreadX ,ADC ,Timer]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
     </component>
-    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_i2c" variant="" vendor="Renesas" version="1.2.0">
+    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_el_nx" variant="" vendor="Renesas" version="1.2.1">
+      <description>Express Logic NetX Synergy Port: Provides=[NetX Driver] , Requires=[NetX]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_el_ux" variant="" vendor="Renesas" version="1.2.1">
+      <description>Express Logic USBX Synergy Port: Provides=[USBX Driver] , Requires=[USBX ,Transfer]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_external_irq" variant="" vendor="Renesas" version="1.2.1">
+      <description>Framework External IRQ: Provides=[Framework External IRQ] , Requires=[External IRQ ,ThreadX]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_i2c" variant="" vendor="Renesas" version="1.2.1">
       <description>Framework I2C: Provides=[Framework I2C] , Requires=[ThreadX ,I2C]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
     </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_adc" variant="" vendor="Renesas" version="1.2.0">
+    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_message" variant="" vendor="Renesas" version="1.2.1">
+      <description>Messaging Framework: Provides=[Message] , Requires=[ThreadX]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Framework Services" condition="" group="all" subgroup="sf_touch_panel_i2c" variant="" vendor="Renesas" version="1.2.1">
+      <description>Framework Touch Panel using I2C: Provides=[Framework Touch Panel] , Requires=[ThreadX ,Message ,I2C ,Framework External IRQ]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_adc" variant="" vendor="Renesas" version="1.2.1">
       <description>A/D Converter: Provides=[ADC]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
     </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_dac" variant="" vendor="Renesas" version="1.2.0">
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_cgc" variant="" vendor="Renesas" version="1.2.1">
+      <description>Clock Generation Circuit: Provides=[CGC]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_dac" variant="" vendor="Renesas" version="1.2.1">
       <description>D/A Converter: Provides=[DAC]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
     </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_dtc" variant="" vendor="Renesas" version="1.2.0">
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_dtc" variant="" vendor="Renesas" version="1.2.1">
       <description>Data Transfer Controller: Provides=[Transfer]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
     </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_gpt" variant="" vendor="Renesas" version="1.2.0">
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_elc" variant="" vendor="Renesas" version="1.2.1">
+      <description>Event Link Controller: Provides=[ELC]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_fmi" variant="" vendor="Renesas" version="1.2.1">
+      <description>Factory MCU Information Module: Provides=[FMI]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_gpt" variant="" vendor="Renesas" version="1.2.1">
       <description>General Purpose Timer: Provides=[Timer ,GPT]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
     </component>
-    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_sci_i2c" variant="" vendor="Renesas" version="1.2.0">
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_icu" variant="" vendor="Renesas" version="1.2.1">
+      <description>External IRQ: Provides=[External IRQ]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_ioport" variant="" vendor="Renesas" version="1.2.1">
+      <description>I/O Port: Provides=[IO Port]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_riic" variant="" vendor="Renesas" version="1.2.1">
+      <description>RIIC: Provides=[I2C Master]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_sci_i2c" variant="" vendor="Renesas" version="1.2.1">
       <description>SCI I2C: Provides=[I2C Master] , Requires=[SCI Common]</description>
-      <originalPack>Renesas.Synergy.1.2.0.pack</originalPack>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="fx" variant="" vendor="Renesas" version="1.2.1">
+      <description>Express Logic FileX: Provides=[FileX] , Requires=[FileX I/O ,ThreadX]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="nx" variant="" vendor="Renesas" version="1.2.1">
+      <description>Express Logic NetX: Provides=[NetX] , Requires=[ThreadX ,NetX Driver]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="tx" variant="" vendor="Renesas" version="1.2.1">
+      <description>Express Logic ThreadX: Provides=[ThreadX]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="ux" variant="" vendor="Renesas" version="1.2.1">
+      <description>Express Logic USBX: Provides=[USBX] , Requires=[ThreadX ,USBX Driver]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="ux_host_class_storage" variant="" vendor="Renesas" version="1.2.1">
+      <description>Express Logic USBX Host Class Storage: Provides=[USBX Host Class Storage] , Requires=[ThreadX ,USBX]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="nx_dhcp" variant="" vendor="Renesas" version="1.2.1">
+      <description>Express Logic NetX DHCP: Provides=[NetX DHCP] , Requires=[NetX]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Express Logic" condition="" group="all" subgroup="nx_dns" variant="" vendor="Renesas" version="1.2.1">
+      <description>Express Logic NetX DNS: Provides=[NetX DNS] , Requires=[NetX]</description>
+      <originalPack>Renesas.Synergy.1.2.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="BSP" condition="" group="Board" subgroup="s7g2_sk" variant="" vendor="Renesas" version="1.2.1">
+      <description>S7G2_SK Board Support Files</description>
+      <originalPack>Renesas.Synergy_board_s7g2_sk.1.2.1.pack</originalPack>
     </component>
   </synergyComponentSelection>
   <synergyIcuConfiguration/>
@@ -296,6 +296,8 @@
       <property id="module.framework.sf_message.work_memory_size" value="4096"/>
       <property id="module.framework.sf_message.pp_subscriber_lists" value="p_subscriber_lists"/>
       <property id="module.framework.sf_message.p_blk_pool_name" value="sf_msg_blk_pool"/>
+      <property id="module.framework.sf_message.init_function" value="sf_message_init0"/>
+      <property id="module.framework.sf_message.init" value="module.framework.sf_message.init.enable"/>
     </module>
     <module id="module.el.nx.ip.1887369973">
       <property id="module.el.nx.ip.name" value="g_ip"/>
@@ -311,12 +313,19 @@
       <property id="module.el.nx.ip.icmp" value="module.el.nx.ip.icmp.enable"/>
       <property id="module.el.nx.ip.igmp" value="module.el.nx.ip.igmp.enable"/>
       <property id="module.el.nx.ip.fragmentation" value="module.el.nx.ip.fragmentation.disable"/>
+      <property id="module.el.nx.ip.init_function" value="ip_init0"/>
+      <property id="module.el.nx.ip.init" value="module.el.nx.ip.init.enable"/>
     </module>
-    <module id="module.el.nx_common.1025156169"/>
+    <module id="module.el.nx_common.1025156169">
+      <property id="module.el.nx_common.init_function" value="nx_common_init0"/>
+      <property id="module.el.nx_common.init" value="module.el.nx_common.init.enable"/>
+    </module>
     <module id="module.el.nx.packet_pool.1545898111">
       <property id="module.el.nx.packet_pool.name" value="g_packet_pool"/>
       <property id="module.el.nx.packet_pool.packet_size" value="1024"/>
       <property id="module.el.nx.packet_pool.number_of_packets" value="64"/>
+      <property id="module.el.nx.packet_pool.init_function" value="packet_pool_init0"/>
+      <property id="module.el.nx.packet_pool.init" value="module.el.nx.packet_pool.init.enable"/>
     </module>
     <module id="module.framework.sf_el_nx.1726779425">
       <property id="module.framework.sf_el_nx.name" value="g_sf_el_nx"/>
@@ -325,9 +334,13 @@
     </module>
     <module id="module.el.nx_dns_client.499936151">
       <property id="module.el.nx_dns_client.name" value="g_dns_client"/>
+      <property id="module.el.nx_dns_client.init_function" value="dns_init0"/>
+      <property id="module.el.nx_dns_client.init" value="module.el.nx_dns_client.init.enable"/>
     </module>
     <module id="module.el.nx_dhcp_client.2061180082">
       <property id="module.el.nx_dhcp_client.name" value="g_dhcp_client"/>
+      <property id="module.el.nx_dhcp_client.init_function" value="dhcp_client_init0"/>
+      <property id="module.el.nx_dhcp_client.init" value="module.el.nx_dhcp_client.init.enable"/>
     </module>
     <module id="module.el.nx_dhcp_common.261721751"/>
     <module id="module.framework.sf_adc_periodic_on_sf_adc_periodic.1842730638">
@@ -337,6 +350,8 @@
       <property id="module.framework.sf_adc_periodic.sample_count" value="1"/>
       <property id="module.framework.sf_adc_periodic.scan_trigger" value="module.framework.sf_adc_periodic.scan_trigger.gpt_channel_0"/>
       <property id="module.framework.sf_adc_periodic.p_callback" value="g_adc_framework_microphone_callback"/>
+      <property id="module.framework.sf_adc_periodic.init_function" value="sf_adc_periodic_init0"/>
+      <property id="module.framework.sf_adc_periodic.init" value="module.framework.sf_adc_periodic.init.enable"/>
     </module>
     <module id="module.driver.adc_on_adc.196131891">
       <property id="module.driver.adc.name" value="g_adc0"/>
@@ -462,11 +477,13 @@
     </module>
     <module id="module.framework.sf_i2c_on_sf_i2c.1780733882">
       <property id="module.framework.sf_i2c.name" value="g_i2c_device_en210_temp_humid"/>
+      <property id="module.framework.sf_i2c.deprecation_warning" value="module.framework.sf_i2c.deprecation_warning.enabled"/>
     </module>
     <module id="module.framework.sf_i2c_bus_on_sf_i2c.1415618611">
       <property id="module.framework.sf_i2c_bus.name" value="g_sf_i2c_shared_bus_chanel_0"/>
       <property id="module.framework.sf_i2c_bus.i2c_interface" value="module.framework.sf_i2c_bus.i2c_interface.sci"/>
       <property id="module.framework.sf_i2c_bus.channel" value="0"/>
+      <property id="module.framework.sf_i2c_bus.deprecation_warning" value="module.framework.sf_i2c_bus.deprecation_warning.enabled"/>
     </module>
     <module id="module.driver.i2c_on_sci_i2c.1214508694">
       <property id="module.driver.i2c.name" value="g_i2c_driver_ens210_temp_humid"/>
@@ -486,13 +503,20 @@
     </module>
     <module id="module.el.ux_host.1638980230">
       <property id="module.el.ux_host.name" value="g_ux_host_configuration"/>
+      <property id="module.el.ux_host.init_function" value="ux_host_init0"/>
+      <property id="module.el.ux_host.init" value="module.el.ux_host.init.enable"/>
     </module>
     <module id="module.el.ux_v2.759556248">
       <property id="module.el.ux_v2.pool_memory_name" value="g_ux_pool_memory"/>
       <property id="module.el.ux_v2.pool_memory_size" value="65536"/>
       <property id="module.el.ux_v2.system_change_function" value="usb_host_event_notification_callback"/>
+      <property id="module.el.ux_v2.init_function" value="ux_common_init0"/>
+      <property id="module.el.ux_v2.init" value="module.el.ux_v2.init.enable"/>
     </module>
-    <module id="module.el.fx_common.725217706"/>
+    <module id="module.el.fx_common.725217706">
+      <property id="module.el.fx_common.init_function" value="fx_common_init0"/>
+      <property id="module.el.fx_common.init" value="module.el.fx_common.init.enable"/>
+    </module>
     <module id="module.framework.sf_el_ux_hcd_hs.1916477931">
       <property id="module.framework.sf_el_ux_hcd.name" value="g_sf_el_ux_hcd_hs_0"/>
       <property id="module.framework.sf_el_ux_hcd.hw_address" value="R_USBHS_BASE"/>
@@ -561,14 +585,18 @@
       <property id="module.framework.sf_touch_panel.pin" value="IOPORT_PORT_06_PIN_09"/>
       <property id="module.framework.sf_touch_panel.ev_class_instance_number" value="0"/>
       <property id="module.framework.sf_touch_panel.rotation_angle" value="module.framework.sf_touch_panel.rotation_angle.angle0"/>
+      <property id="module.framework.sf_touch_panel.init_function" value="sf_touch_panel_i2c_init0"/>
+      <property id="module.framework.sf_touch_panel.init" value="module.framework.sf_touch_panel.init.enable"/>
     </module>
     <module id="module.framework.sf_i2c_on_sf_i2c.1463534915">
       <property id="module.framework.sf_i2c.name" value="g_i2c_device_hih6030_temp"/>
+      <property id="module.framework.sf_i2c.deprecation_warning" value="module.framework.sf_i2c.deprecation_warning.enabled"/>
     </module>
     <module id="module.framework.sf_i2c_bus_on_sf_i2c.846094286">
       <property id="module.framework.sf_i2c_bus.name" value="g_sf_i2c_shared_bus_chanel_8"/>
       <property id="module.framework.sf_i2c_bus.i2c_interface" value="module.framework.sf_i2c_bus.i2c_interface.sci"/>
       <property id="module.framework.sf_i2c_bus.channel" value="8"/>
+      <property id="module.framework.sf_i2c_bus.deprecation_warning" value="module.framework.sf_i2c_bus.deprecation_warning.enabled"/>
     </module>
     <module id="module.driver.i2c_on_sci_i2c.1962179879">
       <property id="module.driver.i2c.name" value="g_i2c_driver_hih6030_temp"/>
@@ -766,21 +794,23 @@
       <property id="config.el.nx_dhcp_client.priority" value="3"/>
       <property id="config.el.nx_dhcp_client.thread_stack_size" value="1024"/>
       <property id="config.el.nx_dhcp_client.time_interval" value="1"/>
-      <property id="config.el.nx_dhcp_client.packet_allocate_timeout" value="1"/>
       <property id="config.el.nx_dhcp_client.bootp" value="config.el.nx_dhcp_client.bootp.disable"/>
       <property id="config.el.nx_dhcp_client.send_arp_probe" value="config.el.nx_dhcp_client.send_arp_probe.disable"/>
-      <property id="config.el.nx_dhcp_client.arp_probe_timeout" value="10"/>
+      <property id="config.el.nx_dhcp_client.arp_probe_wait" value="1"/>
+      <property id="config.el.nx_dhcp_client.arp_probe_min" value="1"/>
+      <property id="config.el.nx_dhcp_client.arp_probe_max" value="2"/>
+      <property id="config.el.nx_dhcp_client.arp_probe_num" value="2"/>
       <property id="config.el.nx_dhcp_client.max_retrans_timeout" value="64"/>
       <property id="config.el.nx_dhcp_client.min_renew_timeout" value="60"/>
       <property id="config.el.nx_dhcp_client.min_retrans_timeout" value="4"/>
       <property id="config.el.nx_dhcp_client.packet_payload" value="592"/>
       <property id="config.el.nx_dhcp_client.packet_pool_size" value="5"/>
-      <property id="config.el.nx_dhcp_client.timeout_decrements" value="0xFFFFFFFF"/>
       <property id="config.el.nx_dhcp_client.client_restore_state" value="config.el.nx_dhcp_client.client_restore_state.disable"/>
-      <property id="config.el.nx_dhcp_client.clear_queue" value="config.el.nx_dhcp_client.clear_queue.disable"/>
       <property id="config.el.nx_dhcp_client.user_create_packet_pool" value="config.el.nx_dhcp_client.user_create_packet_pool.disable"/>
       <property id="config.el.nx_dhcp_client.send_max_dhcp_message_option" value="config.el.nx_dhcp_client.send_max_dhcp_message_option.disable"/>
       <property id="config.el.nx_dhcp_client.buffer_size" value="312"/>
+      <property id="config.el.nx_dhcp_client.max_records" value="1"/>
+      <property id="config.el.nx_dhcp_client.restart_wait" value="10"/>
     </config>
     <config id="config.el.ux_host_class_storage"/>
     <config id="config.framework.sf_message">
@@ -877,6 +907,7 @@
     </config>
     <config id="config.el.nx_dns_client">
       <property id="config.el.nx_dns_client.control_tos" value="config.el.nx_dns_client.control_tos.normal"/>
+      <property id="config.el.nx_dns_client.fragment_option" value="config.el.nx_dns_client.fragment_option.dont_fragment"/>
       <property id="config.el.nx_dns_client.time_to_live" value="128"/>
       <property id="config.el.nx_dns_client.max_servers" value="5"/>
       <property id="config.el.nx_dns_client.message_max" value="512"/>
@@ -902,6 +933,9 @@
     </config>
     <config id="config.framework.sf_i2c">
       <property id="config.framework.sf_i2c.param_checking_enable" value="config.framework.sf_i2c.param_checking_enable.enabled"/>
+    </config>
+    <config id="config.framework.sf_i2c_v2">
+      <property id="config.framework.sf_i2c_v2.param_checking_enable" value="config.framework.sf_i2c_v2.param_checking_enable.enabled"/>
     </config>
     <config id="config.driver.icu">
       <property id="config.driver.icu.param_checking_enable" value="config.driver.icu.param_checking_enable.bsp"/>

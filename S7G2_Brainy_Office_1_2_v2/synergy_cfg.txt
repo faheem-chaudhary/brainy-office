@@ -275,6 +275,7 @@ Synergy Configuration
   Module "NetX IP Instance"
   Module "NetX DNS Client"
     DNS Control Type of Service: Normal
+    Socket fragmentation option: Dont fragment
     Time to live: 128
     Maximum number of DNS Servers in the Client server list: 5
     Maximum DNS queries size (bytes): 512
@@ -293,23 +294,25 @@ Synergy Configuration
     Internal thread priority: 3
     Internal thread stack size (bytes): 1024
     Timeout between DHCP messages processed (seconds): 1
-    Packet allocate timeout (seconds): 1
     Use BOOTP: Disable
     Send ARP probe: Disable
-    Packet ARP probe timeout (seconds): 10
+    ARP probe wait time (seconds): 1
+    Minimum ARP probe wait time (seconds): 1
+    Maximum ARP probe wait time (seconds): 2
+    ARP probe count: 2
     Maximum retransmission timeout (seconds): 64
     Minimum renew timeout (seconds): 60
     Minimum retransmission timeout (seconds): 4
     Client packet payload size (bytes): 592
     Number of packets in internal packet pool: 5
-    Server message check interval (unit = processing interval). Disabled = 0xFFFFFFFF: 0xFFFFFFFF
     Persistent client state: Disable
-    Clear queue packets support: Disable
     Use application packet pool: Disable
     Maximum message size support: Disable
     DHCP options buffer size (bytes): 312
+    Maximum DHCP client state record on a interface: 1
+    Wait before restarting the configuration process (seconds): 10
     
-  Module "I2C Framework Device on sf_i2c"
+  Module "[SUPERSEDED]  I2C Framework Device on sf_i2c"
     Parameter Checking: Enabled
     
   Module "ADC Periodic Framework on sf_adc_periodic"
@@ -344,6 +347,8 @@ Synergy Configuration
       Work memory size in bytes: 4096
       Pointer to subscriber list array: p_subscriber_lists
       name of the block pool internally used in the messaging framework: sf_msg_blk_pool
+      Name of generated initialization function: sf_message_init0
+      Auto Initialization: Enable
       
     Instance "g_fx_media FileX on USB Mass Storage"
       Name: g_fx_media
@@ -356,6 +361,8 @@ Synergy Configuration
         
         Instance "USBX Host Configuration g_ux_host_configuration"
           Name: g_ux_host_configuration
+          Name of generated initialization function: ux_host_init0
+          Auto Initialization: Enable
           
           Instance "g_sf_el_ux_hcd_hs_0 USBX Port HCD on sf_el_ux for USBHS"
             Name: g_sf_el_ux_hcd_hs_0
@@ -365,8 +372,13 @@ Synergy Configuration
             USBX Pool Memory Name: g_ux_pool_memory
             USBX Pool Memory Size: 65536
             User Callback for Host Event Notification(Only valid for USB Host): usb_host_event_notification_callback
+            Name of generated initialization function: ux_common_init0
+            Auto Initialization: Enable
             
       Instance "FileX Common on fx"
+        Name of generated initialization function: fx_common_init0
+        Auto Initialization: Enable
+        
     Instance "g_button_s4_irq11 External IRQ Driver on r_icu"
       Name: g_button_s4_irq11
       Channel: 11
@@ -396,12 +408,16 @@ Synergy Configuration
       Reset Pin: IOPORT_PORT_06_PIN_09
       Touch Event Class Instance Number: 0
       Touch Coordinate Rotation Angle(Clockwise): 0
+      Name of generated initialization function: sf_touch_panel_i2c_init0
+      Auto Initialization: Enable
       
       Instance "g_sf_message Messaging Framework on sf_message"
         Name: g_sf_message
         Work memory size in bytes: 4096
         Pointer to subscriber list array: p_subscriber_lists
         name of the block pool internally used in the messaging framework: sf_msg_blk_pool
+        Name of generated initialization function: sf_message_init0
+        Auto Initialization: Enable
         
       Instance "g_i2c_touch_panel I2C Master Driver on r_riic"
         Name: g_i2c_touch_panel
@@ -462,14 +478,24 @@ Synergy Configuration
       ICMP: Enable
       IGMP: Enable
       IP fragmentation: Disable
+      Name of generated initialization function: ip_init0
+      Auto Initialization: Enable
       
       Instance "NetX Common on nx"
+        Name of generated initialization function: nx_common_init0
+        Auto Initialization: Enable
+        
       Instance "g_packet_pool NetX Packet Pool Instance"
         Name: g_packet_pool
         Packet Size in Bytes: 1024
         Number of Packets in Pool: 64
+        Name of generated initialization function: packet_pool_init0
+        Auto Initialization: Enable
         
         Instance "NetX Common on nx"
+          Name of generated initialization function: nx_common_init0
+          Auto Initialization: Enable
+          
       Instance "g_sf_el_nx NetX Port ETHER on sf_el_nx"
         Name: g_sf_el_nx
         Channel: 1
@@ -477,6 +503,8 @@ Synergy Configuration
         
     Instance "g_dns_client NetX DNS Client"
       Name: g_dns_client
+      Name of generated initialization function: dns_init0
+      Auto Initialization: Enable
       
       Instance "g_ip NetX IP Instance"
         Name: g_ip
@@ -492,14 +520,24 @@ Synergy Configuration
         ICMP: Enable
         IGMP: Enable
         IP fragmentation: Disable
+        Name of generated initialization function: ip_init0
+        Auto Initialization: Enable
         
         Instance "NetX Common on nx"
+          Name of generated initialization function: nx_common_init0
+          Auto Initialization: Enable
+          
         Instance "g_packet_pool NetX Packet Pool Instance"
           Name: g_packet_pool
           Packet Size in Bytes: 1024
           Number of Packets in Pool: 64
+          Name of generated initialization function: packet_pool_init0
+          Auto Initialization: Enable
           
           Instance "NetX Common on nx"
+            Name of generated initialization function: nx_common_init0
+            Auto Initialization: Enable
+            
         Instance "g_sf_el_nx NetX Port ETHER on sf_el_nx"
           Name: g_sf_el_nx
           Channel: 1
@@ -507,6 +545,8 @@ Synergy Configuration
           
     Instance "g_dhcp_client NetX DHCP Client"
       Name: g_dhcp_client
+      Name of generated initialization function: dhcp_client_init0
+      Auto Initialization: Enable
       
       Instance "g_ip NetX IP Instance"
         Name: g_ip
@@ -522,14 +562,24 @@ Synergy Configuration
         ICMP: Enable
         IGMP: Enable
         IP fragmentation: Disable
+        Name of generated initialization function: ip_init0
+        Auto Initialization: Enable
         
         Instance "NetX Common on nx"
+          Name of generated initialization function: nx_common_init0
+          Auto Initialization: Enable
+          
         Instance "g_packet_pool NetX Packet Pool Instance"
           Name: g_packet_pool
           Packet Size in Bytes: 1024
           Number of Packets in Pool: 64
+          Name of generated initialization function: packet_pool_init0
+          Auto Initialization: Enable
           
           Instance "NetX Common on nx"
+            Name of generated initialization function: nx_common_init0
+            Auto Initialization: Enable
+            
         Instance "g_sf_el_nx NetX Port ETHER on sf_el_nx"
           Name: g_sf_el_nx
           Channel: 1
@@ -592,8 +642,9 @@ Synergy Configuration
     Auto start: Disabled
     Time slicing interval (ticks): 1
     
-    Instance "g_i2c_device_en210_temp_humid I2C Framework Device on sf_i2c"
+    Instance "[SUPERSEDED] g_i2c_device_en210_temp_humid I2C Framework Device on sf_i2c"
       Name: g_i2c_device_en210_temp_humid
+      Show deprecation warning: Enabled
       
       Instance "g_i2c_driver_ens210_temp_humid I2C Master Driver on r_sci_i2c"
         Name: g_i2c_driver_ens210_temp_humid
@@ -608,10 +659,11 @@ Synergy Configuration
         Transmit Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
         Transmit End Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
         
-      Instance "g_sf_i2c_shared_bus_chanel_0 I2C Framework Shared Bus on sf_i2c"
+      Instance "[SUPERSEDED] g_sf_i2c_shared_bus_chanel_0 I2C Framework Shared Bus on sf_i2c"
         Name: g_sf_i2c_shared_bus_chanel_0
         I2C Implementation: SCI I2C
         Channel: 0
+        Show deprecation warning: Enabled
         
   Thread "Sensor Air Quality (AMS iAQ) Thread"
     Symbol: sensor_air_quality_thread
@@ -636,6 +688,8 @@ Synergy Configuration
       Number of sampling iterations: 1
       GPT Timer channel used to trigger the scan: Channel 0
       Callback: g_adc_framework_microphone_callback
+      Name of generated initialization function: sf_adc_periodic_init0
+      Auto Initialization: Enable
       
       Instance "g_adc0 ADC Driver on r_adc"
         Name: g_adc0
@@ -767,8 +821,9 @@ Synergy Configuration
     Auto start: Disabled
     Time slicing interval (ticks): 1
     
-    Instance "g_i2c_device_hih6030_temp I2C Framework Device on sf_i2c"
+    Instance "[SUPERSEDED] g_i2c_device_hih6030_temp I2C Framework Device on sf_i2c"
       Name: g_i2c_device_hih6030_temp
+      Show deprecation warning: Enabled
       
       Instance "g_i2c_driver_hih6030_temp I2C Master Driver on r_sci_i2c"
         Name: g_i2c_driver_hih6030_temp
@@ -783,10 +838,11 @@ Synergy Configuration
         Transmit Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
         Transmit End Interrupt Priority: Priority 6 (CM4: valid, CM0+: invalid)
         
-      Instance "g_sf_i2c_shared_bus_chanel_8 I2C Framework Shared Bus on sf_i2c"
+      Instance "[SUPERSEDED] g_sf_i2c_shared_bus_chanel_8 I2C Framework Shared Bus on sf_i2c"
         Name: g_sf_i2c_shared_bus_chanel_8
         I2C Implementation: SCI I2C
         Channel: 8
+        Show deprecation warning: Enabled
         
   Thread "Hack Reboot Thread"
     Symbol: hack_reboot_thread

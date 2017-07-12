@@ -56,7 +56,7 @@ typedef struct
 ///   SECTION: Static (file scope) Variable Declarations     ///
 static MediumOneDeviceCredentials_t mediumOneDeviceCredentials;
 static MqttConnection_t mqttConnection;
-static int connectFailureRetries = 0;
+//static int connectFailureRetries = 0;
 static char topic_name [ 255 ];
 static char publishMessageBuffer [ 512 ];
 
@@ -169,12 +169,12 @@ unsigned int mediumOneInitImpl ( char * configData, size_t dataLength )
     {
         //TODO: Setup Subscription function here, at some point in time
 
-        ///    0/<project_mqtt_id>/<user_mqtt_id>/<device_id>/
+        ///    0/<project_mqtt_id>/<user_mqtt_id>/<device_id>
         sprintf ( topic_name, "0/%s/%s/%s", mediumOneDeviceCredentials.projectId, mediumOneDeviceCredentials.userId,
                   mediumOneDeviceCredentials.name );
 
         mediumOnePublishImpl ( "{\"connected\":true}", 0 );
-        connectFailureRetries = 0;
+//        connectFailureRetries = 0;
         tx_thread_sleep ( 50 ); // wait for half a second to let the message processed by the broker
     }
 
@@ -222,10 +222,13 @@ bool mqttReconnect ()
 
     mqtt_netx_disconnect ();
 
+    ULONG ipAddress;
+
     // test if NetX stack is working.  HostName should resolve in order to make it to application protocol.  Otherwise, make it a system trap
-    handleError (
-            nx_dns_host_by_name_get ( &g_dns_client, (UCHAR *) mediumOneDeviceCredentials.hostName,
-                                      &mqttConnection.hostIpAddress, TX_WAIT_FOREVER ) );
+    UINT dnsResolutionStatus = nx_dns_host_by_name_get ( &g_dns_client, (UCHAR *) mediumOneDeviceCredentials.hostName,
+                                                         &ipAddress, ( 1 * 30 * 100 ) ); // 30 seconds wait, at max
+    handleError ( dnsResolutionStatus );
+//    logApplicationEvent ( "nx_dns_host_by_name_get returned %2X with DNS address resolved to: %X\r\n", dnsResolutionStatus, ipAddress );
 
     status = mqtt_netx_connect ( mediumOneDeviceCredentials.name, &mqttConnection );
 

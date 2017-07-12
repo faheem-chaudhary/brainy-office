@@ -338,7 +338,7 @@ int mqtt_netx_connect ( const char * client_id, const MqttConnection_t * connect
     init_netx_socket ( &g_broker, connection );
     status = mqtt_connect ( &g_broker );
 
-    int packet_length = read_packet ( &g_broker, 0 );
+    int packet_length = read_packet ( &g_broker, 500 ); // 5 seconds timeout
 
     if ( packet_length < 0 )
     {

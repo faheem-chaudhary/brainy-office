@@ -87,12 +87,17 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/synergy/ssp/src/framework/el/ux/ux_src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/zelib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/zelib/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;/${ProjName}/libpaho&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/synergy/ssp/src/framework/el/nx_bsd}&quot;"/>
 								</option>
 								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input.279279117" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input"/>
 							</tool>
 							<tool commandLinePattern="${SECURE_BUILD_COMMAND} ${COMMAND} ${cross_toolchain_flags} ${FLAGS} -c ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} -x c ${INPUTS}" id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1074794130" name="Cross ARM C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler">
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs.820752534" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_RENESAS_SYNERGY_"/>
+									<listOptionValue builtIn="false" value="SSP_SUPPRESS_ISR_SCI0"/>
+									<listOptionValue builtIn="false" value="NX_ENABLE_TCP_KEEPALIVE"/>
+									<listOptionValue builtIn="false" value="NX_BSD_ENABLE_DNS"/>
 									<listOptionValue builtIn="false" value="_POSIX_SOURCE"/>
 								</option>
 								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.std.1219742618" name="Language standard" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.std" useByScannerDiscovery="true" value="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.std.c99" valueType="enumerated"/>
@@ -125,6 +130,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/synergy/ssp/src/framework/el/ux/ux_src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/zelib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/zelib/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/S7G2_Brainy_Office_1_2_v2/libpaho}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/S7G2_Brainy_Office_1_2_v2/libpaho/MQTTClient}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/S7G2_Brainy_Office_1_2_v2/libpaho/MQTTPacket}&quot;"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="true" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.undef.165593993" name="Undefined symbols (-U)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.undef" useByScannerDiscovery="false" valueType="undefDefinedSymbols"/>
 								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.other.167562606" name="Other compiler flags" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.other" useByScannerDiscovery="true" value="" valueType="string"/>
@@ -188,6 +196,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="example_netx_bsd_source.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libemqtt"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libpaho"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="synergy"/>
 					</sourceEntries>
@@ -282,6 +291,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/synergy/ssp/src/framework/el/ux/ux_src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/zelib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/zelib/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/S7G2_Brainy_Office_1_2_v2/libpaho}&quot;"/>
 								</option>
 								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input.1389239226" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input"/>
 							</tool>
@@ -319,6 +329,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/synergy/ssp/src/framework/el/ux/ux_src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/zelib/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/zelib/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/S7G2_Brainy_Office_1_2_v2/libpaho}&quot;"/>
 								</option>
 								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.97893874" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
 							</tool>
@@ -379,6 +390,8 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="example_netx_bsd_source.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libemqtt"/>
+						<entry excluding="MQTTClient|MQTTPacket" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libpaho"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libpaho/MQTTPacket"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="synergy"/>
 					</sourceEntries>
