@@ -1,9 +1,11 @@
 #include "sys_network_thread.h"
 #include "commons.h"
+#include "ether_phy.h"
 
 /// -------------------------------------------------------- ///
 ///   SECTION: Macro Definitions                             ///
-#define NETWORK_STATUS_CHECK_MASK (NX_IP_LINK_ENABLED | NX_IP_ADDRESS_RESOLVED | NX_IP_INTERFACE_LINK_ENABLED | NX_IP_INITIALIZE_DONE)
+#define NETWORK_STATUS_CHECK_MASK       (NX_IP_LINK_ENABLED | NX_IP_ADDRESS_RESOLVED | NX_IP_INTERFACE_LINK_ENABLED | NX_IP_INITIALIZE_DONE)
+#define NETWORK_ETHERNET_PHY_CHANNEL    1
 
 /// --  END OF: Macro Definitions -------------------------  ///
 
@@ -56,6 +58,12 @@ void sys_network_thread_entry ( void )
 
     while ( 1 )
     {
+        // Wait for physical Ehternet connector to get plugged in
+        while ( Phy_GetLinkStatus ( NETWORK_ETHERNET_PHY_CHANNEL ) != R_PHY_OK )
+        {
+            tx_thread_sleep ( sys_network_thread_wait );
+        }
+
         { // Wait for init to finish.
             ULONG status;
             handleError ( nx_ip_interface_status_check ( &g_ip, 0, NX_IP_LINK_ENABLED, &status, NX_WAIT_FOREVER ) );
@@ -101,9 +109,8 @@ void sys_network_thread_entry ( void )
 
         postSystemEventMessage ( sys_network_thread_id, SF_MESSAGE_EVENT_SYSTEM_NETWORK_AVAILABLE );
 
-        while ( 1 ) // actual thread body
+        while ( Phy_GetLinkStatus ( NETWORK_ETHERNET_PHY_CHANNEL ) == R_PHY_OK ) // actual thread body
         {
-            // TODO: Actual thread body code goes here
 //            nx_ip_interface_status_check ( &g_ip, 0, NETWORK_STATUS_CHECK_MASK, &networkStatus, 0 );
 //
 //            if ( ( networkStatus & NETWORK_STATUS_CHECK_MASK ) != NETWORK_STATUS_CHECK_MASK )
